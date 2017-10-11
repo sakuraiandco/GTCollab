@@ -8,6 +8,16 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+
 # Windows Installer files
 *.cab
 *.msi
