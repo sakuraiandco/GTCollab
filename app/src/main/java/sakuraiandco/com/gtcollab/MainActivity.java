@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         final RecyclerView rvContacts = (RecyclerView) findViewById(R.id.courseList);
 
         // Create adapter passing in the sample user data
-        final CourseAdapter adapter = new CourseAdapter(this, new ArrayList<Course>());
+        final CourseAdapter adapter = new CourseAdapter(this);
         // Attach the adapter to the recyclerview to populate items
         rvContacts.setAdapter(adapter);
         // Set layout manager to position the items
@@ -62,11 +62,8 @@ public class MainActivity extends AppCompatActivity {
                             courses = response.getJSONArray("results");
                             for (int i = 0; i < courses.length(); i++) {
                                 JSONObject courseJSON = courses.getJSONObject(i);
-                                Course course = new Course(courseJSON.getInt("id"), courseJSON.getString("name"));
+                                Course course = new Course(courseJSON.getInt("id"), courseJSON.getString("name"), courseJSON.getJSONArray("members"));
                                 adapter.addCourse(course);
-
-//                                Log.d("json testing", courseJSON.toString());
-
                             }
                         } catch (JSONException error) {
                             Log.e("error", error.toString());

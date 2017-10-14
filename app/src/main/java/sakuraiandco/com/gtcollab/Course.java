@@ -1,34 +1,33 @@
 package sakuraiandco.com.gtcollab;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
 
 /**
  * Created by Alex on 10/14/17.
  */
 
 public class Course {
-    private int id;
-    private String name;
+    private final int id;
+    private final String name;
+    // TODO: consider changing to regular array later
+    // TODO: consider adding "joined" field to disable/enable join class button
+    private final JSONArray members;
 
-    Course (int id, String name) {
+    Course (int id, String name, JSONArray members) {
         this.id = id;
         this.name = name;
+        this.members = members;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public JSONArray getMembers() {
+        return members;
     }
-
 }
