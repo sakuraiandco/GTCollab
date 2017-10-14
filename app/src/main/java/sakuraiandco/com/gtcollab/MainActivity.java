@@ -7,48 +7,46 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+
+    private MySingleton singleton;
+    private RequestQueue requestQueue;
+    private RequestHandler requestHandler;
+    private RecyclerView rvCourses;
+    private CourseAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final RecyclerView rvContacts = (RecyclerView) findViewById(R.id.courseList);
+        rvCourses = (RecyclerView) findViewById(R.id.courseList);
 
-        // Create adapter passing in the sample user data
-        final CourseAdapter adapter = new CourseAdapter(this);
-        // Attach the adapter to the recyclerview to populate items
-        rvContacts.setAdapter(adapter);
-        // Set layout manager to position the items
-        rvContacts.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new CourseAdapter(this);
+        rvCourses.setAdapter(adapter);
+        rvCourses.setLayoutManager(new LinearLayoutManager(this));
 
-        MySingleton singleton = MySingleton.getInstance(this.getApplicationContext());
+        singleton = MySingleton.getInstance(this.getApplicationContext());
+        requestQueue = singleton.getRequestQueue();
+        requestHandler = singleton.getRequestHandler();
 
-        final RequestQueue requestQueue = singleton.getRequestQueue();
-        final RequestHandler requestHandler = singleton.getRequestHandler();
+        populateCourses();
 
+    }
+
+    private void populateCourses() {
         HashMap<String, String> params = new HashMap<>(1);
         params.put("subject_term", "1");
 
@@ -71,14 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        final Button button = (Button) findViewById(R.id.testButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Code here executes on main thread after user presses button
-                Log.d("testing", "clicked");
-                requestQueue.add(userListRequest);
-            }
-        });
+        requestQueue.add(userListRequest);
     }
 
     @Override
