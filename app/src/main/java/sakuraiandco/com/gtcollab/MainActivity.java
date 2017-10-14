@@ -2,6 +2,8 @@ package sakuraiandco.com.gtcollab;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -33,29 +35,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final RecyclerView rvContacts = (RecyclerView) findViewById(R.id.courseList);
+
+        // Create adapter passing in the sample user data
+        final CourseAdapter adapter = new CourseAdapter(this, new ArrayList<Course>());
+        // Attach the adapter to the recyclerview to populate items
+        rvContacts.setAdapter(adapter);
+        // Set layout manager to position the items
+        rvContacts.setLayoutManager(new LinearLayoutManager(this));
+
         MySingleton singleton = MySingleton.getInstance(this.getApplicationContext());
 
         final RequestQueue requestQueue = singleton.getRequestQueue();
         final RequestHandler requestHandler = singleton.getRequestHandler();
 
-        final Request userListRequest = requestHandler.getRequest("users", new Response.Listener<JSONObject>() {
+        HashMap<String, String> params = new HashMap<>(1);
+        params.put("subject_term", "1");
 
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.d("JSON test", response.toString());
-                JSONArray users;
-                try{
-                    users = response.getJSONArray("results");
-                } catch(JSONException error) {
-                    Log.e("error", error.toString());
-                }
-            }
-        });
+        final Request userListRequest = requestHandler.getRequest("courses", "GET", params,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        JSONArray courses;
+                        try {
+                            courses = response.getJSONArray("results");
+                            for (int i = 0; i < courses.length(); i++) {
+                                JSONObject courseJSON = courses.getJSONObject(i);
+                                Course course = new Course(courseJSON.getInt("id"), courseJSON.getString("name"));
+                                adapter.addCourse(course);
+
+//                                Log.d("json testing", courseJSON.toString());
+
+                            }
+                        } catch (JSONException error) {
+                            Log.e("error", error.toString());
+                        }
+                    }
+                });
 
         final Button button = (Button) findViewById(R.id.testButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
+                Log.d("testing", "clicked");
                 requestQueue.add(userListRequest);
             }
         });

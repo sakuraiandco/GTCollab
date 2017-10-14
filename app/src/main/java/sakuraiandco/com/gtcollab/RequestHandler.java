@@ -39,6 +39,16 @@ public class RequestHandler {
     }
 
     public Request getRequest(String path, String requestMethod, HashMap<String, String> params, Response.Listener<JSONObject> listener) {
+        return getRequest(path, requestMethod, params, listener, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // default error listener
+                Log.e("error", error.toString());
+            }
+        });
+    }
+
+    public Request getRequest(String path, String requestMethod, HashMap<String, String> params, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         int method = Request.Method.GET;
         try {
             method = (int) Request.Method.class.getField(requestMethod).get(null);
@@ -50,15 +60,7 @@ public class RequestHandler {
 
         JSONObject jsonRequest = params == null ? null : new JSONObject(params);
 
-        return new JsonObjectRequest
-                (method, url, jsonRequest, listener, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("error", error.toString());
-                    }
-
-                }) {
+        return new JsonObjectRequest (method, url, jsonRequest, listener, errorListener) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<>();
