@@ -17,7 +17,6 @@
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
-        android:text="Nope"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -30,7 +29,6 @@
         android:ems="10"
         android:hint="Location"
         android:inputType="text"
-        android:text="Nope"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/createMeetingName" />
 
@@ -41,10 +39,9 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:focusable="false"
         android:hint="Date"
         android:inputType="date"
-        android:text="2017-10-14"
-        android:focusable="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/createMeetingLocation" />
 
@@ -55,10 +52,9 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:focusable="false"
         android:hint="Time"
         android:inputType="time"
-        android:text="20:00"
-        android:focusable="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/createMeetingDate" />
 
@@ -81,7 +77,6 @@
         android:ems="10"
         android:hint="Description"
         android:inputType="textMultiLine"
-        android:text="nope"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/createMeetingDuration" />
 
@@ -94,7 +89,6 @@
         android:ems="10"
         android:hint="Duration (minutes)"
         android:inputType="number"
-        android:text="60"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/createMeetingTime" />
 
