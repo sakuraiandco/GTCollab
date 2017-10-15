@@ -30,6 +30,22 @@ public class RequestHandler {
         this.authorization = authorization;
     }
 
+    public Request getRequest(String path, String requestMethod) {
+        return getRequest(path, requestMethod, null, new Response.Listener<JSONObject>() {
+            // default empty response
+            @Override
+            public void onResponse(JSONObject response) {}
+        });
+    }
+
+    public Request getRequest(String path, String requestMethod, HashMap<String, String> params) {
+        return getRequest(path, requestMethod, params, new Response.Listener<JSONObject>() {
+            // default empty response
+            @Override
+            public void onResponse(JSONObject response) {}
+        });
+    }
+
     public Request getRequest(String path, Response.Listener<JSONObject> listener) {
         return getRequest(path, "GET", listener);
     }

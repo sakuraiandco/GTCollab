@@ -1,6 +1,7 @@
 package sakuraiandco.com.gtcollab;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -76,8 +77,16 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
                 Log.d("testing", String.format("joined %s", course.getName()));
+                course.join(Singleton.getUser());
+                Intent intent = new Intent(context, CoursePageActivity.class);
+                intent.putExtra("courseID", course.getId());
+                intent.putExtra("courseName", course.getName());
+                context.startActivity(intent);
+
             }
         });
+        // TODO: disable button if already joined
+
     }
 
     @Override

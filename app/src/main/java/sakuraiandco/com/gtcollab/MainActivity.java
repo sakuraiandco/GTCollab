@@ -1,5 +1,6 @@
 package sakuraiandco.com.gtcollab;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,11 +22,12 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MySingleton singleton;
+    private ContextSingleton contextSingleton;
     private RequestQueue requestQueue;
     private RequestHandler requestHandler;
     private RecyclerView rvCourses;
     private CourseAdapter adapter;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +40,10 @@ public class MainActivity extends AppCompatActivity {
         rvCourses.setAdapter(adapter);
         rvCourses.setLayoutManager(new LinearLayoutManager(this));
 
-        singleton = MySingleton.getInstance(this.getApplicationContext());
-        requestQueue = singleton.getRequestQueue();
-        requestHandler = singleton.getRequestHandler();
+        contextSingleton = ContextSingleton.getInstance(this.getApplicationContext());
+        requestQueue = contextSingleton.getRequestQueue();
+        requestHandler = Singleton.getRequestHandler();
+        context = this;
 
         populateCourses();
 
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String, String> params = new HashMap<>(1);
         params.put("subject_term", "1");
 
-        final Request userListRequest = requestHandler.getRequest("courses", "GET", params,
+        final Request courseListRequest = requestHandler.getRequest("courses", "GET", params,
                 new Response.Listener<JSONObject>() {
 
                     @Override
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                             courses = response.getJSONArray("results");
                             for (int i = 0; i < courses.length(); i++) {
                                 JSONObject courseJSON = courses.getJSONObject(i);
-                                Course course = new Course(courseJSON.getInt("id"), courseJSON.getString("name"), courseJSON.getJSONArray("members"));
+                                Course course = new Course(courseJSON, context);
                                 adapter.addCourse(course);
                             }
                         } catch (JSONException error) {
@@ -69,28 +72,28 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        requestQueue.add(userListRequest);
+        requestQueue.add(courseListRequest);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 }
