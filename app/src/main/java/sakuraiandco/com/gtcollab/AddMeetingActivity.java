@@ -62,7 +62,7 @@ public class AddMeetingActivity extends AppCompatActivity {
         this.findViewById(R.id.createMeetingButton).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String name = ((EditText) findViewById(R.id.createMeetingName)).getText().toString();
-                String location = ((EditText) findViewById(R.id.createMeetingDate)).getText().toString();
+                String location = ((EditText) findViewById(R.id.createMeetingLocation)).getText().toString();
                 String description = ((EditText) findViewById(R.id.createMeetingDescription)).getText().toString();
                 String startDate = ((EditText) findViewById(R.id.createMeetingDate)).getText().toString();
                 String startTime = ((EditText) findViewById(R.id.createMeetingTime)).getText().toString();

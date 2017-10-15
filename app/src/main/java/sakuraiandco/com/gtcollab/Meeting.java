@@ -121,7 +121,7 @@ public class Meeting {
         params.put("description", description);
         params.put("start_date", startDate);
         params.put("start_time", startTime);
-        params.put("duration", Integer.toString(durationMinutes));
+        params.put("duration_minutes", Integer.toString(durationMinutes));
         params.put("course", Integer.toString(courseID));
 
         String path = "meetings";
@@ -136,7 +136,7 @@ public class Meeting {
         params.put("description", description);
         params.put("start_date", startDate);
         params.put("start_time", startTime);
-        params.put("duration", Integer.toString(duration));
+        params.put("duration_minutes", Integer.toString(duration));
         params.put("course", Integer.toString(courseID));
 
 //        try {
