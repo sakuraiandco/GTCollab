@@ -69,6 +69,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
+        android:textColor="#fff"
         tools:text="Classes" />
 
     <SearchView
@@ -80,6 +81,7 @@
         app:layout_constraintRight_toRightOf="@+id/appBarLayout"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/classesTitle"
+        android:textColor="#fff"
         android:layout_marginLeft="8dp" />
 
 </android.support.constraint.ConstraintLayout>

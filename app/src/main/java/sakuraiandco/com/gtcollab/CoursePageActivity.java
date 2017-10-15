@@ -8,9 +8,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,14 +24,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 
-public class CoursePageActivity extends AppCompatActivity {
+import sakuraiandco.com.gtcollab.temp.constants.Constants;
+import sakuraiandco.com.gtcollab.temp.domain.Group;
+import sakuraiandco.com.gtcollab.temp.domain.User;
+import sakuraiandco.com.gtcollab.temp.rest.GroupDAO;
+import sakuraiandco.com.gtcollab.temp.rest.base.BaseDAO;
+import sakuraiandco.com.gtcollab.temp.rest.base.DAOListener;
+
+public class CoursePageActivity extends AppCompatActivity{
 
     private ContextSingleton contextSingleton;
     private RequestQueue requestQueue;
     private RequestHandler requestHandler;
-    private RecyclerView rvMeetings;
+    private RecyclerView recyclerView;
     private MeetingAdapter meetingAdapter;
+    private GroupAdapter groupAdapter;
     private Context context;
 
 
@@ -40,11 +52,33 @@ public class CoursePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_page);
 
-        rvMeetings = (RecyclerView) findViewById(R.id.meetingList);
+        recyclerView = (RecyclerView) findViewById(R.id.meetingList);
 
         meetingAdapter = new MeetingAdapter(this);
-        rvMeetings.setAdapter(meetingAdapter);
-        rvMeetings.setLayoutManager(new LinearLayoutManager(this));
+        groupAdapter = new GroupAdapter(this);
+
+        final ToggleButton displayToggle = (ToggleButton) findViewById(R.id.courseDisplayToggle);
+
+        displayToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (groupAdapter.isEmpty()) {
+                        populateGroups();
+                    }
+                    recyclerView.setAdapter(groupAdapter);
+                } else {
+                    if (meetingAdapter.isEmpty()) {
+                        populateMeetings();
+                    }
+                    recyclerView.setAdapter(meetingAdapter);
+
+                }
+            }
+        });
+
+        recyclerView.setAdapter(meetingAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
         Intent intent = getIntent();
@@ -53,19 +87,23 @@ public class CoursePageActivity extends AppCompatActivity {
 
         ((TextView) this.findViewById(R.id.courseTitle)).setText(courseName);
 
-        Log.d("id", Integer.toString(courseID));
-
         contextSingleton = ContextSingleton.getInstance(this.getApplicationContext());
         requestQueue = contextSingleton.getRequestQueue();
         requestHandler = Singleton.getRequestHandler();
         context = this;
 
+
+        // TODO: change to take into account current "tab"
         ((ImageButton) this.findViewById(R.id.addMeetingButton)).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                Intent intent = new Intent(context, AddMeetingActivity.class);
-                intent.putExtra("courseID", courseID);
-                intent.putExtra("courseName", courseName);
-                context.startActivity(intent);
+                if (displayToggle.isChecked()) {
+                    // add group
+                } else {
+                    Intent intent = new Intent(context, AddMeetingActivity.class);
+                    intent.putExtra("courseID", courseID);
+                    intent.putExtra("courseName", courseName);
+                    context.startActivity(intent);
+                }
             }
         });
 
@@ -114,6 +152,24 @@ public class CoursePageActivity extends AppCompatActivity {
                 });
 
         requestQueue.add(request);
+    }
+
+    private void populateGroups() {
+        new GroupDAO(new DAOListener<Group>() {
+            @Override
+            public void onListReady(List<Group> groups) {
+//                groupAdapter = new GroupAdapter(context, groups);
+            }
+            @Override
+            public void onObjectReady(Group group) {
+                groupAdapter.addGroup(group);
+            }
+
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Log.e("GroupDAO error", error.toString());
+            }
+        }).getAll();
     }
 
 }

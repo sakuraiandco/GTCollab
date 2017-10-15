@@ -47,7 +47,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <ToggleButton
-        android:id="@+id/toggleButton"
+        android:id="@+id/courseDisplayToggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"

@@ -151,4 +151,8 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.ViewHold
 
     }
 
+    public boolean isEmpty() {
+        return getItemCount() == 0;
+    }
+
 }
