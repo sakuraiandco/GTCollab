@@ -77,7 +77,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         boolean inCourse = false;
         for (int i = 0; i < members.length(); i++) {
             try {
-                if (members.getInt(i) == Singleton.getUser().getId()) {
+                if (members.getInt(i) == Singleton.getTempUser().getId()) {
                     inCourse = true;
                     viewHolder.joinClassButton.setText("View");
                     break;
@@ -94,7 +94,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
                 // Code here executes on main thread after user presses button
                 Log.d("testing", String.format("joined %s", course.getName()));
                 // TODO: access inCourse from within listener to avoid unnecessary call
-                course.join(Singleton.getUser());
+                course.join(Singleton.getTempUser());
                 Intent intent = new Intent(context, CoursePageActivity.class);
                 intent.putExtra("courseID", course.getId());
                 intent.putExtra("courseName", course.getName());

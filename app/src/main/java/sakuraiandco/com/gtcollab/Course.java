@@ -10,8 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-
 /**
  * Created by Alex on 10/14/17.
  */
@@ -63,13 +61,13 @@ public class Course {
         return members;
     }
 
-    public void join(User user) {
+    public void join(TempUser tempUser) {
         String path = String.format("courses/%d/join", id);
         final Request request = Singleton.getRequestHandler().getRequest(path, "POST");
         contextSingleton.getRequestQueue().add(request);
     }
 
-    public void join(User user, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+    public void join(TempUser tempUser, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         String path = String.format("courses/%d/join", id);
         final Request request = Singleton.getRequestHandler().getRequest(path, "POST", null, listener, errorListener);
 

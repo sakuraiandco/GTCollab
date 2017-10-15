@@ -1,0 +1,133 @@
+App Structure/Flow
+
+open app -->
+    tempUser is not logged in (no auth-token in SharedPreferences) --> login screen
+        submit username and password --> save returned auth-token in SharedPreferences (POST api-auth-token) + save returned tempUser id in SharedPreferences (GET users/?username={username}) + home screen redirect
+        click register --> create account form
+            submit account info --> submit username and password save returned auth-token in SharedPreferences (POST api-auth-token) + home screen redirect
+    tempUser is logged in (auth token in shared Preferences) --> home screen = course list (current term) (GET courses/?term={currentTermId}&members={userId})
+        click show old courses --> term list (GET courses/&members={userId})
+        click course --> course page (GET course/{id})
+            click members --> users list (GET users/?courses_as_member={courseId})
+                click tempUser --> tempUser profile page (GET users/{id})
+            click leave course --> (POST courses/{id}/leave} + home screen redirect
+            click groups --> groups list (GET groups/course={courseId})
+                click group --> group page (GET groups/{id})
+                    click members --> users list (GET users/?groups_as_member={groupId})
+                        click tempUser --> tempUser profile page (GET users/{id})
+                    click leave group --> (POST groups/{id}/leave) + groups list redirect
+                    click group chat --> chat screen (GET group-messages?group={groupId})
+                        submit new message --> (POST group-messages/)
+                        receive new messages --> TODO (push notifications?)
+                click join group --> (POST groups/{id}/join)
+                click leave group --> (POST groups/{id}/leave)
+                click create group --> create group form
+                    submit group info --> (POST groups/) + groups list redirect
+            click meetings --> meetings list (GET meetings/?course={courseId})
+                click meeting --> meeting page (GET meetings/{id})
+                    click leave meeting --> (POST meetings/{id}/leave) + meetings list redirect
+                    click propose new meeting time/location --> TODO (push notification to other users?)
+                    click members --> users list (GET users/?meetings_as_member={meetingId})
+                        click tempUser --> tempUser profile page (GET users/{id})
+                click join meeting --> (POST meetings/{id}/join)
+                click leave meeting --> (POST meetings/{id}/leave)
+                click create meeting --> create meeting form
+                    submit meeting info --> (POST meetings/) + meetings list redirect
+            click course chat --> chat screen (GET course-messages?course={courseId})
+                submit new message --> (POST course-messages/)
+                receive new messages --> TODO (push notifications?)
+        course search --> subject list (GET subjects/?term={currentTermId})
+            click subject --> course list (GET courses/?subject={subjectId})
+                click course --> home screen redirect (POST courses/{id}/join)
+            click searchbar --> course list (GET courses/?term={currentTermId})
+                type search query --> filtered course list (GET courses/?term={currentTermId}&search={searchQuery})
+                    click course --> home screen redirect (POST courses/{id}/join)
+            click search options --> term list (GET terms)
+                click term --> course search redirect (but search the selected term instead of currentTerm)
+        click logout --> login screen redirect (just remove auth-token stored in SharedPreferences)
+
+UI Notes:
+    login screen
+        UI controls/buttons/links:
+            username field
+            password field
+            submit button
+            New User? button
+    registration screen
+        UI controls/buttons/links:
+            all fields
+            submit button
+    home screen (list of courses tempUser is member of)
+        UI controls/buttons/links:
+            show old courses
+            add course --> course search
+            logout
+        for each course:
+            display:
+                subject + number    "CS 1332"
+    course search (list of all courses by default, can be filtered with search bar)
+        UI controls/buttons/links:
+            searchbar at top
+            options button
+        for each course:
+            display:
+                name                "Data Struct & Algorithms"
+                subject + number    "CS 1332"
+    course page
+        display:
+            term                "Fall 2017"                 (optional)
+            name                "Data Struct & Algorithms"
+            subject + number    "CS 1332"
+            sections            "A, B, C, F"                (optional)
+            member count        "32 members"
+        UI controls/buttons/links:
+            members list
+            leave course
+            meetings list
+            groups list
+            course chat
+    groups list
+        UI controls/buttons/links:
+            create group
+        for each group item:
+            display:
+                name
+                member count (icon with number?)
+            buttons/links:
+                group item itself (opens group details page)
+                join/leave
+                members list (click on member count icon?)
+    group details
+        display:
+            everything
+            "Created by: " ?
+        UI controls/buttons/links:
+            group chat
+            join/leave
+            members list
+    meetings list
+        UI controls/buttons/links:
+            create meeting
+        for each meeting item:
+            display:
+                name
+                location
+                start_date - start_time - duration_minutes
+                member count (icon with number?)
+            buttons/links:
+                meeting item itself (opens meeting details page)
+                join/leave
+                members list (click on member count icon?)
+    meeting details
+        display:
+            everything
+            "Created by: " ?
+        UI controls/buttons/links:
+            join/leave
+            members list
+            propose new time/location
+
+Notes:
+    back buttons in app bar where appropriate
+    print error messages on failed responses accordingly (e.g. 400, 401, 403, 404, etc.)
+    save information in SharedPreferences where necessary; e.g. it might be useful to store tempUser id
