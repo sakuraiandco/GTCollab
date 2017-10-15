@@ -144,4 +144,10 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         return getItemCount() == 0;
     }
 
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+        cacheGroups();
+        notifyDataSetChanged();
+    }
+
 }
