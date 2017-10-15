@@ -48,7 +48,6 @@ public class MeetingDAO extends BaseDAO<Meeting> {
             o.put("start_date", m.getStartDate().toString());
             o.put("start_time", m.getStartTime().toString("HH:mm"));
             o.put("duration_minutes", m.getDurationMinutes());
-            o.put("creator", m.getCreator().getId());
             o.put("members", memberIds);
         } catch (JSONException e) {
             e.printStackTrace(); // shouldn't happen
@@ -59,7 +58,7 @@ public class MeetingDAO extends BaseDAO<Meeting> {
     @Override
     public Meeting toDomain(JSONObject o) {
         try {
-            JSONArray membersJSON = o.getJSONArray("members");
+            JSONArray membersJSON = o.getJSONArray("members_data");
             UserDAO userDAO = new UserDAO(null);
             List<User> members = new ArrayList<>();
             for (int i = 0; i < membersJSON.length(); i++) {

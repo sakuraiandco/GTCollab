@@ -42,7 +42,6 @@ public class GroupDAO extends BaseDAO<Group> {
         try {
             o.put("id", g.getId());
             o.put("name", g.getName());
-            o.put("creator", g.getCreator().getId());
             o.put("members", memberIds);
         } catch (JSONException e) {
             e.printStackTrace(); // shouldn't happen
@@ -53,7 +52,7 @@ public class GroupDAO extends BaseDAO<Group> {
     @Override
     public Group toDomain(JSONObject o) {
         try {
-            JSONArray membersJSON = o.getJSONArray("members");
+            JSONArray membersJSON = o.getJSONArray("members_data");
             UserDAO userDAO = new UserDAO(null);
             List<User> members = new ArrayList<>();
             for (int i = 0; i < membersJSON.length(); i++) {
