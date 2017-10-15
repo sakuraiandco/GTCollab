@@ -63,6 +63,7 @@ public class CoursePageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(context, AddMeetingActivity.class);
                 intent.putExtra("courseID", courseID);
+                intent.putExtra("courseName", courseName);
                 context.startActivity(intent);
             }
         });

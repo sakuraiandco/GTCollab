@@ -113,7 +113,6 @@ public class Meeting {
     }
 
 
-    // TODO: format time and date properly
     public void create(int courseID) {
         Map<String, String> params = new HashMap<>(5);
         params.put("name", name);
@@ -138,14 +137,6 @@ public class Meeting {
         params.put("start_time", startTime);
         params.put("duration_minutes", Integer.toString(duration));
         params.put("course", Integer.toString(courseID));
-
-//        try {
-////            Log.d("testing", new SimpleDateFormat().parse(startDate).toString());
-//            Log.d("testing 2", DateFormat.getDateInstance().parse(startDate).toString());
-//        } catch (Exception error) {
-//            Log.e("error", error.toString());
-//
-//        }
 
         String path = "meetings";
         final Request request = Singleton.getRequestHandler().getRequest(path, "POST", params);
