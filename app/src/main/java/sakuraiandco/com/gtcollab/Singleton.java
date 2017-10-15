@@ -8,7 +8,7 @@ final class Singleton {
     private static final Singleton instance = new Singleton();
 
     // TODO: replace hardcoding once login implemented
-    private static TempUser tempUser = new TempUser(2, "user1", "Token 3193ce9eae1d77c51d133f75edfb4c3df8e2f96a");
+    private static TempUser tempUser = new TempUser(1, "admin", "Token ae58c6766f9152f8ffe0a143382f4121fbf6e3cb");
     // TODO: consider moving variables elsewhere for organization, and changing authorization to be tempUser specific
     private static String baseURL = "https://secure-headland-60131.herokuapp.com/api/";
     private static final RequestHandler requestHandler = new RequestHandler(baseURL, tempUser.getAuthorization());

@@ -78,11 +78,9 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         final Course course = courses.get(position);
 
         JSONArray members = course.getMembers();
-        boolean inCourse = false;
         for (int i = 0; i < members.length(); i++) {
             try {
                 if (members.getInt(i) == Singleton.getTempUser().getId()) {
-                    inCourse = true;
                     viewHolder.joinClassButton.setText("View");
                     break;
                 }

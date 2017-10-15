@@ -158,10 +158,15 @@ public class CoursePageActivity extends AppCompatActivity{
         new GroupDAO(new DAOListener<Group>() {
             @Override
             public void onListReady(List<Group> groups) {
+                Log.d("testing", "group list ready");
+                for (Group group: groups) {
+                    groupAdapter.addGroup(group);
+                }
 //                groupAdapter = new GroupAdapter(context, groups);
             }
             @Override
             public void onObjectReady(Group group) {
+                Log.d("testing", "group item ready");
                 groupAdapter.addGroup(group);
             }
 

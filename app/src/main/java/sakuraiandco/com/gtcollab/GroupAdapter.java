@@ -2,6 +2,7 @@ package sakuraiandco.com.gtcollab;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
         public ViewHolder(View itemView) {
             super(itemView);
-
             groupText = itemView.findViewById(R.id.groupItem);
 
         }
@@ -46,6 +46,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
     public GroupAdapter(Context context, List<Group> groups) {
         this.groups = groups;
+        notifyDataSetChanged();
         this.context = context;
     }
 
@@ -59,7 +60,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         LayoutInflater inflater = LayoutInflater.from(context);
 
         // Inflate the custom layout
-        View contactView = inflater.inflate(R.layout.meeting_item, parent, false);
+        View contactView = inflater.inflate(R.layout.group_item, parent, false);
 
         // Return a new holder instance
         ViewHolder viewHolder = new ViewHolder(contactView);
@@ -70,15 +71,15 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(GroupAdapter.ViewHolder viewHolder, int position) {
         final Group group = groups.get(position);
-
         viewHolder.groupText.setText(group.getName());
 
         boolean inGroup = false;
 
-        List<User> members = group.getMembers();
-        for (User user: members) {
+        List<Integer> members = group.getMembers();
+        for (int id: members) {
             // TODO: get current user and compare to member list
-            if (Integer.parseInt(Constants.CURRENT_USER_KEY) == user.getId()) {
+            String userID = context.getSharedPreferences(Constants.AUTH_TOKEN_FILE, 0).getString(Constants.CURRENT_USER_KEY, "missing");
+            if (Integer.parseInt(userID) == id) {
                 inGroup = true;
                 break;
             }

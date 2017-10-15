@@ -52,6 +52,7 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.ViewHold
     }
     public MeetingAdapter(Context context, List<Meeting> meetings) {
         this.meetings = meetings;
+        notifyDataSetChanged();
         this.context = context;
     }
 
