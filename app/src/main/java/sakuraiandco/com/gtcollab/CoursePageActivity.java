@@ -42,9 +42,6 @@ public class CoursePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_page);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
         rvMeetings = (RecyclerView) findViewById(R.id.meetingList);
 
         adapter = new MeetingAdapter(this);

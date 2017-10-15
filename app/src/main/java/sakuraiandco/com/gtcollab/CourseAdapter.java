@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,13 +73,27 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
     public void onBindViewHolder(CourseAdapter.ViewHolder viewHolder, int position) {
         final Course course = courses.get(position);
 
+        JSONArray members = course.getMembers();
+        boolean inCourse = false;
+        for (int i = 0; i < members.length(); i++) {
+            try {
+                if (members.getInt(i) == Singleton.getUser().getId()) {
+                    inCourse = true;
+                    viewHolder.joinClassButton.setText("View");
+                    break;
+                }
+            } catch (JSONException error) {
+                Log.e("error", error.toString());
+            }
+        }
+
         viewHolder.nameTextView.setText(course.getName());
         viewHolder.classMemberCount.setText(String.format("%d members", (course.getMembers().length())));
-        viewHolder.joinClassButton.setText("Join");
         viewHolder.joinClassButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
                 Log.d("testing", String.format("joined %s", course.getName()));
+                // TODO: access inCourse from within listener to avoid unnecessary call
                 course.join(Singleton.getUser());
                 Intent intent = new Intent(context, CoursePageActivity.class);
                 intent.putExtra("courseID", course.getId());
@@ -85,7 +102,6 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
 
             }
         });
-        // TODO: disable button if already joined
 
     }
 

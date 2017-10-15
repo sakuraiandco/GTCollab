@@ -22,7 +22,7 @@
         android:layout_width="69dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
-        android:text="Button"
+        android:text="Join"
         app:layout_constraintBaseline_toBaselineOf="@+id/class_member_count"
         app:layout_constraintRight_toRightOf="parent" />
 
