@@ -71,4 +71,15 @@
         tools:layout_constraintRight_creator="1"
         tools:text="Classes" />
 
+    <SearchView
+        android:id="@+id/courseSearch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintRight_toRightOf="@+id/appBarLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/classesTitle"
+        android:layout_marginLeft="8dp" />
+
 </android.support.constraint.ConstraintLayout>

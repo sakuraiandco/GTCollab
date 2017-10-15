@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -20,7 +22,7 @@ import java.util.List;
  * Created by Alex on 10/14/17.
  */
 
-public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder> {
+public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder> implements Filterable{
 
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access
@@ -42,6 +44,8 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
     }
     private List<Course> courses;
     private Context context;
+    private List<Course> cachedCourses;
+    private CourseFilter courseFilter;
 
     public CourseAdapter(Context context) {
         this(context, new ArrayList<Course>());
@@ -113,5 +117,53 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
     public void addCourse(Course course) {
         courses.add(course);
         this.notifyItemInserted(courses.size() - 1);
+    }
+
+    public void cacheCourses() {
+        cachedCourses = courses;
+    }
+
+    public void restoreCoursesFromCache() {
+        courses = cachedCourses;
+        this.notifyDataSetChanged();
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (courseFilter == null) {
+            courseFilter = new CourseFilter();
+        }
+        return courseFilter;
+
+    }
+
+    private class CourseFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+            if (constraint != null && constraint.length() > 0) {
+                List<Course> filterList = new ArrayList<>();
+                for (Course course: cachedCourses) {
+                    if ((course.getName().toUpperCase()).contains(constraint.toString().toUpperCase())) {
+                        filterList.add(course);
+                    }
+                }
+                results.count = filterList.size();
+                results.values = filterList;
+            } else {
+                results.count = cachedCourses.size();
+                results.values = cachedCourses;
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint,
+                                      FilterResults results) {
+            courses = (List) results.values;
+            notifyDataSetChanged();
+        }
+
     }
 }

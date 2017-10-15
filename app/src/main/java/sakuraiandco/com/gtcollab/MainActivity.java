@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -46,10 +47,25 @@ public class MainActivity extends AppCompatActivity {
         context = this;
 
         populateCourses();
+        SearchView search = (SearchView) findViewById(R.id.courseSearch);
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
 
     }
 
     private void populateCourses() {
+        // TODO: either change api to have current term or store locally/get from user (former is better)
         HashMap<String, String> params = new HashMap<>(1);
         params.put("subject_term", "1");
 
@@ -66,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                                 Course course = new Course(courseJSON, context);
                                 adapter.addCourse(course);
                             }
+                            adapter.cacheCourses();
                         } catch (JSONException error) {
                             Log.e("error", error.toString());
                         }
