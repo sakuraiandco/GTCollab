@@ -38,7 +38,7 @@ public class RequestHandler {
         });
     }
 
-    public Request getRequest(String path, String requestMethod, HashMap<String, String> params) {
+    public Request getRequest(String path, String requestMethod, Map<String, String> params) {
         return getRequest(path, requestMethod, params, new Response.Listener<JSONObject>() {
             // default empty response
             @Override
@@ -54,7 +54,7 @@ public class RequestHandler {
         return getRequest(path, requestMethod, null, listener);
     }
 
-    public Request getRequest(String path, String requestMethod, HashMap<String, String> params, Response.Listener<JSONObject> listener) {
+    public Request getRequest(String path, String requestMethod, Map<String, String> params, Response.Listener<JSONObject> listener) {
         return getRequest(path, requestMethod, params, listener, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -64,7 +64,7 @@ public class RequestHandler {
         });
     }
 
-    public Request getRequest(String path, String requestMethod, HashMap<String, String> params, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+    public Request getRequest(String path, String requestMethod, Map<String, String> params, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         int method = Request.Method.GET;
         try {
             method = (int) Request.Method.class.getField(requestMethod).get(null);
@@ -79,7 +79,7 @@ public class RequestHandler {
         return new JsonObjectRequest (method, url, jsonRequest, listener, errorListener) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
+                Map<String, String> headers = new HashMap<>();
                 headers.put("Authorization", authorization);
                 return headers;
             }

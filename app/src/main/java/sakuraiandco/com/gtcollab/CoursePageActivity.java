@@ -3,14 +3,12 @@ package sakuraiandco.com.gtcollab;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -20,7 +18,6 @@ import com.android.volley.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.HashMap;
 
@@ -62,6 +59,14 @@ public class CoursePageActivity extends AppCompatActivity {
         requestHandler = Singleton.getRequestHandler();
         context = this;
 
+        ((ImageButton) this.findViewById(R.id.addMeetingButton)).setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AddMeetingActivity.class);
+                intent.putExtra("courseID", courseID);
+                context.startActivity(intent);
+            }
+        });
+
 
         populateMeetings();
 
@@ -82,7 +87,7 @@ public class CoursePageActivity extends AppCompatActivity {
                             meetings = response.getJSONArray("results");
                             for (int i = 0; i < meetings.length(); i++) {
                                 JSONObject meetingJSON = meetings.getJSONObject(i);
-                                Meeting meeting = new Meeting(meetingJSON);
+                                Meeting meeting = new Meeting(meetingJSON, context);
                                 adapter.addMeeting(meeting);
                             }
                         } catch (JSONException error) {

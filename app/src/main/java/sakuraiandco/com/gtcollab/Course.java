@@ -20,7 +20,7 @@ public class Course {
     private int id;
     private String name;
     // TODO: consider changing to regular array later
-    // TODO: consider adding "joined" field to disable/enable join class button
+    // TODO: consider adding "joined" field to disable/enable join class button (be careful to update object when joining/leaving)
     private JSONArray members;
     private Context context;
     private ContextSingleton contextSingleton;
@@ -66,13 +66,12 @@ public class Course {
     public void join(User user) {
         String path = String.format("courses/%d/join", id);
         final Request request = Singleton.getRequestHandler().getRequest(path, "POST");
-
         contextSingleton.getRequestQueue().add(request);
     }
 
     public void join(User user, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         String path = String.format("courses/%d/join", id);
-        final Request request = Singleton.getRequestHandler().getRequest(path, "POST");
+        final Request request = Singleton.getRequestHandler().getRequest(path, "POST", null, listener, errorListener);
 
         contextSingleton.getRequestQueue().add(request);
     }

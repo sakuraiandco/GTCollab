@@ -1,11 +1,21 @@
 package sakuraiandco.com.gtcollab;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Alex on 10/14/17.
@@ -25,8 +35,29 @@ public class Meeting {
     private int durationMinutes;
     private int creatorID;
     private JSONArray members;
+    private Context context;
+    private ContextSingleton contextSingleton;
 
-    public Meeting(JSONObject meetingJSON) {
+
+    public Meeting(int id, String name, String location, String description, String startDate, String startTime, int durationMinutes, int creatorID, Context context) {
+        this(id, name, location, description, startDate, startTime, durationMinutes, creatorID, new JSONArray(), context);
+    }
+
+    public Meeting(int id, String name, String location, String description, String startDate, String startTime, int durationMinutes, int creatorID, JSONArray members, Context context) {
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.description = description;
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.durationMinutes = durationMinutes;
+        this.creatorID = creatorID;
+        this.members = members;
+        this.context = context;
+        this.contextSingleton = ContextSingleton.getInstance(context.getApplicationContext());
+    }
+
+    public Meeting(JSONObject meetingJSON, Context context) {
         try {
             this.id = meetingJSON.getInt("id");
             this.name = meetingJSON.getString("name");
@@ -38,6 +69,8 @@ public class Meeting {
             this.durationMinutes = meetingJSON.getInt("duration_minutes");
             this.creatorID = meetingJSON.getInt("id");
             this.members = meetingJSON.getJSONArray("members");
+            this.context = context;
+            this.contextSingleton = ContextSingleton.getInstance(context.getApplicationContext());
         } catch (JSONException error) {
             Log.e("error", error.toString());
         }
@@ -77,5 +110,45 @@ public class Meeting {
 
     public JSONArray getMembers() {
         return members;
+    }
+
+
+    // TODO: format time and date properly
+    public void create(int courseID) {
+        Map<String, String> params = new HashMap<>(5);
+        params.put("name", name);
+        params.put("location", location);
+        params.put("description", description);
+        params.put("start_date", startDate);
+        params.put("start_time", startTime);
+        params.put("duration", Integer.toString(durationMinutes));
+        params.put("course", Integer.toString(courseID));
+
+        String path = "meetings";
+        final Request request = Singleton.getRequestHandler().getRequest(path, "POST", params);
+        contextSingleton.getRequestQueue().add(request);
+    }
+
+    public static void create(String name, String location, String description, String startDate, String startTime, int duration, int courseID, RequestQueue queue) {
+        Map<String, String> params = new HashMap<>(5);
+        params.put("name", name);
+        params.put("location", location);
+        params.put("description", description);
+        params.put("start_date", startDate);
+        params.put("start_time", startTime);
+        params.put("duration", Integer.toString(duration));
+        params.put("course", Integer.toString(courseID));
+
+//        try {
+////            Log.d("testing", new SimpleDateFormat().parse(startDate).toString());
+//            Log.d("testing 2", DateFormat.getDateInstance().parse(startDate).toString());
+//        } catch (Exception error) {
+//            Log.e("error", error.toString());
+//
+//        }
+
+        String path = "meetings";
+        final Request request = Singleton.getRequestHandler().getRequest(path, "POST", params);
+        queue.add(request);
     }
 }
