@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.temp.domain.Group;
-import sakuraiandco.com.gtcollab.temp.domain.User;
 import sakuraiandco.com.gtcollab.temp.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.temp.rest.base.DAOListener;
 
@@ -20,8 +19,11 @@ import static sakuraiandco.com.gtcollab.temp.utils.NetworkUtils.postRequest;
 
 public class GroupDAO extends BaseDAO<Group> {
 
+    private UserDAO userDAO;
+
     public GroupDAO(DAOListener<Group> callback) {
         super(Group.BASE_URL, callback);
+        this.userDAO = new UserDAO(null);
     }
 
     public void joinGroup(int id) {
@@ -35,14 +37,10 @@ public class GroupDAO extends BaseDAO<Group> {
     @Override
     public JSONObject toJSON(Group g) {
         JSONObject o = new JSONObject();
-        JSONArray memberIds = new JSONArray();
-        for (User u : g.getMembers()) {
-            memberIds.put(u.getId());
-        }
         try {
             o.put("id", g.getId());
             o.put("name", g.getName());
-            o.put("members", memberIds);
+            o.put("members", new JSONArray(g.getMembers()));
         } catch (JSONException e) {
             e.printStackTrace(); // shouldn't happen
         }
@@ -52,11 +50,10 @@ public class GroupDAO extends BaseDAO<Group> {
     @Override
     public Group toDomain(JSONObject o) {
         try {
-            JSONArray membersJSON = o.getJSONArray("members_data");
-            UserDAO userDAO = new UserDAO(null);
-            List<User> members = new ArrayList<>();
+            JSONArray membersJSON = o.getJSONArray("members");
+            List<Integer> members = new ArrayList<>();
             for (int i = 0; i < membersJSON.length(); i++) {
-                members.add(userDAO.toDomain(membersJSON.getJSONObject(i)));
+                members.add(membersJSON.getInt(i));
             }
             return Group.builder()
                     .id(o.getInt("id"))

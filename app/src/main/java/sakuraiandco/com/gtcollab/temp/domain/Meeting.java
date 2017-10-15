@@ -28,6 +28,6 @@ public class Meeting extends Entity {
     LocalTime startTime;
     int durationMinutes;
     User creator;
-    List<User> members;
+    List<Integer> members;
 
 }

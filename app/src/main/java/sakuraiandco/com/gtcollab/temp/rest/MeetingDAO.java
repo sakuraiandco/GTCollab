@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.temp.domain.Meeting;
-import sakuraiandco.com.gtcollab.temp.domain.User;
 import sakuraiandco.com.gtcollab.temp.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.temp.rest.base.DAOListener;
 
@@ -22,8 +21,11 @@ import static sakuraiandco.com.gtcollab.temp.utils.NetworkUtils.postRequest;
 
 public class MeetingDAO extends BaseDAO<Meeting> {
 
+    private UserDAO userDAO;
+
     public MeetingDAO(DAOListener<Meeting> callback) {
         super(Meeting.BASE_URL, callback);
+        this.userDAO = new UserDAO(null);
     }
 
     public void joinMeeting(int id) {
@@ -37,10 +39,6 @@ public class MeetingDAO extends BaseDAO<Meeting> {
     @Override
     public JSONObject toJSON(Meeting m) {
         JSONObject o = new JSONObject();
-        JSONArray memberIds = new JSONArray();
-        for (User u : m.getMembers()) {
-            memberIds.put(u.getId());
-        }
         try {
             o.put("id", m.getId());
             o.put("name", m.getName());
@@ -48,7 +46,7 @@ public class MeetingDAO extends BaseDAO<Meeting> {
             o.put("start_date", m.getStartDate().toString());
             o.put("start_time", m.getStartTime().toString("HH:mm"));
             o.put("duration_minutes", m.getDurationMinutes());
-            o.put("members", memberIds);
+            o.put("members", new JSONArray(m.getMembers()));
         } catch (JSONException e) {
             e.printStackTrace(); // shouldn't happen
         }
@@ -58,11 +56,10 @@ public class MeetingDAO extends BaseDAO<Meeting> {
     @Override
     public Meeting toDomain(JSONObject o) {
         try {
-            JSONArray membersJSON = o.getJSONArray("members_data");
-            UserDAO userDAO = new UserDAO(null);
-            List<User> members = new ArrayList<>();
+            JSONArray membersJSON = o.getJSONArray("members");
+            List<Integer> members = new ArrayList<>();
             for (int i = 0; i < membersJSON.length(); i++) {
-                members.add(userDAO.toDomain(membersJSON.getJSONObject(i)));
+                members.add(membersJSON.getInt(i));
             }
             return Meeting.builder()
                     .id(o.getInt("id"))

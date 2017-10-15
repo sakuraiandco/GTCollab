@@ -21,6 +21,6 @@ public class Group extends Entity {
     int id;
     String name;
     User creator;
-    List<User> members;
+    List<Integer> members;
 
 }
