@@ -72,7 +72,7 @@ public class RequestHandler {
             Log.e("Error", error.toString());
         }
 
-        String url = this.baseURL.concat(path);
+        String url = this.baseURL.concat(path.concat("/"));
 
         JSONObject jsonRequest = params == null ? null : new JSONObject(params);
 

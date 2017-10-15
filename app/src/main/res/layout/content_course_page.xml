@@ -13,23 +13,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/meetingList"
-        android:layout_width="326dp"
-        android:layout_height="422dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.508"
+        android:layout_marginTop="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/courseTitle"
-        app:layout_constraintVertical_bias="0.333" />
+        android:layout_marginLeft="8dp" />
 
     <ImageButton
         android:id="@+id/addMeetingButton"
@@ -42,4 +30,30 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.717" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/meetingList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/courseTitle"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:textOff="Meetings"
+        android:textOn="Groups"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_editor_absoluteY="1dp" />
+
 </android.support.constraint.ConstraintLayout>

@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -19,7 +21,7 @@ import java.util.List;
  * Created by Alex on 10/14/17.
  */
 
-public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.ViewHolder> {
+public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.ViewHolder> implements Filterable {
 
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access
@@ -42,6 +44,8 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.ViewHold
     }
     private List<Meeting> meetings;
     private Context context;
+    private List<Meeting> cachedMeetings;
+    private Filter meetingFilter;
 
     public MeetingAdapter(Context context) {
         this(context, new ArrayList<Meeting>());
@@ -102,6 +106,49 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.ViewHold
     public void addMeeting(Meeting meeting) {
         meetings.add(meeting);
         this.notifyItemInserted(meetings.size() - 1);
+    }
+
+    public void cacheMeetings() {
+        cachedMeetings = meetings;
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (meetingFilter == null) {
+            meetingFilter = new MeetingAdapter.MeetingFilter();
+        }
+        return meetingFilter;
+
+    }
+
+    private class MeetingFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+            if (constraint != null && constraint.length() > 0) {
+                List<Meeting> filterList = new ArrayList<>();
+                for (Meeting meeting: cachedMeetings) {
+                    if ((meeting.getName().toUpperCase()).contains(constraint.toString().toUpperCase())) {
+                        filterList.add(meeting);
+                    }
+                }
+                results.count = filterList.size();
+                results.values = filterList;
+            } else {
+                results.count = cachedMeetings.size();
+                results.values = cachedMeetings;
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint,
+                                      FilterResults results) {
+            meetings = (List) results.values;
+            notifyDataSetChanged();
+        }
+
     }
 
 }

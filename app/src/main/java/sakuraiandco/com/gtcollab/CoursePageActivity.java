@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -27,7 +28,7 @@ public class CoursePageActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private RequestHandler requestHandler;
     private RecyclerView rvMeetings;
-    private MeetingAdapter adapter;
+    private MeetingAdapter meetingAdapter;
     private Context context;
 
 
@@ -41,8 +42,8 @@ public class CoursePageActivity extends AppCompatActivity {
 
         rvMeetings = (RecyclerView) findViewById(R.id.meetingList);
 
-        adapter = new MeetingAdapter(this);
-        rvMeetings.setAdapter(adapter);
+        meetingAdapter = new MeetingAdapter(this);
+        rvMeetings.setAdapter(meetingAdapter);
         rvMeetings.setLayoutManager(new LinearLayoutManager(this));
 
 
@@ -71,6 +72,20 @@ public class CoursePageActivity extends AppCompatActivity {
 
         populateMeetings();
 
+        SearchView search = (SearchView) findViewById(R.id.meetingSearch);
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                meetingAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
     }
 
     // TODO: change to upcoming meetings with user clock
@@ -89,8 +104,9 @@ public class CoursePageActivity extends AppCompatActivity {
                             for (int i = 0; i < meetings.length(); i++) {
                                 JSONObject meetingJSON = meetings.getJSONObject(i);
                                 Meeting meeting = new Meeting(meetingJSON, context);
-                                adapter.addMeeting(meeting);
+                                meetingAdapter.addMeeting(meeting);
                             }
+                            meetingAdapter.cacheMeetings();
                         } catch (JSONException error) {
                             Log.e("error", error.toString());
                         }
