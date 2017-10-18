@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="sakuraiandco.com.gtcollab.CourseActivity">
+    <item
+        android:id="@+id/action_new_meeting"
+        android:orderInCategory="0"
+        android:title="@string/action_new_meeting"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_new_group"
+        android:orderInCategory="1"
+        android:title="@string/action_new_group"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_course_members"
+        android:orderInCategory="2"
+        android:title="@string/action_course_members"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_leave_course"
+        android:orderInCategory="99"
+        android:title="@string/action_leave_course"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+</menu>

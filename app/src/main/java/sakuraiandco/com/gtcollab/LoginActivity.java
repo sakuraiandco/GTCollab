@@ -38,14 +38,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sakuraiandco.com.gtcollab.temp.constants.Constants;
-import sakuraiandco.com.gtcollab.temp.constants.SingletonProvider;
-import sakuraiandco.com.gtcollab.temp.domain.User;
-import sakuraiandco.com.gtcollab.temp.rest.RESTServices;
-import sakuraiandco.com.gtcollab.temp.rest.UserDAO;
-import sakuraiandco.com.gtcollab.temp.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.temp.rest.base.DAOListener;
-import sakuraiandco.com.gtcollab.temp.utils.VolleyResponseListener;
+import sakuraiandco.com.gtcollab.constants.Arguments;
+import sakuraiandco.com.gtcollab.constants.SingletonProvider;
+import sakuraiandco.com.gtcollab.domain.User;
+import sakuraiandco.com.gtcollab.rest.RESTServices;
+import sakuraiandco.com.gtcollab.rest.UserDAO;
+import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
+import sakuraiandco.com.gtcollab.rest.base.DAOListener;
+import sakuraiandco.com.gtcollab.temp.MainActivity;
+import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -302,7 +303,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public void onResponse(JSONObject response) {
         String authToken = response.optString("token", null);
         if (authToken != null) {
-            this.getSharedPreferences(Constants.AUTH_TOKEN_FILE, 0).edit().putString(Constants.AUTH_TOKEN_KEY, authToken).apply();
+            this.getSharedPreferences(Arguments.AUTH_TOKEN_FILE, 0).edit().putString(Arguments.AUTH_TOKEN, authToken).apply();
             Toast.makeText(this, "Authentication successful", Toast.LENGTH_SHORT).show();
 
             Map<String, String> filters = new HashMap<>();
@@ -318,16 +319,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public void onListReady(List<User> users) {
         User user = users.get(0);
-        this.getSharedPreferences(Constants.AUTH_TOKEN_FILE, 0).edit().putString(Constants.CURRENT_USER_KEY, String.valueOf(user.getId())).apply();
+        this.getSharedPreferences(Arguments.AUTH_TOKEN_FILE, 0).edit().putString(Arguments.CURRENT_USER, String.valueOf(user.getId())).apply();
         Toast.makeText(this, "User " + user.getId() + " logged in", Toast.LENGTH_SHORT).show();
-        Intent homeScreenIntent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(homeScreenIntent);
+        Intent courseListActivityIntent = new Intent(LoginActivity.this, CourseListActivity.class);
+        startActivity(courseListActivityIntent);
+        finish();
     }
 
     @Override
-    public void onObjectReady(User user) {
-        return;
-    }
+    public void onObjectReady(User user) {}
 
     @Override
     public void onDAOError(BaseDAO.Error error) {

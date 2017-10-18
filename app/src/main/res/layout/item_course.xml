@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/text_course_short_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/item_padding"
+        android:paddingLeft="@dimen/item_padding"
+        android:paddingRight="@dimen/item_padding"
+        android:paddingBottom="@dimen/item_padding_inner"
+        android:text="CS 1332"
+        android:textSize="@dimen/item_text_size_large" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/item_padding_inner"
+        android:paddingLeft="@dimen/item_padding"
+        android:paddingRight="@dimen/item_padding"
+        android:paddingBottom="@dimen/item_padding">
+
+        <TextView
+            android:id="@+id/text_course_long_name"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Algorithms and Data Structures"
+            android:textSize="@dimen/item_text_size_default" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/item_padding_inner"
+            android:text="("
+            android:textSize="@dimen/item_text_size_default" />
+
+        <TextView
+            android:id="@+id/text_course_num_members"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="32"
+            android:textSize="@dimen/item_text_size_default" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text=" members)"
+            android:textSize="@dimen/item_text_size_default" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -6,10 +6,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- To auto-complete the email text field in the login form with the tempUser's emails -->
-    <!--<uses-permission android:name="android.permission.GET_ACCOUNTS" />-->
-    <!--<uses-permission android:name="android.permission.READ_PROFILE" />-->
-    <!--<uses-permission android:name="android.permission.READ_CONTACTS" />-->
-
+    <!-- <uses-permission android:name="android.permission.GET_ACCOUNTS" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_PROFILE" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_CONTACTS" /> -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,19 +17,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".temp.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CoursePageActivity"
+            android:name=".temp.CoursePageActivity"
             android:label="@string/title_activity_course_page"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".AddMeetingActivity"
+            android:name=".temp.AddMeetingActivity"
             android:label="@string/title_activity_add_meeting"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <!-- TEMP -->
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login">
@@ -39,6 +39,71 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SearchResultsActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
+        <activity
+            android:name=".CourseListActivity"
+            android:label="@string/title_activity_course_list"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name=".SubjectSearchActivity"
+            android:label="@string/title_activity_subject_search"
+            android:launchMode="singleTop"
+            android:parentActivityName=".CourseListActivity">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchResultsActivity" />
+        </activity>
+
+        <activity
+            android:name=".CourseSearchActivity"
+            android:label="@string/title_activity_course_search"
+            android:launchMode="singleTop"
+            android:parentActivityName=".SubjectSearchActivity">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchResultsActivity" />
+        </activity>
+
+        <activity
+            android:name=".CourseActivity"
+            android:label="@string/title_activity_course"
+            android:launchMode="singleTop"
+            android:parentActivityName=".CourseListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity
+            android:name=".UserListActivity"
+            android:label="@string/title_activity_user_list"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name=".CreateMeetingActivity"
+            android:label="@string/title_activity_create_meeting"
+            android:launchMode="singleTop"
+            android:parentActivityName=".CourseActivity">
+        </activity>
+
+        <activity
+            android:name=".CreateGroupActivity"
+            android:label="@string/title_activity_create_group"
+            android:launchMode="singleTop"
+            android:parentActivityName=".CourseActivity">
+        </activity>
+
     </application>
 
 </manifest>

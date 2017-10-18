@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="sakuraiandco.com.gtcollab.CoursePageActivity"
+    tools:context="sakuraiandco.com.gtcollab.temp.CoursePageActivity"
     tools:showIn="@layout/activity_course_page">
 
     <TextView
