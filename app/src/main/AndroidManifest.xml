@@ -36,26 +36,25 @@
             android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".SearchResultsActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
         <activity
             android:name=".CourseListActivity"
             android:label="@string/title_activity_course_list"
             android:launchMode="singleTop" />
-
         <activity
             android:name=".SubjectSearchActivity"
             android:label="@string/title_activity_subject_search"
@@ -65,7 +64,6 @@
                 android:name="android.app.default_searchable"
                 android:value=".SearchResultsActivity" />
         </activity>
-
         <activity
             android:name=".CourseSearchActivity"
             android:label="@string/title_activity_course_search"
@@ -75,35 +73,30 @@
                 android:name="android.app.default_searchable"
                 android:value=".SearchResultsActivity" />
         </activity>
-
         <activity
             android:name=".CourseActivity"
             android:label="@string/title_activity_course"
             android:launchMode="singleTop"
             android:parentActivityName=".CourseListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".UserListActivity"
             android:label="@string/title_activity_user_list"
-            android:launchMode="singleTop">
-        </activity>
-
+            android:launchMode="singleTop" />
         <activity
             android:name=".CreateMeetingActivity"
             android:label="@string/title_activity_create_meeting"
             android:launchMode="singleTop"
-            android:parentActivityName=".CourseActivity">
-        </activity>
-
+            android:parentActivityName=".CourseActivity" />
         <activity
             android:name=".CreateGroupActivity"
             android:label="@string/title_activity_create_group"
             android:launchMode="singleTop"
-            android:parentActivityName=".CourseActivity">
-        </activity>
-
+            android:parentActivityName=".CourseActivity" />
+        <activity
+            android:name=".RegisterActivity"
+            android:label="@string/title_activity_register"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

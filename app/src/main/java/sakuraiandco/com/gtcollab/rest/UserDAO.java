@@ -26,6 +26,8 @@ public class UserDAO extends BaseDAO<User> {
         o.put("first_name", u.getFirstName());
         o.put("last_name", u.getLastName());
         o.put("email", u.getEmail());
+        // TODO: change to use real data when profile implemented
+        o.put("profile", new JSONObject());
         return o;
     }
 

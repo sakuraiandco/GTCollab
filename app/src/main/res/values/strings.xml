@@ -65,4 +65,11 @@
     <string name="edit_group_name_hint">Name</string>
     <string name="button_create_group_text">Create</string>
     <string name="title_activity_create_group">Create Group</string>
+    <string name="title_activity_register">Register</string>
+    <string name="text_register">Not a member? Sign up now.</string>
+    <string name="text_login">Already registered? Log in now.</string>
+    <string name="action_register">Register</string>
+    <string name="prompt_confirm_password">Confirm Password</string>
+    <string name="prompt_email">Email</string>
+    <string name="title_activity_testing">testing</string>
 </resources>
