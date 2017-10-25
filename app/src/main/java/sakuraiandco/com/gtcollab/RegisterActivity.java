@@ -3,10 +3,7 @@ package sakuraiandco.com.gtcollab;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
@@ -119,28 +116,25 @@ public class RegisterActivity extends AppCompatActivity {
         email.setError(null);
 
 
-        View focusView = null;
         boolean valid = true;
+        // TODO: implement username and password validation when/if standards established (to match backend)
 
         String emailString = email.getText().toString();
         if (!Patterns.EMAIL_ADDRESS.matcher(emailString).matches()) {
             email.setError("Email must be valid");
-            focusView = email;
+            email.requestFocus();
             valid = false;
         }
 
         if (!password.getText().toString().equals(confirmPassword.getText().toString())) {
             password.setError("Passwords must match");
-            focusView = password;
-            valid = false;
+            password.requestFocus();
         }
 
         if(TextUtils.isEmpty(username.getText().toString())) {
             username.setError(getString(R.string.error_field_required));
-        }
-
-        if (!valid) {
-            focusView.requestFocus();
+            username.requestFocus();
+            valid = false;
         }
 
         return valid;

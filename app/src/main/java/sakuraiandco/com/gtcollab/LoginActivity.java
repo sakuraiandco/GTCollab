@@ -18,13 +18,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -46,7 +44,6 @@ import sakuraiandco.com.gtcollab.rest.RESTServices;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.rest.base.DAOListener;
-import sakuraiandco.com.gtcollab.temp.MainActivity;
 import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -67,7 +64,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mUsernameView;
+    private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -81,7 +78,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         SingletonProvider.setContext(getApplicationContext());
 
         // Set up the login form.
-        mUsernameView = (AutoCompleteTextView) findViewById(R.id.email);
+        mUsernameView = (EditText) findViewById(R.id.username);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -277,22 +274,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             usernames.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
-
-        addEmailsToAutoComplete(usernames);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
-    }
-
-    private void addEmailsToAutoComplete(List<String> usernameAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, usernameAddressCollection);
-
-        mUsernameView.setAdapter(adapter);
     }
 
     @Override
