@@ -508,16 +508,18 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 .setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Map<String, String> filters = new HashMap<>(2);
+                        filters.put("course", String.valueOf(courseId));
+
                         switch (prefixes[which]) {
                             case "All":
                                 if (currentTab == TAB_GROUPS) {
-                                    groupDAO.getAll();
+                                    groupDAO.getByFilters(filters);
                                 } else {
-                                    meetingDAO.getAll();
+                                    meetingDAO.getByFilters(filters);
                                 }
                                 break;
                             case "My":
-                                Map<String, String> filters = new HashMap<>(1);
                                 filters.put("members", String.valueOf(userId));
                                 if (currentTab == TAB_GROUPS) {
                                     groupDAO.getByFilters(filters);
