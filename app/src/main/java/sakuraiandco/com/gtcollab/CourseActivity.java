@@ -97,6 +97,8 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
     private Context context; // TODO
     private int currentTab;
+    private String groupFilter = "All Groups";
+    private String meetingFilter = "All Meetings";
 
     CoordinatorLayout mainContent;
 
@@ -242,24 +244,20 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                String[] filter = textFilter.getText().toString().split("\\s");
-                String option = filter[0];
-                String category;
+                String filter = meetingFilter;
                 switch (tab.getText().toString()) {
                     case "Groups":
-                        category = "Groups";
+                        filter = groupFilter;
                         currentTab = TAB_GROUPS;
                         break;
                     case "Meetings":
-                        category = "Meetings";
+                        filter = meetingFilter;
                         currentTab = TAB_MEETINGS;
                         break;
-                    default:
-                        category = "Meetings";
-                        currentTab = TAB_MEETINGS;
+
                 }
-                String filterText = TextUtils.join(" ", Arrays.asList(option, category));
-                textFilter.setText(filterText);
+
+                textFilter.setText(filter);
             }
 
             @Override
@@ -504,31 +502,42 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
             options[i] = prefixes[i] + " " + category;
         }
 
+        // TODO: consider moving filter button to both fragments for cleaner code
+
         builder.setTitle("Filter by")
                 .setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Map<String, String> filters = new HashMap<>(2);
                         filters.put("course", String.valueOf(courseId));
+                        textFilter.setText(options[which]);
+                        String option = prefixes[which];
+                        String category;
 
-                        switch (prefixes[which]) {
+                        switch (option) {
                             case "All":
                                 if (currentTab == TAB_GROUPS) {
                                     groupDAO.getByFilters(filters);
+                                    category = "Groups";
+                                    groupFilter = option + " " + category;
                                 } else {
                                     meetingDAO.getByFilters(filters);
+                                    category = "Meetings";
+                                    meetingFilter = option + " " + category;
                                 }
                                 break;
                             case "My":
                                 filters.put("members", String.valueOf(userId));
                                 if (currentTab == TAB_GROUPS) {
                                     groupDAO.getByFilters(filters);
+                                    category = "Groups";
+                                    groupFilter = option + " " + category;
                                 } else {
                                     meetingDAO.getByFilters(filters);
+                                    category = "Meetings";
+                                    meetingFilter = option + " " + category;
                                 }
                                 break;
-                            default:
-
                         }
 
                     }
