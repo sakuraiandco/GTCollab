@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import sakuraiandco.com.gtcollab.constants.Arguments;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
@@ -49,6 +50,11 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("testing", "register button clicked");
+
+                // deletes auth token before registration in case invalid (due to account deletion/changing auth token)
+                // NOTE: will cause problems if registration is ever accessed by logged in user (shouldn't happen though)
+                context.getSharedPreferences(Arguments.AUTH_TOKEN_FILE, 0).edit().remove(Arguments.AUTH_TOKEN).apply();
+
                 boolean valid = validateFields();
                 if (valid) {
                     User user = User.builder()

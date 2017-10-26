@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import sakuraiandco.com.gtcollab.adapters.CourseListAdapter;
+import sakuraiandco.com.gtcollab.constants.Arguments;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.rest.CourseDAO;
@@ -93,6 +94,8 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
                 startActivity(subjectSearchActivity);
                 return true;
             case R.id.action_logout:
+                // delete auth token on logout
+                this.getSharedPreferences(Arguments.AUTH_TOKEN_FILE, 0).edit().remove(Arguments.AUTH_TOKEN).apply();
                 Intent loginActivityIntent = new Intent(this, LoginActivity.class);
                 startActivity(loginActivityIntent);
                 return true;
