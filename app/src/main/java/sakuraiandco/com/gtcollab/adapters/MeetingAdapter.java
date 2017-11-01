@@ -1,12 +1,10 @@
 package sakuraiandco.com.gtcollab.adapters;
 
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,10 +13,7 @@ import java.util.List;
 
 import lombok.Setter;
 import sakuraiandco.com.gtcollab.R;
-import sakuraiandco.com.gtcollab.UserListActivity;
 import sakuraiandco.com.gtcollab.domain.Meeting;
-
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
 
 /**
  * Created by kaliq on 10/17/2017.
@@ -59,6 +54,7 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.MeetingV
         holder.textMeetingDuration.setText(String.valueOf(m.getDurationMinutes() + "min"));
         holder.textMeetingCreator.setText(m.getCreator().getFirstName() + " " + m.getCreator().getLastName());
         holder.textMeetingNumMembers.setText(String.valueOf(m.getMembers().size()));
+        holder.textMeetingDescription.setText(m.getDescription());
         holder.checkboxMeeting.setChecked(m.getMembers().contains(Integer.valueOf(userId)));
         holder.setObjectId(m.getId());
     }

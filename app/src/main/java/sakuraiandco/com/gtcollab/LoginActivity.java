@@ -7,6 +7,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -45,10 +46,12 @@ import sakuraiandco.com.gtcollab.rest.RESTServices;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.rest.base.DAOListener;
-import sakuraiandco.com.gtcollab.temp.MainActivity;
 import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
 
 import static android.Manifest.permission.READ_CONTACTS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN;
+import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 
 /**
  * A login screen that offers login via username/password.
@@ -71,6 +74,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +83,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // set context
         SingletonProvider.setContext(getApplicationContext());
+
+        prefs = getSharedPreferences(AUTH_TOKEN_FILE, 0);
+        prefs.edit().remove(AUTH_TOKEN).remove(CURRENT_USER).apply();
 
         // Set up the login form.
         mUsernameView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -303,7 +311,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public void onResponse(JSONObject response) {
         String authToken = response.optString("token", null);
         if (authToken != null) {
-            this.getSharedPreferences(Arguments.AUTH_TOKEN_FILE, 0).edit().putString(Arguments.AUTH_TOKEN, authToken).apply();
+            prefs.edit().putString(Arguments.AUTH_TOKEN, authToken).apply();
             Toast.makeText(this, "Authentication successful", Toast.LENGTH_SHORT).show();
 
             Map<String, String> filters = new HashMap<>();
@@ -319,7 +327,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public void onListReady(List<User> users) {
         User user = users.get(0);
-        this.getSharedPreferences(Arguments.AUTH_TOKEN_FILE, 0).edit().putString(Arguments.CURRENT_USER, String.valueOf(user.getId())).apply();
+        prefs.edit().putString(Arguments.CURRENT_USER, String.valueOf(user.getId())).apply();
         Toast.makeText(this, "User " + user.getId() + " logged in", Toast.LENGTH_SHORT).show();
         Intent courseListActivityIntent = new Intent(LoginActivity.this, CourseListActivity.class);
         startActivity(courseListActivityIntent);

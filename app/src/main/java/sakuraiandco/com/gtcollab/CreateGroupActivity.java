@@ -1,24 +1,18 @@
 package sakuraiandco.com.gtcollab;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TimePicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
@@ -30,8 +24,8 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_TAB;
+import static sakuraiandco.com.gtcollab.constants.Arguments.SELECTED_USERS;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
-import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
 
 public class CreateGroupActivity extends AppCompatActivity implements DAOListener<Group> {
 
@@ -40,7 +34,11 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
     GroupDAO groupDAO;
 
     EditText editGroupName;
+    Button buttonAddMembers;
+    TextView textGroupMembers;
     Button buttonCreateGroup;
+
+    List<Integer> members;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +56,25 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
 
         // TODO
 //        String name;
-//        List<Integer> members; TODO: invite other users?
+        members = new ArrayList<>();
 
         // handle intent
         handleIntent(getIntent());
 
         // view
         editGroupName = (EditText) findViewById(R.id.edit_group_name);
+        buttonAddMembers = (Button) findViewById(R.id.button_add_members);
+        textGroupMembers = (TextView) findViewById(R.id.text_group_members);
         buttonCreateGroup = (Button) findViewById(R.id.button_create_group);
+
+        buttonAddMembers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CreateGroupActivity.this, UserSelectActivity.class);
+                intent.putExtra(COURSE_ID, courseId); // select users from course members
+                startActivityForResult(intent, 0); // TODO: refactor request code into constant
+            }
+        });
 
         buttonCreateGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +83,7 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
                     Group m = Group.builder()
                             .name(editGroupName.getText().toString().trim())
                             .courseId(Integer.valueOf(courseId))
+                            .members(members)
                             .build();
                     groupDAO.create(m);
                 }
@@ -113,6 +123,17 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+            if (resultCode == 0) {
+                members = data.getIntegerArrayListExtra(SELECTED_USERS);
+                textGroupMembers.setText(members.toString());
+            }
         }
     }
 

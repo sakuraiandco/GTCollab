@@ -34,10 +34,6 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -54,7 +50,12 @@
         <activity
             android:name=".CourseListActivity"
             android:label="@string/title_activity_course_list"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".SubjectSearchActivity"
@@ -103,6 +104,29 @@
             android:launchMode="singleTop"
             android:parentActivityName=".CourseActivity">
         </activity>
+
+        <activity
+            android:name=".UserSelectActivity"
+            android:label="@string/title_activity_user_select"
+            android:launchMode="singleTop"
+            android:parentActivityName=".CreateGroupActivity">
+        </activity>
+
+        <service
+            android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service android:name="sakuraiandco.com.gtcollab.utils.NotificationUtils$NotificationActionService" />
 
     </application>
 

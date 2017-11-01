@@ -65,4 +65,8 @@
     <string name="edit_group_name_hint">Name</string>
     <string name="button_create_group_text">Create</string>
     <string name="title_activity_create_group">Create Group</string>
+    <string name="channel_name">General Notifications</string>
+    <string name="action_submit">Submit</string>
+    <string name="button_add_members_text">Add Members</string>
+    <string name="title_activity_user_select">User Select</string>
 </resources>

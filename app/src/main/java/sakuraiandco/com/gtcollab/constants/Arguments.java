@@ -11,6 +11,7 @@ public class Arguments {
     public static final String COURSE_ID = "courseId";
     public static final String TITLE = "title";
     public static final String COURSE_TAB = "courseTab";
+    public static final String SELECTED_USERS = "selectedUsers";
 
     // Filter arguments
     public static final String SUBJECT = "subject";
@@ -27,5 +28,12 @@ public class Arguments {
     // SharedPreferences arguments
     public static final String AUTH_TOKEN = "authToken";
     public static final String CURRENT_USER = "currUser";
+    public static final String DEVICE_REGISTRATION_ID = "deviceRegistrationId";
     public static final String AUTH_TOKEN_FILE = "api_auth_token";
+
+    // Notification Actions
+    public static final String ACTION_1  = "action1";
+    public static final String ACTION_2  = "action2";
+    public static final String ACTION_3  = "action3";
+    public static final String ACTION_4  = "action4";
 }

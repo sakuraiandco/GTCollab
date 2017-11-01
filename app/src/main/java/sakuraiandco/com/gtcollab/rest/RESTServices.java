@@ -17,6 +17,7 @@ public class RESTServices {
 
     public static final String AUTH_URL = Constants.BASE_URL + "/api-token-auth/";
     public static final String SERVER_STATUS_URL = Constants.BASE_URL + "/server-status/";
+    public static final String DEVICES_FCM_URL = Constants.BASE_URL + "/devices/fcm/";
 
     public static void authUser(String username, String password, VolleyResponseListener callback) {
         JSONObject body = new JSONObject();
@@ -31,6 +32,18 @@ public class RESTServices {
 
     public static void getServerStatus(VolleyResponseListener callback) {
         getRequest(SERVER_STATUS_URL, callback);
+    }
+
+    public static void registerDevice(String token, VolleyResponseListener callback) {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("registration_id", token);
+            body.put("cloud_message_type", "FCM");
+            body.put("active", true);
+        } catch (JSONException e) { // shouldn't happen with String
+            e.printStackTrace();
+        }
+        postRequest(DEVICES_FCM_URL, body, callback);
     }
 
 }

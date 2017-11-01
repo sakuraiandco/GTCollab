@@ -19,12 +19,12 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
-import java.util.Date;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Meeting;
 import sakuraiandco.com.gtcollab.rest.MeetingDAO;
+import sakuraiandco.com.gtcollab.rest.MeetingInvitationDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
@@ -38,6 +38,7 @@ public class CreateMeetingActivity extends AppCompatActivity implements DAOListe
     String courseId;
 
     MeetingDAO meetingDAO;
+    MeetingInvitationDAO meetingInvitationDAO;
 
     EditText editMeetingName;
     EditText editMeetingLocation;

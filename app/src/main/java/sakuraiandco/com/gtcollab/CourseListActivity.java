@@ -27,6 +27,9 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.MEMBERS;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.forceDeviceTokenRefresh;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.login;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.logout;
 
 public class CourseListActivity extends AppCompatActivity implements DAOListener<Course>,CourseListAdapter.Listener {
 
@@ -43,6 +46,9 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
 
         // initialization
         SingletonProvider.setContext(getApplicationContext());
+
+        // device registration
+        forceDeviceTokenRefresh(); // TODO: ASSUMES CourseListActivity is launcher activity; best place to put this? LoginActivity instead?
 
         // data
         courseDAO = new CourseDAO(this);
@@ -64,8 +70,7 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
             filters.put(MEMBERS, userId);
             courseDAO.getByFilters(filters);
         } else {
-            Intent loginActivityIntent = new Intent(this, LoginActivity.class);
-            startActivity(loginActivityIntent);
+            login(this);
         }
     }
 
@@ -93,8 +98,7 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
                 startActivity(subjectSearchActivity);
                 return true;
             case R.id.action_logout:
-                Intent loginActivityIntent = new Intent(this, LoginActivity.class);
-                startActivity(loginActivityIntent);
+                logout(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "825614777632",
+    "firebase_url": "https://gtcollab-ef8e0.firebaseio.com",
+    "project_id": "gtcollab-ef8e0",
+    "storage_bucket": "gtcollab-ef8e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825614777632:android:bdac70b8911b9ad9",
+        "android_client_info": {
+          "package_name": "sakuraiandco.com.gtcollab"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "825614777632-2k48butssqniapftft3rsjqb211v0d9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9cFn4-s_E0q39GFw1NDjMQkj9HHQ_hHs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

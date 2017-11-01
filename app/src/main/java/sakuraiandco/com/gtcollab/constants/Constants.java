@@ -17,4 +17,10 @@ public abstract class Constants {
     public static final int TAB_MEETINGS = 0;
     public static final int TAB_GROUPS = 1;
 
+    // Notification types
+    public static final int GROUP_INVITATION = 1;
+    public static final int MEETING_INVITATION = 2;
+    public static final int GROUP_NOTIFICATION = 3;
+    public static final int MEETING_PROPOSAL = 4;
+
 }
