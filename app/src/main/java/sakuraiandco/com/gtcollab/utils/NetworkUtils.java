@@ -27,7 +27,6 @@ public class NetworkUtils {
     }
 
     public static void getRequest(String url, Map<String, String> queryParams, VolleyResponseListener callback) {
-        String queryString = "";
         Uri.Builder builder = Uri.parse(url).buildUpon();
         if (queryParams != null) {
             for (Map.Entry e : queryParams.entrySet()) {

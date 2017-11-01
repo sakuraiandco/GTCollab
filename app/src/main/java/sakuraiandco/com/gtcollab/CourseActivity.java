@@ -20,7 +20,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +48,6 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_TAB;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.GROUP;
 import static sakuraiandco.com.gtcollab.constants.Arguments.MEETING;
@@ -391,6 +389,23 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 context.textNoGroupsFound = rootView.findViewById(R.id.text_no_groups_found);
                 context.groupFilter = rootView.findViewById(R.id.group_filter_text);
                 context.groupSearch = rootView.findViewById(R.id.group_search);
+
+                context.groupSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        context.refreshGroupList(query);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        if (newText.isEmpty()) {
+                            context.refreshGroupList(newText);
+                        }
+                        return false;
+                    }
+                });
             } else { // meetings (e.g. sectionNum = 0)
                 rootView = inflater.inflate(R.layout.fragment_course_meetings, container, false);
                 context.meetingsRecyclerView = rootView.findViewById(R.id.meetings_recycler_view);
@@ -405,20 +420,14 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
                     @Override
                     public boolean onQueryTextSubmit(String query) {
-                        // TODO: add filter by "my" and "all" since filter still active with search
-                        Map<String, String> filters = new HashMap<>(2);
-                        filters.put("course", String.valueOf(context.courseId));
-                        filters.put("name", query);
-                        context.meetingDAO.getByFilters(filters);
+                        context.refreshMeetingList(query);
                         return false;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
                         if (newText.isEmpty()) {
-                            Map<String, String> filters = new HashMap<>(2);
-                            filters.put("course", String.valueOf(context.courseId));
-                            context.meetingDAO.getByFilters(filters);
+                            context.refreshMeetingList(newText);
                         }
                         return false;
                     }
@@ -491,15 +500,8 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 .setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Map<String, String> filters = new HashMap<>(2);
-                        filters.put("course", String.valueOf(courseId));
                         groupFilter.setText(options[which]);
-                        String option = prefixes[which];
-
-                        if (option.equals("My")) {
-                            filters.put("members", String.valueOf(userId));
-                        }
-                        groupDAO.getByFilters(filters);
+                        refreshGroupList();
                     }
                 })
                 .show();
@@ -521,17 +523,53 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 .setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Map<String, String> filters = new HashMap<>(2);
-                        filters.put("course", String.valueOf(courseId));
+//                        Map<String, String> filters = new HashMap<>(2);
+//                        filters.put("course", String.valueOf(courseId));
                         meetingFilter.setText(options[which]);
-                        String option = prefixes[which];
-
-                        if (option.equals("My")) {
-                            filters.put("members", String.valueOf(userId));
-                        }
-                        meetingDAO.getByFilters(filters);
+//                        String option = prefixes[which];
+//
+//                        if (option.equals("My")) {
+//                            filters.put("members", String.valueOf(userId));
+//                        }
+//                        meetingDAO.getByFilters(filters);
+                        refreshMeetingList();
                     }
                 })
                 .show();
+    }
+
+    private void refreshMeetingList() {
+        refreshMeetingList(meetingSearch.getQuery().toString());
+    }
+
+    private void refreshGroupList() {
+        refreshGroupList(groupSearch.getQuery().toString());
+    }
+
+    private void refreshMeetingList(String query) {
+        Map<String, String> filters = new HashMap<>(5);
+        String option = meetingFilter.getText().toString().split("\\s")[0];
+        filters.put("course", String.valueOf(courseId));
+        filters.put("name", query);
+        if (!query.isEmpty()) {
+            filters.put("name", query);
+        }
+        if (option.equals("My")) {
+            filters.put("members", String.valueOf(userId));
+        }
+        meetingDAO.getByFilters(filters);
+    }
+
+    private void refreshGroupList(String query) {
+        Map<String, String> filters = new HashMap<>(5);
+        String option = groupFilter.getText().toString().split("\\s")[0];
+        filters.put("course", String.valueOf(courseId));
+        if (!query.isEmpty()) {
+            filters.put("name", query);
+        }
+        if (option.equals("My")) {
+            filters.put("members", String.valueOf(userId));
+        }
+        groupDAO.getByFilters(filters);
     }
 }
