@@ -79,9 +79,12 @@ public class NotificationUtils {
             public void onObjectReady(Group group) {
                 NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-                String content = courseShortName + ": " + creatorFirstName + " has invited you to their group...";
+                String content = courseShortName + ": " + creatorFirstName + " has invited you to their group!";
                 String bigContent = content
                         + "\n\n" + group.getName();
+
+                // NOTE: loses 32 bits of data
+                int notificationId =  (int) System.currentTimeMillis();
 
                 // Default Action
                 TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -93,11 +96,13 @@ public class NotificationUtils {
                 Intent joinGroupIntent = new Intent(context, NotificationActionService.class);
                 joinGroupIntent.setAction(ACTION_1);
                 joinGroupIntent.putExtra("groupId", groupId); // TODO: refactor key
+                joinGroupIntent.putExtra("notificationId", notificationId);
                 PendingIntent joinMeetingPendingIntent = PendingIntent.getService(context, 0, joinGroupIntent, PendingIntent.FLAG_UPDATE_CURRENT); // TODO: unique request codes?
 
                 // Ignore Invite Action
                 Intent ignoreInviteIntent = new Intent(context, NotificationActionService.class);
                 ignoreInviteIntent.setAction(ACTION_1);
+                ignoreInviteIntent.putExtra("notificationId", notificationId);
                 PendingIntent ignoreInvitePendingIntent = PendingIntent.getService(context, 1, ignoreInviteIntent, PendingIntent.FLAG_UPDATE_CURRENT); // TODO: unique request codes?
 
                 // Expanded Content
@@ -133,12 +138,17 @@ public class NotificationUtils {
             public void onObjectReady(Meeting meeting) {
                 NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-                String content = courseShortName + ": " + creatorFirstName + " has invited you to their meeting...";
-                String bigContent = content
-                        + "\n\n" + meeting.getName()
-                        + "\n" + meeting.getLocation()
-                        + "\n" + meeting.getStartDate().toString("EEE MMM dd") + " " + meeting.getStartTime().toString("h:mm a") + " - " + meeting.getDurationMinutes() + " min"
-                        + "\n\n" + meeting.getDescription();
+                String content = String.format(
+                        "%s: %s has invited you to their meeting!\n\n" +
+                        "Name: %s\n" +
+                                "Location: %s\n" +
+                                "Start Date: %s\n" +
+                                "Start Time: %s\n" +
+                                "Duration: %d minutes\n" +
+                                "Description: %s", courseShortName, creatorFirstName, meeting.getName(), meeting.getLocation(), meeting.getStartDate().toString("EEE MMM dd"), meeting.getStartTime().toString("h:mm a"), meeting.getDurationMinutes(), meeting.getDescription());
+
+                // NOTE: loses 32 bits of data
+                int notificationId =  (int) System.currentTimeMillis();
 
                 // Default Action
                 TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -150,16 +160,19 @@ public class NotificationUtils {
                 Intent joinMeetingIntent = new Intent(context, NotificationActionService.class);
                 joinMeetingIntent.setAction(ACTION_2);
                 joinMeetingIntent.putExtra("meetingId", meetingId); // TODO: refactor key
+                joinMeetingIntent.putExtra("notificationId", notificationId);
+
                 PendingIntent joinMeetingPendingIntent = PendingIntent.getService(context, 0, joinMeetingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 // Ignore Invite Action
                 Intent ignoreInviteIntent = new Intent(context, NotificationActionService.class);
                 ignoreInviteIntent.setAction(ACTION_2);
+                ignoreInviteIntent.putExtra("notificationId", notificationId);
                 PendingIntent ignoreInvitePendingIntent = PendingIntent.getService(context, 1, ignoreInviteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 // Expanded Content
                 NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-                bigTextStyle.bigText(bigContent);
+                bigTextStyle.bigText(content);
 
                 Notification n = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_sentiment_neutral_black_24dp)
@@ -174,7 +187,7 @@ public class NotificationUtils {
                         .addAction(R.drawable.ic_sentiment_neutral_black_24dp, "Ignore", ignoreInvitePendingIntent)
                         .build();
                 n.flags |= Notification.FLAG_AUTO_CANCEL;
-                mNotificationManager.notify((int) System.currentTimeMillis(), n); // TODO: custom notification ID - unique for each invitation?
+                mNotificationManager.notify(notificationId, n); // TODO: custom notification ID - unique for each invitation?
             }
         });
         meetingDAO.get(meetingId);
@@ -194,10 +207,15 @@ public class NotificationUtils {
                 String bigContent = content
                         + "\n\n" + group.getName();
 
+                // NOTE: loses 32 bits of data
+                int notificationId =  (int) System.currentTimeMillis();
+
                 // Default Action
                 TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                 stackBuilder.addParentStack(LoginActivity.class); // TODO: set to activity where user can see pending invitations / proposals
-                stackBuilder.addNextIntent(new Intent(context, LoginActivity.class));
+                Intent intent = new Intent(context, LoginActivity.class);
+                intent.putExtra("notificationId", notificationId);
+                stackBuilder.addNextIntent(intent);
                 PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 // Expanded Content
@@ -215,7 +233,7 @@ public class NotificationUtils {
                         .setContentIntent(resultPendingIntent)
                         .build();
                 n.flags |= Notification.FLAG_AUTO_CANCEL;
-                mNotificationManager.notify((int) System.currentTimeMillis(), n); // TODO: custom notification ID - unique for each invitation? if-so use unique request codes for pendingIntents too
+                mNotificationManager.notify(notificationId, n); // TODO: custom notification ID - unique for each invitation? if-so use unique request codes for pendingIntents too
             }
         });
         groupDAO.get(groupId);
@@ -228,7 +246,7 @@ public class NotificationUtils {
 
         public NotificationActionService() {
             super(NotificationActionService.class.getSimpleName());
-            groupDAO = new GroupDAO(new DAOListener<Group>() { // TODO: open app to cousre page to display success / error dialog (?)
+            groupDAO = new GroupDAO(new DAOListener<Group>() { // TODO: open app to course page to display success / error dialog (?)
                 @Override
                 public void onDAOError(BaseDAO.Error error) {}
                 @Override
@@ -245,6 +263,7 @@ public class NotificationUtils {
                 public void onObjectReady(Meeting meeting) {
                     Intent intent = new Intent(NotificationActionService.this, CourseListActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
                     startActivity(intent);
                 }
             });
@@ -255,20 +274,19 @@ public class NotificationUtils {
             Log.d("NOTIFICATION_ACTION", "Made it here");
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             String action = intent.getAction();
+            manager.cancel(intent.getIntExtra("notificationId", -1)); // TODO
             switch (action) {
                 case ACTION_1: // Join Group
                     int groupId = intent.getIntExtra("groupId", -1);
                     if (groupId != -1) {
                         groupDAO.joinGroup(groupId);
                     }
-                    manager.cancel(111); // TODO
                     break;
                 case ACTION_2: // Join Meeting
                     int meetingId = intent.getIntExtra("meetingId", -1);
                     if (meetingId != -1) {
                         meetingDAO.joinMeeting(meetingId);
                     }
-                    manager.cancel(222); // TODO
                     break;
                 case ACTION_3:
                     break;
