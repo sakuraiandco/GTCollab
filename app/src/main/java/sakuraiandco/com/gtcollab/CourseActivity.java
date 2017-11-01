@@ -400,9 +400,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        if (newText.isEmpty()) {
-                            context.refreshGroupList(newText);
-                        }
+                        context.refreshGroupList(newText);
                         return false;
                     }
                 });
@@ -426,9 +424,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        if (newText.isEmpty()) {
-                            context.refreshMeetingList(newText);
-                        }
+                        context.refreshMeetingList(newText);
                         return false;
                     }
                 });
@@ -523,15 +519,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 .setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-//                        Map<String, String> filters = new HashMap<>(2);
-//                        filters.put("course", String.valueOf(courseId));
                         meetingFilter.setText(options[which]);
-//                        String option = prefixes[which];
-//
-//                        if (option.equals("My")) {
-//                            filters.put("members", String.valueOf(userId));
-//                        }
-//                        meetingDAO.getByFilters(filters);
                         refreshMeetingList();
                     }
                 })
