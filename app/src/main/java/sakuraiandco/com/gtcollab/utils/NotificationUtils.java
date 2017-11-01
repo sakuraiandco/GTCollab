@@ -203,7 +203,7 @@ public class NotificationUtils {
             public void onObjectReady(Group group) {
                 NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-                String content = courseShortName + ": " + creatorFirstName + " has added you to their group...";
+                String content = courseShortName + ": " + creatorFirstName + " has added you to their group!";
                 String bigContent = content
                         + "\n\n" + group.getName();
 
@@ -261,10 +261,10 @@ public class NotificationUtils {
                 public void onListReady(List<Meeting> meetings) {}
                 @Override
                 public void onObjectReady(Meeting meeting) {
-                    Intent intent = new Intent(NotificationActionService.this, CourseListActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    startActivity(intent);
+//                    Intent intent = new Intent(NotificationActionService.this, CourseListActivity.class);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//
+//                    startActivity(intent);
                 }
             });
         }
