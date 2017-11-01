@@ -17,23 +17,42 @@
             android:orientation="horizontal"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginStart="10dp"
-            android:clickable="true"
-            android:onClick="onMeetingFilterClick">
+            android:layout_marginStart="10dp">
 
-            <ImageView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="filter"
-                android:src="@drawable/ic_filter_list_black_24dp"/>
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="onMeetingFilterClick">
 
-            <TextView
-                android:id="@+id/meeting_filter_text"
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="filter"
+                    android:src="@drawable/ic_filter_list_black_24dp"/>
+
+                <TextView
+                    android:id="@+id/meeting_filter_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="All Meetings"
+                    android:textSize="@dimen/item_text_size_default" />
+            </LinearLayout>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="All Meetings"
-                android:textSize="@dimen/item_text_size_default" />
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.SearchView
+                    android:layout_width="wrap_content"
+                    android:id="@+id/meeting_search"
+                    android:layout_alignParentEnd="true"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+
 
         </LinearLayout>
 

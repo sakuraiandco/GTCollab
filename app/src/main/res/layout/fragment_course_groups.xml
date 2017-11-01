@@ -1,8 +1,8 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="sakuraiandco.com.gtcollab.CourseActivity$PlaceholderFragment">
 
     <LinearLayout
@@ -14,26 +14,48 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginStart="10dp"
-            android:clickable="true"
-            android:onClick="onGroupFilterClick">
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-            <ImageView
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="filter"
-                android:src="@drawable/ic_filter_list_black_24dp"/>
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="onGroupFilterClick">
 
-            <TextView
-                android:id="@+id/group_filter_text"
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:contentDescription="filter"
+                    android:src="@drawable/ic_filter_list_black_24dp" />
+
+                <TextView
+                    android:id="@+id/group_filter_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:gravity="center"
+                    android:text="All Groups"
+                    android:textSize="@dimen/item_text_size_default" />
+            </LinearLayout>
+
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="All Groups"
-                android:textSize="@dimen/item_text_size_default" />
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.SearchView
+                    android:id="@+id/group_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true" />
+
+            </RelativeLayout>
+
 
         </LinearLayout>
 
@@ -50,7 +72,7 @@
             android:padding="@dimen/item_padding"
             android:text="@string/no_groups_found"
             android:textSize="@dimen/item_text_size_medium"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

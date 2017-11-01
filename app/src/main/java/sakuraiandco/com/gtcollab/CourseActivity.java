@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -76,6 +77,9 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
     TextView meetingFilter;
     TextView groupFilter;
+
+    SearchView meetingSearch;
+    SearchView groupSearch;
 
     CourseDAO courseDAO;
     GroupDAO groupDAO;
@@ -377,7 +381,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             int sectionNum = getArguments().getInt(ARG_SECTION_NUMBER);
             View rootView;
-            CourseActivity context = (CourseActivity) getActivity();
+            final CourseActivity context = (CourseActivity) getActivity();
             if (sectionNum == TAB_GROUPS) {
                 rootView = inflater.inflate(R.layout.fragment_course_groups, container, false);
                 context.groupsRecyclerView = rootView.findViewById(R.id.groups_recycler_view);
@@ -386,6 +390,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 context.groupsRecyclerView.addItemDecoration(new DividerItemDecoration(context.groupsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
                 context.textNoGroupsFound = rootView.findViewById(R.id.text_no_groups_found);
                 context.groupFilter = rootView.findViewById(R.id.group_filter_text);
+                context.groupSearch = rootView.findViewById(R.id.group_search);
             } else { // meetings (e.g. sectionNum = 0)
                 rootView = inflater.inflate(R.layout.fragment_course_meetings, container, false);
                 context.meetingsRecyclerView = rootView.findViewById(R.id.meetings_recycler_view);
@@ -394,6 +399,30 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 context.meetingsRecyclerView.addItemDecoration(new DividerItemDecoration(context.meetingsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
                 context.textNoMeetingsFound = rootView.findViewById(R.id.text_no_meetings_found);
                 context.meetingFilter = rootView.findViewById(R.id.meeting_filter_text);
+                context.meetingSearch = rootView.findViewById(R.id.meeting_search);
+
+                context.meetingSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        // TODO: add filter by "my" and "all" since filter still active with search
+                        Map<String, String> filters = new HashMap<>(2);
+                        filters.put("course", String.valueOf(context.courseId));
+                        filters.put("name", query);
+                        context.meetingDAO.getByFilters(filters);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        if (newText.isEmpty()) {
+                            Map<String, String> filters = new HashMap<>(2);
+                            filters.put("course", String.valueOf(context.courseId));
+                            context.meetingDAO.getByFilters(filters);
+                        }
+                        return false;
+                    }
+                });
             }
             return rootView;
         }
