@@ -23,7 +23,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -73,7 +72,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    UserDAO userDAO;
+
     SharedPreferences prefs;
+
+    String userId;
+    String authToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +87,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // set context
         SingletonProvider.setContext(getApplicationContext());
 
+        // data
+        userDAO = new UserDAO(LoginActivity.this);
+
+        // saved data
         prefs = getSharedPreferences(AUTH_TOKEN_FILE, 0);
-        prefs.edit().remove(AUTH_TOKEN).remove(CURRENT_USER).apply();
+        //        prefs.edit().remove(AUTH_TOKEN).remove(CURRENT_USER).apply();
+        userId = prefs.getString(CURRENT_USER, null);
+        authToken = prefs.getString(AUTH_TOKEN, null);
+
+        // check if user is already authenticated
+        if (userId != null && authToken != null) {
+            userDAO.get(Integer.valueOf(userId));
+        }
 
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -305,7 +320,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Map<String, String> filters = new HashMap<>();
             filters.put("username", mUsernameView.getText().toString().trim());
 
-            UserDAO userDAO = new UserDAO(LoginActivity.this);
             userDAO.getByFilters(filters);
         } else {
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
