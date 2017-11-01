@@ -71,7 +71,7 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(CreateGroupActivity.this, UserSelectActivity.class);
-                intent.putExtra(COURSE_ID, courseId); // select users from course members
+                intent.putExtra(COURSE, courseId); // select users from course members
                 startActivityForResult(intent, 0); // TODO: refactor request code into constant
             }
         });
