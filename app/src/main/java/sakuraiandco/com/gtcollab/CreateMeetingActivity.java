@@ -51,6 +51,7 @@ public class CreateMeetingActivity extends AppCompatActivity implements DAOListe
     LocalDate startDate;
     LocalTime startTime;
 
+    // TODO: change validation so all error fields show error indication instead of one focused on
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -72,4 +72,6 @@
     <string name="prompt_confirm_password">Confirm Password</string>
     <string name="prompt_email">Email</string>
     <string name="title_activity_testing">testing</string>
+    <string name="prompt_first_name">First Name</string>
+    <string name="prompt_last_name">Last Name</string>
 </resources>

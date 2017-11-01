@@ -27,12 +27,13 @@ public class RegisterActivity extends AppCompatActivity {
 
     EditText username;
     EditText email;
+    EditText firstName;
+    EditText lastName;
     EditText password;
     EditText confirmPassword;
     Button registerButton;
     Context context;
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +44,8 @@ public class RegisterActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.username);
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
+        firstName = (EditText) findViewById(R.id.first_name);
+        lastName = (EditText) findViewById(R.id.last_name);
         confirmPassword = (EditText) findViewById(R.id.password_confirm);
         registerButton = (Button) findViewById(R.id.register_button);
 
@@ -61,8 +64,8 @@ public class RegisterActivity extends AppCompatActivity {
                             .username(username.getText().toString())
                             .email(email.getText().toString())
                             .password(password.getText().toString())
-                            .firstName("testing")
-                            .lastName("testing")
+                            .firstName(firstName.getText().toString())
+                            .lastName(lastName.getText().toString())
                             .build();
                     new UserDAO(new DAOListener<User>() {
                         @Override
@@ -73,9 +76,20 @@ public class RegisterActivity extends AppCompatActivity {
                                 JSONArray usernameErrors = errorJSON.optJSONArray("username");
                                 JSONArray emailErrors = errorJSON.optJSONArray("email");
                                 JSONArray passwordErrors = errorJSON.optJSONArray("password");
+                                JSONArray firstNameErrors = errorJSON.optJSONArray("first_name");
+                                JSONArray lastNameErrors = errorJSON.optJSONArray("last_name");
+
                                 if (passwordErrors != null) {
                                     password.setError(passwordErrors.getString(0));
                                     password.requestFocus();
+                                }
+                                if (firstNameErrors != null) {
+                                    firstName.setError(firstNameErrors.getString(0));
+                                    firstName.requestFocus();
+                                }
+                                if (lastNameErrors != null) {
+                                    lastName.setError(lastNameErrors.getString(0));
+                                    lastName.requestFocus();
                                 }
                                 if (emailErrors != null) {
                                     email.setError(emailErrors.getString(0));
@@ -116,8 +130,11 @@ public class RegisterActivity extends AppCompatActivity {
 
     private boolean validateFields() {
 
+        // clear old errors
         username.setError(null);
         password.setError(null);
+        firstName.setError(null);
+        lastName.setError(null);
         confirmPassword.setError(null);
         email.setError(null);
 
@@ -132,9 +149,28 @@ public class RegisterActivity extends AppCompatActivity {
             valid = false;
         }
 
+        if (TextUtils.isEmpty(lastName.getText().toString())) {
+            lastName.setError(getString(R.string.error_field_required));
+            lastName.requestFocus();
+            valid = false;
+        }
+
+        if (TextUtils.isEmpty(firstName.getText().toString())) {
+            firstName.setError(getString(R.string.error_field_required));
+            firstName.requestFocus();
+            valid = false;
+        }
+
+        if (TextUtils.isEmpty(password.getText().toString())) {
+            password.setError("Password must be greater than 0 characters");
+            password.requestFocus();
+            valid = false;
+        }
+
         if (!password.getText().toString().equals(confirmPassword.getText().toString())) {
             password.setError("Passwords must match");
             password.requestFocus();
+            valid = false;
         }
 
         if(TextUtils.isEmpty(username.getText().toString())) {
