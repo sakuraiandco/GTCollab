@@ -41,6 +41,12 @@
         </activity>
 
         <activity
+            android:name=".RegisterActivity"
+            android:label="@string/title_activity_register"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
             android:name=".SearchResultsActivity"
             android:launchMode="singleTop">
             <intent-filter>
