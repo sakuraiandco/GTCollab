@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -20,7 +19,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,13 +26,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +52,6 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_TAB;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.GROUP;
 import static sakuraiandco.com.gtcollab.constants.Arguments.MEETING;
-import static sakuraiandco.com.gtcollab.constants.Arguments.SEARCH_RESULTS;
-import static sakuraiandco.com.gtcollab.constants.Arguments.SUBJECT;
 import static sakuraiandco.com.gtcollab.constants.Arguments.TITLE;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
@@ -81,7 +73,9 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
     TextView textCourseLongName;
     TextView textCourseSections;
     TextView textCourseNumMembers;
-    TextView textFilter;
+
+    TextView meetingFilter;
+    TextView groupFilter;
 
     CourseDAO courseDAO;
     GroupDAO groupDAO;
@@ -96,9 +90,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
     Course course;
 
     private Context context; // TODO
-    private int currentTab;
-    private String groupFilter = "All Groups";
-    private String meetingFilter = "All Meetings";
+//    private int currentTab;
 
     CoordinatorLayout mainContent;
 
@@ -116,13 +108,13 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         // initialization
         SingletonProvider.setContext(getApplicationContext());
 
-        textFilter = (TextView) findViewById(R.id.filter_text);
         context = this;
 
         // data
         courseDAO = new CourseDAO(new DAOListener<Course>() {
             @Override
-            public void onListReady(List<Course> courses) {}
+            public void onListReady(List<Course> courses) {
+            }
 
             @Override
             public void onObjectReady(Course course) {
@@ -150,6 +142,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 textCourseSections.setText(sections);
                 textCourseNumMembers.setText(String.valueOf(course.getNumMembers()));
             }
+
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
@@ -166,6 +159,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     textNoGroupsFound.setVisibility(View.GONE);
                 }
             }
+
             @Override
             public void onObjectReady(Group group) {
                 List<Integer> members = group.getMembers();
@@ -185,6 +179,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     Snackbar.make(mainContent, "Left group: " + group.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
                 }
             }
+
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "GroupDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
@@ -201,6 +196,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     textNoMeetingsFound.setVisibility(View.GONE);
                 }
             }
+
             @Override
             public void onObjectReady(Meeting meeting) {
                 List<Integer> members = meeting.getMembers();
@@ -220,6 +216,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     Snackbar.make(mainContent, "Left meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
                 }
             }
+
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
@@ -244,20 +241,6 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                String filter = meetingFilter;
-                switch (tab.getText().toString()) {
-                    case "Groups":
-                        filter = groupFilter;
-                        currentTab = TAB_GROUPS;
-                        break;
-                    case "Meetings":
-                        filter = meetingFilter;
-                        currentTab = TAB_MEETINGS;
-                        break;
-
-                }
-
-                textFilter.setText(filter);
             }
 
             @Override
@@ -316,24 +299,24 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
             Toast.makeText(this, "No course ID", Toast.LENGTH_SHORT).show();
         }
         int tab = getIntent().getIntExtra(COURSE_TAB, -1);
-        String[] filter = textFilter.getText().toString().split("\\s");
-        String option = filter[0];
-        String category;
-        switch (tab) {
-            case TAB_MEETINGS:
-                mViewPager.setCurrentItem(TAB_MEETINGS);
-                category = "Meetings";
-                break;
-            case TAB_GROUPS:
-                mViewPager.setCurrentItem(TAB_GROUPS);
-                category = "Groups";
-                break;
-            default:
-                mViewPager.setCurrentItem(TAB_MEETINGS);
-                category = "Meetings";
-        }
-        String filterText = TextUtils.join(" ", Arrays.asList(option, category));
-        textFilter.setText(filterText);
+//        String[] filter = meetingFilter.getText().toString().split("\\s");
+//        String option = filter[0];
+//        String category;
+//        switch (tab) {
+//            case TAB_MEETINGS:
+//                mViewPager.setCurrentItem(TAB_MEETINGS);
+//                category = "Meetings";
+//                break;
+//            case TAB_GROUPS:
+//                mViewPager.setCurrentItem(TAB_GROUPS);
+//                category = "Groups";
+//                break;
+//            default:
+//                mViewPager.setCurrentItem(TAB_MEETINGS);
+//                category = "Meetings";
+//        }
+//        String filterText = TextUtils.join(" ", Arrays.asList(option, category));
+//        meetingFilter.setText(filterText);
     }
 
     @Override
@@ -398,7 +381,8 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {}
+        public PlaceholderFragment() {
+        }
 
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
@@ -412,7 +396,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             int sectionNum = getArguments().getInt(ARG_SECTION_NUMBER);
             View rootView;
-            Context context = getActivity();
+            CourseActivity context = (CourseActivity) getActivity();
             if (sectionNum == TAB_GROUPS) {
                 rootView = inflater.inflate(R.layout.fragment_course_groups, container, false);
                 groupsRecyclerView = rootView.findViewById(R.id.groups_recycler_view);
@@ -420,6 +404,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 groupsRecyclerView.setAdapter(groupAdapter);
                 groupsRecyclerView.addItemDecoration(new DividerItemDecoration(groupsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
                 textNoGroupsFound = rootView.findViewById(R.id.text_no_groups_found);
+                context.groupFilter = rootView.findViewById(R.id.group_filter_text);
             } else { // meetings (e.g. sectionNum = 0)
                 rootView = inflater.inflate(R.layout.fragment_course_meetings, container, false);
                 meetingsRecyclerView = rootView.findViewById(R.id.meetings_recycler_view);
@@ -427,6 +412,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 meetingsRecyclerView.setAdapter(meetingAdapter);
                 meetingsRecyclerView.addItemDecoration(new DividerItemDecoration(meetingsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
                 textNoMeetingsFound = rootView.findViewById(R.id.text_no_meetings_found);
+                context.meetingFilter = rootView.findViewById(R.id.meeting_filter_text);
             }
             return rootView;
         }
@@ -444,7 +430,9 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         }
 
         @Override
-        public int getCount() { return 2; }
+        public int getCount() {
+            return 2;
+        }
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -477,24 +465,11 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         startActivity(createGroupActivityIntent);
     }
 
-    public void onFilterClick(View v) {
-        Log.d("tag", "filter clicker");
-        String[] filter = textFilter.getText().toString().split("\\s");
-        String option = filter[0];
-        String category = filter[1];
+    public void onGroupFilterClick(View v) {
+        final String category = "Groups";
 
         AlertDialog.Builder builder;
         builder = new AlertDialog.Builder(this);
-        switch(currentTab) {
-            case TAB_GROUPS:
-                category = "Groups";
-                break;
-            case TAB_MEETINGS:
-                category = "Meetings";
-                break;
-            default:
-                category = "Meetings";
-        }
 
         final String[] prefixes = {"All", "My"};
         final String[] options = new String[prefixes.length];
@@ -502,7 +477,37 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
             options[i] = prefixes[i] + " " + category;
         }
 
-        // TODO: consider moving filter button to both fragments for cleaner code
+        builder.setTitle("Filter by")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Map<String, String> filters = new HashMap<>(2);
+                        filters.put("course", String.valueOf(courseId));
+                        groupFilter.setText(options[which]);
+                        String option = prefixes[which];
+
+                        if (option.equals("My")) {
+                            filters.put("members", String.valueOf(userId));
+                        }
+                        groupDAO.getByFilters(filters);
+                    }
+                })
+                .show();
+
+
+    }
+
+    public void onMeetingFilterClick(View v) {
+        final String category = "Meetings";
+
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(this);
+
+        final String[] prefixes = {"All", "My"};
+        final String[] options = new String[prefixes.length];
+        for (int i = 0; i < prefixes.length; i++) {
+            options[i] = prefixes[i] + " " + category;
+        }
 
         builder.setTitle("Filter by")
                 .setItems(options, new DialogInterface.OnClickListener() {
@@ -510,38 +515,65 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     public void onClick(DialogInterface dialog, int which) {
                         Map<String, String> filters = new HashMap<>(2);
                         filters.put("course", String.valueOf(courseId));
-                        textFilter.setText(options[which]);
+                        meetingFilter.setText(options[which]);
                         String option = prefixes[which];
-                        String category;
 
-                        switch (option) {
-                            case "All":
-                                if (currentTab == TAB_GROUPS) {
-                                    groupDAO.getByFilters(filters);
-                                    category = "Groups";
-                                    groupFilter = option + " " + category;
-                                } else {
-                                    meetingDAO.getByFilters(filters);
-                                    category = "Meetings";
-                                    meetingFilter = option + " " + category;
-                                }
-                                break;
-                            case "My":
-                                filters.put("members", String.valueOf(userId));
-                                if (currentTab == TAB_GROUPS) {
-                                    groupDAO.getByFilters(filters);
-                                    category = "Groups";
-                                    groupFilter = option + " " + category;
-                                } else {
-                                    meetingDAO.getByFilters(filters);
-                                    category = "Meetings";
-                                    meetingFilter = option + " " + category;
-                                }
-                                break;
+                        if (option.equals("My")) {
+                            filters.put("members", String.valueOf(userId));
                         }
-
+                        meetingDAO.getByFilters(filters);
                     }
                 })
                 .show();
+
     }
+
+//    public void onFilterClick(View v) {
+//        Log.d("tag", "filter clicker");
+//        String[] filter = meetingFilter.getText().toString().split("\\s");
+//        String option = filter[0];
+//        String category = filter[1];
+
+    // TODO: consider moving filter button to both fragments for cleaner code
+//
+//        builder.setTitle("Filter by")
+//                .setItems(options, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Map<String, String> filters = new HashMap<>(2);
+//                        filters.put("course", String.valueOf(courseId));
+//                        meetingFilter.setText(options[which]);
+//                        String option = prefixes[which];
+//                        String category;
+//
+//                        switch (option) {
+//                            case "All":
+//                                if (currentTab == TAB_GROUPS) {
+//                                    groupDAO.getByFilters(filters);
+//                                    category = "Groups";
+//                                    groupFilter = option + " " + category;
+//                                } else {
+//                                    meetingDAO.getByFilters(filters);
+//                                    category = "Meetings";
+//                                    meetingFilter = option + " " + category;
+//                                }
+//                                break;
+//                            case "My":
+//                                filters.put("members", String.valueOf(userId));
+//                                if (currentTab == TAB_GROUPS) {
+//                                    groupDAO.getByFilters(filters);
+//                                    category = "Groups";
+//                                    groupFilter = option + " " + category;
+//                                } else {
+//                                    meetingDAO.getByFilters(filters);
+//                                    category = "Meetings";
+//                                    meetingFilter = option + " " + category;
+//                                }
+//                                break;
+//                        }
+//
+//                    }
+//                })
+//                .show();
+//    }
 }
