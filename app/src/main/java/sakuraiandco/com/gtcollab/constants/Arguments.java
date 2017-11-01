@@ -12,6 +12,7 @@ public class Arguments {
     public static final String TITLE = "title";
     public static final String COURSE_TAB = "courseTab";
     public static final String SELECTED_USERS = "selectedUsers";
+    public static final String EXTRA_USER = "user";
 
     // Filter arguments
     public static final String SUBJECT = "subject";
@@ -20,6 +21,7 @@ public class Arguments {
     public static final String MEETING = "meeting";
     public static final String MEMBERS = "members";
     public static final String TERM = "term";
+    public static final String FILTER_USERNAME = "username";
 
     public static final String COURSES_AS_MEMBER = "courses_as_member";
     public static final String GROUPS_AS_MEMBER = "groups_as_member";
