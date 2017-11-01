@@ -538,26 +538,27 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         Map<String, String> filters = new HashMap<>(5);
         String option = meetingFilter.getText().toString().split("\\s")[0];
         filters.put("course", String.valueOf(courseId));
-        filters.put("name", query);
-        if (!query.isEmpty()) {
-            filters.put("name", query);
-        }
         if (option.equals("My")) {
             filters.put("members", String.valueOf(userId));
         }
-        meetingDAO.getByFilters(filters);
+        if (!query.isEmpty()) {
+            meetingDAO.getBySearchAndFilters(query, filters);
+        } else {
+            meetingDAO.getByFilters(filters);
+        }
     }
 
     private void refreshGroupList(String query) {
         Map<String, String> filters = new HashMap<>(5);
         String option = groupFilter.getText().toString().split("\\s")[0];
         filters.put("course", String.valueOf(courseId));
-        if (!query.isEmpty()) {
-            filters.put("name", query);
-        }
         if (option.equals("My")) {
             filters.put("members", String.valueOf(userId));
         }
-        groupDAO.getByFilters(filters);
+        if (!query.isEmpty()) {
+            groupDAO.getBySearchAndFilters(query, filters);
+        } else {
+            groupDAO.getByFilters(filters);
+        }
     }
 }
