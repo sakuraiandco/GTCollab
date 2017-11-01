@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/form_field_margin"
             android:hint="@string/edit_meeting_description_hint"
-            android:inputType="textMultiLine"
+            android:inputType="textAutoCorrect|textMultiLine|textCapSentences"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_meeting_duration" />

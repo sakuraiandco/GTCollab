@@ -69,4 +69,13 @@
     <string name="action_submit">Submit</string>
     <string name="button_add_members_text">Add Members</string>
     <string name="title_activity_user_select">User Select</string>
+    <string name="title_activity_register">Register</string>
+    <string name="text_register">Not a member? Sign up now.</string>
+    <string name="text_login">Already registered? Log in now.</string>
+    <string name="action_register">Register</string>
+    <string name="prompt_confirm_password">Confirm Password</string>
+    <string name="prompt_email">Email</string>
+    <string name="title_activity_testing">testing</string>
+    <string name="prompt_first_name">First Name</string>
+    <string name="prompt_last_name">Last Name</string>
 </resources>

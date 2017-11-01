@@ -1,11 +1,14 @@
 package sakuraiandco.com.gtcollab.utils;
 
+import android.net.Uri;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,16 +27,14 @@ public class NetworkUtils {
     }
 
     public static void getRequest(String url, Map<String, String> queryParams, VolleyResponseListener callback) {
-        String queryString = "";
+        Uri.Builder builder = Uri.parse(url).buildUpon();
         if (queryParams != null) {
             for (Map.Entry e : queryParams.entrySet()) {
-                queryString += e.getKey() + "=" + e.getValue() + "&";
-            }
-            if (!queryString.isEmpty()) {
-                queryString = "?" + queryString.substring(0, queryString.length()-1); // remove trailing '&'
+                builder.appendQueryParameter((String) e.getKey(), (String) e.getValue());
             }
         }
-        baseRequest(Request.Method.GET, url + queryString, null, callback);
+        String finalUrl = builder.build().toString();
+        baseRequest(Request.Method.GET, finalUrl, null, callback);
     }
 
     public static void postRequest(String url, JSONObject body, VolleyResponseListener callback) {

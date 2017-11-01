@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import sakuraiandco.com.gtcollab.adapters.CourseListAdapter;
+import sakuraiandco.com.gtcollab.constants.Arguments;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.rest.CourseDAO;

@@ -1,6 +1,8 @@
 package sakuraiandco.com.gtcollab;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -16,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,11 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,12 +48,9 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_TAB;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.GROUP;
 import static sakuraiandco.com.gtcollab.constants.Arguments.MEETING;
-import static sakuraiandco.com.gtcollab.constants.Arguments.SEARCH_RESULTS;
-import static sakuraiandco.com.gtcollab.constants.Arguments.SUBJECT;
 import static sakuraiandco.com.gtcollab.constants.Arguments.TITLE;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
@@ -63,10 +60,10 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
 
-    private static TextView textNoGroupsFound;
-    private static TextView textNoMeetingsFound;
-    private static RecyclerView groupsRecyclerView;
-    private static RecyclerView meetingsRecyclerView;
+    private TextView textNoGroupsFound;
+    private TextView textNoMeetingsFound;
+    private RecyclerView groupsRecyclerView;
+    private RecyclerView meetingsRecyclerView;
 
     private static GroupAdapter groupAdapter; // TODO: non-static?
     private static MeetingAdapter meetingAdapter; // TODO: non-static?
@@ -75,6 +72,12 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
     TextView textCourseLongName;
     TextView textCourseSections;
     TextView textCourseNumMembers;
+
+    TextView meetingFilter;
+    TextView groupFilter;
+
+    SearchView meetingSearch;
+    SearchView groupSearch;
 
     CourseDAO courseDAO;
     GroupDAO groupDAO;
@@ -88,7 +91,8 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
     Course course;
 
-    private static Context context; // TODO
+    private Context context; // TODO
+//    private int currentTab;
 
     CoordinatorLayout mainContent;
 
@@ -106,10 +110,13 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         // initialization
         SingletonProvider.setContext(getApplicationContext());
 
+        context = this;
+
         // data
         courseDAO = new CourseDAO(new DAOListener<Course>() {
             @Override
-            public void onListReady(List<Course> courses) {}
+            public void onListReady(List<Course> courses) {
+            }
 
             @Override
             public void onObjectReady(Course course) {
@@ -137,6 +144,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                 textCourseSections.setText(sections);
                 textCourseNumMembers.setText(String.valueOf(course.getNumMembers()));
             }
+
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
@@ -153,6 +161,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     textNoGroupsFound.setVisibility(View.GONE);
                 }
             }
+
             @Override
             public void onObjectReady(Group group) {
                 List<Integer> members = group.getMembers();
@@ -172,6 +181,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     Snackbar.make(mainContent, "Left group: " + group.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
                 }
             }
+
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "GroupDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
@@ -188,6 +198,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     textNoMeetingsFound.setVisibility(View.GONE);
                 }
             }
+
             @Override
             public void onObjectReady(Meeting meeting) {
                 List<Integer> members = meeting.getMembers();
@@ -207,6 +218,7 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
                     Snackbar.make(mainContent, "Left meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
                 }
             }
+
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
@@ -228,6 +240,21 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -272,17 +299,6 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
             meetingDAO.getByFilters(filters);
         } else {
             Toast.makeText(this, "No course ID", Toast.LENGTH_SHORT).show();
-        }
-        int tab = getIntent().getIntExtra(COURSE_TAB, -1);
-        switch (tab) {
-            case TAB_MEETINGS:
-                mViewPager.setCurrentItem(TAB_MEETINGS);
-                break;
-            case TAB_GROUPS:
-                mViewPager.setCurrentItem(TAB_GROUPS);
-                break;
-            default:
-                mViewPager.setCurrentItem(TAB_MEETINGS);
         }
     }
 
@@ -348,7 +364,8 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
 
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {}
+        public PlaceholderFragment() {
+        }
 
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
@@ -362,20 +379,55 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             int sectionNum = getArguments().getInt(ARG_SECTION_NUMBER);
             View rootView;
+            final CourseActivity context = (CourseActivity) getActivity();
             if (sectionNum == TAB_GROUPS) {
                 rootView = inflater.inflate(R.layout.fragment_course_groups, container, false);
-                groupsRecyclerView = rootView.findViewById(R.id.groups_recycler_view);
-                groupsRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-                groupsRecyclerView.setAdapter(groupAdapter);
-                groupsRecyclerView.addItemDecoration(new DividerItemDecoration(groupsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
-                textNoGroupsFound = rootView.findViewById(R.id.text_no_groups_found);
+                context.groupsRecyclerView = rootView.findViewById(R.id.groups_recycler_view);
+                context.groupsRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+                context.groupsRecyclerView.setAdapter(groupAdapter);
+                context.groupsRecyclerView.addItemDecoration(new DividerItemDecoration(context.groupsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
+                context.textNoGroupsFound = rootView.findViewById(R.id.text_no_groups_found);
+                context.groupFilter = rootView.findViewById(R.id.group_filter_text);
+                context.groupSearch = rootView.findViewById(R.id.group_search);
+
+                context.groupSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        context.refreshGroupList(query);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        context.refreshGroupList(newText);
+                        return false;
+                    }
+                });
             } else { // meetings (e.g. sectionNum = 0)
                 rootView = inflater.inflate(R.layout.fragment_course_meetings, container, false);
-                meetingsRecyclerView = rootView.findViewById(R.id.meetings_recycler_view);
-                meetingsRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-                meetingsRecyclerView.setAdapter(meetingAdapter);
-                meetingsRecyclerView.addItemDecoration(new DividerItemDecoration(meetingsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
-                textNoMeetingsFound = rootView.findViewById(R.id.text_no_meetings_found);
+                context.meetingsRecyclerView = rootView.findViewById(R.id.meetings_recycler_view);
+                context.meetingsRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+                context.meetingsRecyclerView.setAdapter(meetingAdapter);
+                context.meetingsRecyclerView.addItemDecoration(new DividerItemDecoration(context.meetingsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
+                context.textNoMeetingsFound = rootView.findViewById(R.id.text_no_meetings_found);
+                context.meetingFilter = rootView.findViewById(R.id.meeting_filter_text);
+                context.meetingSearch = rootView.findViewById(R.id.meeting_search);
+
+                context.meetingSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        context.refreshMeetingList(query);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        context.refreshMeetingList(newText);
+                        return false;
+                    }
+                });
             }
             return rootView;
         }
@@ -393,7 +445,9 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         }
 
         @Override
-        public int getCount() { return 2; }
+        public int getCount() {
+            return 2;
+        }
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -424,5 +478,87 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         Intent createGroupActivityIntent = new Intent(this, CreateGroupActivity.class);
         createGroupActivityIntent.putExtra(COURSE, courseId);
         startActivity(createGroupActivityIntent);
+    }
+
+    public void onGroupFilterClick(View v) {
+        final String category = "Groups";
+
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(this);
+
+        final String[] prefixes = {"All", "My"};
+        final String[] options = new String[prefixes.length];
+        for (int i = 0; i < prefixes.length; i++) {
+            options[i] = prefixes[i] + " " + category;
+        }
+
+        builder.setTitle("Filter by")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        groupFilter.setText(options[which]);
+                        refreshGroupList();
+                    }
+                })
+                .show();
+    }
+
+    public void onMeetingFilterClick(View v) {
+        final String category = "Meetings";
+
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(this);
+
+        final String[] prefixes = {"All", "My"};
+        final String[] options = new String[prefixes.length];
+        for (int i = 0; i < prefixes.length; i++) {
+            options[i] = prefixes[i] + " " + category;
+        }
+
+        builder.setTitle("Filter by")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        meetingFilter.setText(options[which]);
+                        refreshMeetingList();
+                    }
+                })
+                .show();
+    }
+
+    private void refreshMeetingList() {
+        refreshMeetingList(meetingSearch.getQuery().toString());
+    }
+
+    private void refreshGroupList() {
+        refreshGroupList(groupSearch.getQuery().toString());
+    }
+
+    private void refreshMeetingList(String query) {
+        Map<String, String> filters = new HashMap<>(5);
+        String option = meetingFilter.getText().toString().split("\\s")[0];
+        filters.put("course", String.valueOf(courseId));
+        if (option.equals("My")) {
+            filters.put("members", String.valueOf(userId));
+        }
+        if (!query.isEmpty()) {
+            meetingDAO.getBySearchAndFilters(query, filters);
+        } else {
+            meetingDAO.getByFilters(filters);
+        }
+    }
+
+    private void refreshGroupList(String query) {
+        Map<String, String> filters = new HashMap<>(5);
+        String option = groupFilter.getText().toString().split("\\s")[0];
+        filters.put("course", String.valueOf(courseId));
+        if (option.equals("My")) {
+            filters.put("members", String.valueOf(userId));
+        }
+        if (!query.isEmpty()) {
+            groupDAO.getBySearchAndFilters(query, filters);
+        } else {
+            groupDAO.getByFilters(filters);
+        }
     }
 }

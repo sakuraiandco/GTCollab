@@ -31,8 +31,8 @@ public class TermDAO extends ReadOnlyDAO<Term> {
                 .id(o.getInt("id"))
                 .name(o.getString("name"))
                 .code(o.getString("code"))
-                .startDate(DateTime.parse(o.getString("startDate"), ISODateTimeFormat.yearMonthDay()).toLocalDate())
-                .endDate(DateTime.parse(o.getString("startTime"), ISODateTimeFormat.yearMonthDay()).toLocalDate())
+                .startDate(DateTime.parse(o.getString("start_date"), ISODateTimeFormat.yearMonthDay()).toLocalDate())
+                .endDate(DateTime.parse(o.getString("end_date"), ISODateTimeFormat.yearMonthDay()).toLocalDate())
                 .subjectsLoaded(o.getBoolean("subjects_loaded"))
                 .build();
     }
