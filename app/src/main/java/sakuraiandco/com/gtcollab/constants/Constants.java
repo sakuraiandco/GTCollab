@@ -7,7 +7,7 @@ package sakuraiandco.com.gtcollab.constants;
 public abstract class Constants {
 
     // REST API endpoints
-    public static final String HOST_NAME = "https://secure-headland-60131.herokuapp.com";
+    public static final String HOST_NAME = "https://gtcollab.herokuapp.com";
     public static final String BASE_URL = HOST_NAME + "/api";
 
     public static final String AUTH_HEADER = "Authorization";
