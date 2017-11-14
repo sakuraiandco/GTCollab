@@ -6,6 +6,6 @@ package sakuraiandco.com.gtcollab.domain;
 
 public abstract class Entity {
 
-    int id;
+    // int id; // TODO: doesn't work with lombok builder?
 
 }

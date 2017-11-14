@@ -8,7 +8,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +28,8 @@ public class NetworkUtils {
     public static void getRequest(String url, Map<String, String> queryParams, VolleyResponseListener callback) {
         Uri.Builder builder = Uri.parse(url).buildUpon();
         if (queryParams != null) {
-            for (Map.Entry e : queryParams.entrySet()) {
-                builder.appendQueryParameter((String) e.getKey(), (String) e.getValue());
+            for (Map.Entry<String, String> e : queryParams.entrySet()) {
+                builder.appendQueryParameter(e.getKey(), e.getValue());
             }
         }
         String finalUrl = builder.build().toString();
@@ -55,7 +54,7 @@ public class NetworkUtils {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/json; charset=utf-8");
-                String authToken = SingletonProvider.getContext().getSharedPreferences(Arguments.AUTH_TOKEN_FILE, 0).getString(Arguments.AUTH_TOKEN, null);
+                String authToken = SingletonProvider.getContext().getSharedPreferences(Arguments.DEFAULT_SHARED_PREFERENCES, 0).getString(Arguments.AUTH_TOKEN, null);
                 if (authToken != null) {
                     headers.put(Constants.AUTH_HEADER, "Token " + authToken);
                 }

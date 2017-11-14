@@ -18,23 +18,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sakuraiandco.com.gtcollab.adapters.AdapterListener;
 import sakuraiandco.com.gtcollab.adapters.CourseSearchAdapter;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Course;
+import sakuraiandco.com.gtcollab.domain.Subject;
+import sakuraiandco.com.gtcollab.domain.Term;
+import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.CourseDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
+import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.SEARCH_RESULTS;
-import static sakuraiandco.com.gtcollab.constants.Arguments.SUBJECT;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SEARCH_RESULTS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SUBJECT;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_SUBJECT;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseListActivity;
 
-public class CourseSearchActivity extends AppCompatActivity implements DAOListener<Course>,CourseSearchAdapter.Listener {
+public class CourseSearchActivity extends AppCompatActivity {
 
+    // data
     CourseDAO courseDAO;
 
+    // adapter
+    CourseSearchAdapter courseSearchAdapter;
+
+    // layout manager
+    LinearLayoutManager linearLayoutManager;
+
+    // view
     TextView textNoCoursesFound;
     RecyclerView coursesRecyclerView;
-    CourseSearchAdapter courseSearchAdapter;
+
+    // context
+    User user;
+    Term term;
+    Subject subject;
+    List<Course> searchResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +69,40 @@ public class CourseSearchActivity extends AppCompatActivity implements DAOListen
         SingletonProvider.setContext(getApplicationContext());
 
         // data
-        courseDAO = new CourseDAO(this);
+        courseDAO = new CourseDAO(new BaseDAO.Listener<Course>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CourseSearchActivity.this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<Course> courses) {
+                onCourseListReady(courses);
+            }
+            @Override
+            public void onObjectReady(Course course) {
+                Toast.makeText(CourseSearchActivity.this, "Joined " + course.getShortName(), Toast.LENGTH_SHORT).show();
+                startCourseListActivity(CourseSearchActivity.this, user, term);
+            }
+        });
 
         // adapter
-        courseSearchAdapter = new CourseSearchAdapter(this);
+        courseSearchAdapter = new CourseSearchAdapter(new AdapterListener<Course>() {
+            @Override
+            public void onClick(Course course) {
+                courseDAO.joinCourse(course.getId()); // TODO: show dialog first?
+            }
+        });
+
+        // layout manager
+        linearLayoutManager = new LinearLayoutManager(this);
 
         // view
-        textNoCoursesFound = (TextView) findViewById(R.id.text_no_courses_found);
-        coursesRecyclerView = (RecyclerView) findViewById(R.id.courses_recycler_view);
-        coursesRecyclerView.setLayoutManager(new LinearLayoutManager(this.getBaseContext(), LinearLayoutManager.VERTICAL, false));
-        coursesRecyclerView.setHasFixedSize(true); // TODO: optimization
+        textNoCoursesFound = findViewById(R.id.text_no_courses_found);
+        coursesRecyclerView = findViewById(R.id.courses_recycler_view);
         coursesRecyclerView.setAdapter(courseSearchAdapter);
+        coursesRecyclerView.setLayoutManager(linearLayoutManager);
+        coursesRecyclerView.setHasFixedSize(true); // TODO: optimization
+        coursesRecyclerView.addOnScrollListener(new PaginationScrollListener<>(linearLayoutManager, courseDAO));
 
         // retrieve data
         handleIntent(getIntent());
@@ -70,17 +114,21 @@ public class CourseSearchActivity extends AppCompatActivity implements DAOListen
     }
 
     private void handleIntent(Intent intent) {
-        List<Course> courses = intent.getParcelableArrayListExtra(SEARCH_RESULTS);
-        if (courses != null) {
-            courseSearchAdapter.setData(courses);
+        user = intent.getParcelableExtra(EXTRA_USER);
+        term = intent.getParcelableExtra(EXTRA_TERM);
+        subject = intent.getParcelableExtra(EXTRA_SUBJECT);
+        searchResults = intent.getParcelableArrayListExtra(EXTRA_SEARCH_RESULTS);
+
+        if (searchResults != null) {
+            courseSearchAdapter.setData(searchResults);
         } else {
-            String subject = intent.getStringExtra(SUBJECT);
             if (subject != null) {
+                getSupportActionBar().setTitle(subject.getCode() + " courses");
                 Map<String, String> filters = new HashMap<>();
-                filters.put(SUBJECT, subject);
+                filters.put(FILTER_SUBJECT, String.valueOf(subject.getId()));
                 courseDAO.getByFilters(filters);
             } else {
-                Toast.makeText(this, "No subject", Toast.LENGTH_SHORT).show(); // TODO: error handling
+                Toast.makeText(this, "No subject context", Toast.LENGTH_SHORT).show(); // TODO: error handling
             }
         }
     }
@@ -89,39 +137,28 @@ public class CourseSearchActivity extends AppCompatActivity implements DAOListen
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
-
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
         return true;
     }
 
     @Override
-    public void onListReady(List<Course> courses) {
-        if (!courses.isEmpty()) {
-            textNoCoursesFound.setVisibility(View.GONE);
-            courseSearchAdapter.setData(courses);
-        } else {
-            textNoCoursesFound.setVisibility(View.VISIBLE);
+    public void startActivity(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            intent.putExtra(EXTRA_USER, user);
+            intent.putExtra(EXTRA_TERM, term);
         }
+        super.startActivity(intent);
     }
 
-    @Override
-    public void onObjectReady(Course course) {
-        Toast.makeText(this, "Joined " + course.getSubjectCode() + " " + course.getCourseNumber(), Toast.LENGTH_SHORT).show();
-        Intent courseListActivityIntent = new Intent(this, CourseListActivity.class);
-        startActivity(courseListActivityIntent);
-    }
-
-    @Override
-    public void onDAOError(BaseDAO.Error error) {
-        Toast.makeText(this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
-    }
-
-    @Override
-    public void onClickCourseAdapter(View view, int objectId) {
-        courseDAO.joinCourse(objectId);
+    public void onCourseListReady(List<Course> courses) {
+        courseSearchAdapter.addData(courses);
+        if (courseSearchAdapter.getData().isEmpty()) {
+            textNoCoursesFound.setVisibility(View.VISIBLE);
+        } else {
+            textNoCoursesFound.setVisibility(View.GONE);
+        }
     }
 
 }

@@ -6,14 +6,14 @@ package sakuraiandco.com.gtcollab.constants;
 
 public abstract class Constants {
 
-    // REST API endpoints
+    // REST API
     public static final String HOST_NAME = "https://gtcollab.herokuapp.com";
     public static final String BASE_URL = HOST_NAME + "/api";
-
     public static final String AUTH_HEADER = "Authorization";
 
     public static final String CURR_TERM = "1"; // TODO: obtain programatically via api/terms/current/ endpoint
 
+    // Course activity tabs
     public static final int TAB_MEETINGS = 0;
     public static final int TAB_GROUPS = 1;
 

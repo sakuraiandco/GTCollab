@@ -6,7 +6,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import sakuraiandco.com.gtcollab.domain.Term;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 import sakuraiandco.com.gtcollab.rest.base.ReadOnlyDAO;
 
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.getRequest;
@@ -17,12 +16,12 @@ import static sakuraiandco.com.gtcollab.utils.NetworkUtils.getRequest;
 
 public class TermDAO extends ReadOnlyDAO<Term> {
 
-    public TermDAO(DAOListener<Term> callback) {
+    public TermDAO(Listener<Term> callback) {
         super(Term.BASE_URL, callback);
     }
 
     public void getCurrent() {
-        getRequest(baseURL + "current", this);
+        getRequest(getBaseURL() + "current", this);
     }
 
     @Override

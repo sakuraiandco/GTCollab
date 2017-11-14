@@ -10,7 +10,6 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.domain.MeetingInvitation;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 /**
  * Created by kaliq on 11/1/2017.
@@ -18,7 +17,7 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 public class MeetingInvitationDAO extends BaseDAO<MeetingInvitation> {
 
-    public MeetingInvitationDAO(DAOListener callback) {
+    public MeetingInvitationDAO(Listener<MeetingInvitation> callback) {
         super(MeetingInvitation.BASE_URL, callback);
     }
 

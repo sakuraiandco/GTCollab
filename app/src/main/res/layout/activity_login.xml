@@ -73,21 +73,15 @@
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
 
-
-
             <TextView
-                android:id="@+id/registerTextButton"
+                android:id="@+id/register_text_button"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/text_register"
                 android:gravity="center_horizontal"
-                android:onClick="onRegisterClick"
                 android:clickable="true"
                 android:focusable="true"
                 android:layout_marginTop="16dp"/>
-
-
-
 
         </LinearLayout>
     </ScrollView>

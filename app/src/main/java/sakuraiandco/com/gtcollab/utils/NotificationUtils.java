@@ -12,7 +12,6 @@ import android.util.Log;
 
 import java.util.List;
 
-import sakuraiandco.com.gtcollab.CourseListActivity;
 import sakuraiandco.com.gtcollab.LoginActivity;
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.domain.Group;
@@ -20,7 +19,6 @@ import sakuraiandco.com.gtcollab.domain.Meeting;
 import sakuraiandco.com.gtcollab.rest.GroupDAO;
 import sakuraiandco.com.gtcollab.rest.MeetingDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 import static sakuraiandco.com.gtcollab.constants.Arguments.ACTION_1;
 import static sakuraiandco.com.gtcollab.constants.Arguments.ACTION_2;
@@ -70,7 +68,7 @@ public class NotificationUtils {
     }
 
     public static void notifyGroupInvitation(final Context context, final int groupId, final String courseShortName, final String creatorFirstName) {
-        GroupDAO groupDAO = new GroupDAO(new DAOListener<Group>() { // TODO: make synchronous; use synchronous Volley request?
+        GroupDAO groupDAO = new GroupDAO(new BaseDAO.Listener<Group>() { // TODO: make synchronous; use synchronous Volley request?
             @Override
             public void onDAOError(BaseDAO.Error error) {}
             @Override
@@ -129,7 +127,7 @@ public class NotificationUtils {
     }
 
     public static void notifyMeetingInvitation(final Context context, final int meetingId, final String courseShortName, final String creatorFirstName) {
-        MeetingDAO meetingDAO = new MeetingDAO(new DAOListener<Meeting>() { // TODO: make synchronous; use synchronous Volley request?
+        MeetingDAO meetingDAO = new MeetingDAO(new BaseDAO.Listener<Meeting>() { // TODO: make synchronous; use synchronous Volley request?
             @Override
             public void onDAOError(BaseDAO.Error error) {}
             @Override
@@ -194,7 +192,7 @@ public class NotificationUtils {
     }
 
     public static void notifyAddedToGroup(final Context context, final int groupId, final String courseShortName, final String creatorFirstName) {
-        GroupDAO groupDAO = new GroupDAO(new DAOListener<Group>() { // TODO: make synchronous; use synchronous Volley request?
+        GroupDAO groupDAO = new GroupDAO(new BaseDAO.Listener<Group>() { // TODO: make synchronous; use synchronous Volley request?
             @Override
             public void onDAOError(BaseDAO.Error error) {}
             @Override
@@ -246,7 +244,7 @@ public class NotificationUtils {
 
         public NotificationActionService() {
             super(NotificationActionService.class.getSimpleName());
-            groupDAO = new GroupDAO(new DAOListener<Group>() { // TODO: open app to course page to display success / error dialog (?)
+            groupDAO = new GroupDAO(new BaseDAO.Listener<Group>() { // TODO: open app to course page to display success / error dialog (?)
                 @Override
                 public void onDAOError(BaseDAO.Error error) {}
                 @Override
@@ -254,7 +252,7 @@ public class NotificationUtils {
                 @Override
                 public void onObjectReady(Group group) {}
             });
-            meetingDAO = new MeetingDAO(new DAOListener<Meeting>() { // TODO: open app to cousre page to display success / error dialog (?)
+            meetingDAO = new MeetingDAO(new BaseDAO.Listener<Meeting>() { // TODO: open app to cousre page to display success / error dialog (?)
                 @Override
                 public void onDAOError(BaseDAO.Error error) {}
                 @Override

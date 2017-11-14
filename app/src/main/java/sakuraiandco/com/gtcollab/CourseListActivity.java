@@ -1,7 +1,9 @@
 package sakuraiandco.com.gtcollab;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,29 +18,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sakuraiandco.com.gtcollab.adapters.AdapterListener;
 import sakuraiandco.com.gtcollab.adapters.CourseListAdapter;
-import sakuraiandco.com.gtcollab.constants.Arguments;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Course;
+import sakuraiandco.com.gtcollab.domain.Term;
+import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.CourseDAO;
+import sakuraiandco.com.gtcollab.rest.TermDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
+import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.MEMBERS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_MEMBERS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_TERM;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.forceDeviceTokenRefresh;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.login;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.logout;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseActvitiy;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startSubjectSearchActivity;
 
-public class CourseListActivity extends AppCompatActivity implements DAOListener<Course>,CourseListAdapter.Listener {
+public class CourseListActivity extends AppCompatActivity {
 
+    // data
+    TermDAO termDAO;
     CourseDAO courseDAO;
 
+    // saved data
+    SharedPreferences prefs;
+
+    // adapter
+    CourseListAdapter courseListAdapter;
+
+    // view
     TextView textNoCoursesFound;
     RecyclerView coursesRecyclerView;
-    CourseListAdapter courseListAdapter;
+    FloatingActionButton fab;
+
+    // context
+    User user;
+    Term term;
+
+    // variables
+    private String userId;
+    private String authToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,31 +74,75 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
         // initialization
         SingletonProvider.setContext(getApplicationContext());
 
+        // TODO: put in handleIntent()?
+        Intent intent = getIntent();
+        user = intent.getParcelableExtra(EXTRA_USER);
+        term = intent.getParcelableExtra(EXTRA_TERM);
+
         // device registration
         forceDeviceTokenRefresh(); // TODO: ASSUMES CourseListActivity is launcher activity; best place to put this? LoginActivity instead?
 
         // data
-        courseDAO = new CourseDAO(this);
+        termDAO = new TermDAO(new BaseDAO.Listener<Term>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CourseListActivity.this, "TermDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<Term> terms) {}
+            @Override
+            public void onObjectReady(Term term) {
+                onTermObjectReady(term);
+            }
+        });
+        courseDAO = new CourseDAO(new BaseDAO.Listener<Course>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CourseListActivity.this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<Course> courses) {
+                onCourseListReady(courses);
+            }
+            @Override
+            public void onObjectReady(Course course) {}
+        });
+
+        // saved data
+        prefs = getSharedPreferences(DEFAULT_SHARED_PREFERENCES, 0);
+        userId = prefs.getString(CURRENT_USER, null); // TODO: not needed? how to use this to verify authentication?
+        authToken = prefs.getString(AUTH_TOKEN, null); // TODO: not needed? how to use this to verify authentication?
 
         // adapter
-        courseListAdapter = new CourseListAdapter(this);
+        courseListAdapter = new CourseListAdapter(new AdapterListener<Course>() {
+            @Override
+            public void onClick(Course course) {
+                startCourseActvitiy(CourseListActivity.this, user, term, course);
+            }
+        });
 
         // view
-        textNoCoursesFound = (TextView) findViewById(R.id.text_no_courses_found);
-        coursesRecyclerView = (RecyclerView) findViewById(R.id.courses_recycler_view);
+        textNoCoursesFound = findViewById(R.id.text_no_courses_found);
+        coursesRecyclerView = findViewById(R.id.courses_recycler_view);
+        coursesRecyclerView.setAdapter(courseListAdapter);
         coursesRecyclerView.setLayoutManager(new LinearLayoutManager(this.getBaseContext(), LinearLayoutManager.VERTICAL, false));
         coursesRecyclerView.setHasFixedSize(true); // TODO: optimization
-        coursesRecyclerView.setAdapter(courseListAdapter);
+        // TODO: pagination needed for course list?
+        fab = findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (term != null) { // Wait for current term to be loaded
+                    startSubjectSearchActivity(CourseListActivity.this, user, term);
+                } else {
+                    Toast.makeText(CourseListActivity.this, "Server busy", Toast.LENGTH_SHORT).show(); // TODO: error handling
+                }
+            }
+        });
 
         // retrieve data
-        String userId = getSharedPreferences(AUTH_TOKEN_FILE, 0).getString(CURRENT_USER, null);
-        if (userId != null) {
-            Map<String, String> filters = new HashMap<>();
-            filters.put(MEMBERS, userId);
-            courseDAO.getByFilters(filters);
-        } else {
-            login(this);
-        }
+        handleIntent(intent);
     }
 
     @Override
@@ -81,6 +151,16 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
     }
 
     private void handleIntent(Intent intent) {
+        if (user != null) {
+            if (term != null) {
+                getCourses();
+            } else {
+                termDAO.getCurrent();
+            }
+        } else {
+            login(this);
+        }
+
         // TODO: update course status (e.g. new activity bubble)
     }
 
@@ -95,8 +175,11 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_course:
-                Intent subjectSearchActivity = new Intent(this, SubjectSearchActivity.class);
-                startActivity(subjectSearchActivity);
+                if (term != null) { // Wait for current term to be loaded
+                    startSubjectSearchActivity(this, user, term);
+                } else {
+                    Toast.makeText(this, "Server busy", Toast.LENGTH_SHORT).show(); // TODO: error handling
+                }
                 return true;
             case R.id.action_logout:
                 logout(this);
@@ -106,28 +189,25 @@ public class CourseListActivity extends AppCompatActivity implements DAOListener
         }
     }
 
-    @Override
-    public void onListReady(List<Course> courses) {
-        if (!courses.isEmpty()) {
-            textNoCoursesFound.setVisibility(View.GONE);
-            courseListAdapter.setData(courses);
-        } else {
+    private void getCourses() {
+        Map<String, String> filters = new HashMap<>();
+        filters.put(FILTER_TERM, String.valueOf(term.getId()));
+        filters.put(FILTER_MEMBERS, String.valueOf(user.getId()));
+        courseDAO.getByFilters(filters);
+    }
+
+    private void onTermObjectReady(Term term) {
+        this.term = term;
+        getCourses();
+    }
+
+    private void onCourseListReady(List<Course> courses) {
+        courseListAdapter.setData(courses);
+        if (courseListAdapter.getData().isEmpty()) {
             textNoCoursesFound.setVisibility(View.VISIBLE);
+        } else {
+            textNoCoursesFound.setVisibility(View.GONE);
         }
     }
 
-    @Override
-    public void onObjectReady(Course course) {}
-
-    @Override
-    public void onDAOError(BaseDAO.Error error) {
-        Toast.makeText(this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
-    }
-
-    @Override
-    public void onClickCourseAdapter(View view, int objectId) {
-        Intent courseActivityIntent = new Intent(this, CourseActivity.class);
-        courseActivityIntent.putExtra(COURSE_ID, String.valueOf(objectId));
-        startActivity(courseActivityIntent);
-    }
 }

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import org.joda.time.LocalTime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Builder;
@@ -38,16 +39,19 @@ public class Course extends Entity implements Parcelable {
     public static final Creator<Course> CREATOR = new Creator<Course>() {
         @Override
         public Course createFromParcel(Parcel in) {
-            return Course.builder()
+            Course c = Course.builder()
                     .id(in.readInt())
                     .name(in.readString())
                     .subjectCode(in.readString())
                     .courseNumber(in.readString())
                     .sections(in.createStringArrayList())
                     .meetingTimes(in.createTypedArrayList(MeetingTime.CREATOR))
+                    .members(new ArrayList<Integer>())
                     .numMembers(in.readInt())
                     .isCancelled(in.readByte() != 0)
                     .build();
+            in.readList(c.getMembers(), null);
+            return c;
         }
 
         @Override
@@ -71,6 +75,7 @@ public class Course extends Entity implements Parcelable {
         dest.writeTypedList(meetingTimes);
         dest.writeInt(numMembers);
         dest.writeByte((byte) (isCancelled ? 1 : 0));
+        dest.writeList(members); // TODO: out of order - messy? better way?
     }
 
     @Data

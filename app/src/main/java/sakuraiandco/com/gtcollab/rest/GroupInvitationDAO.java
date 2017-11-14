@@ -10,7 +10,6 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.domain.GroupInvitation;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 /**
  * Created by kaliq on 11/1/2017.
@@ -18,7 +17,7 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 public class GroupInvitationDAO extends BaseDAO<GroupInvitation> {
 
-    public GroupInvitationDAO(DAOListener callback) {
+    public GroupInvitationDAO(Listener<GroupInvitation> callback) {
         super(GroupInvitation.BASE_URL, callback);
     }
 

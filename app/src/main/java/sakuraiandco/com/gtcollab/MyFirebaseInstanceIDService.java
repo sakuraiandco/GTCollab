@@ -13,7 +13,7 @@ import java.io.UnsupportedEncodingException;
 
 import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEVICE_REGISTRATION_ID;
 import static sakuraiandco.com.gtcollab.rest.RESTServices.registerDevice;
 
@@ -38,7 +38,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         Log.d(TAG, "Refreshed token: " + refreshedToken);
 
         // Save token to local storage
-        SharedPreferences prefs = getSharedPreferences(AUTH_TOKEN_FILE, 0);
+        SharedPreferences prefs = getSharedPreferences(DEFAULT_SHARED_PREFERENCES, 0);
         prefs.edit().putString(DEVICE_REGISTRATION_ID, refreshedToken).apply();
 
         // Register new device registration ID with server
@@ -46,7 +46,9 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
             @Override
             public void onErrorResponse(VolleyError error) {
                 try {
-                    Log.d(TAG, new String(error.networkResponse.data,"UTF-8"));
+                    if (error.networkResponse.data != null) { // TODO: ?
+                        Log.d(TAG, new String(error.networkResponse.data,"UTF-8"));
+                    }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }

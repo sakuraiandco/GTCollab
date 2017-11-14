@@ -11,7 +11,6 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.domain.Meeting;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.postRequest;
 
@@ -23,17 +22,17 @@ public class MeetingDAO extends BaseDAO<Meeting> {
 
     private UserDAO userDAO;
 
-    public MeetingDAO(DAOListener<Meeting> callback) {
+    public MeetingDAO(Listener<Meeting> callback) {
         super(Meeting.BASE_URL, callback);
         this.userDAO = new UserDAO(null);
     }
 
     public void joinMeeting(int id) {
-        postRequest(baseURL + id + "/join/", null, this);
+        postRequest(getBaseURL() + id + "/join/", null, this);
     }
 
     public void leaveMeeting(int id) {
-        postRequest(baseURL + id + "/leave/", null, this);
+        postRequest(getBaseURL() + id + "/leave/", null, this);
     }
 
     @Override

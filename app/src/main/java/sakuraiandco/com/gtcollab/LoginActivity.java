@@ -1,6 +1,5 @@
 package sakuraiandco.com.gtcollab;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,14 +26,14 @@ import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.RESTServices;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
 
 import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN;
-import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_USERNAME;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.register;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseListActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -48,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editUsername;
     private EditText editPassword;
     private Button buttonLogin;
+    private TextView registerTextButton;
 
     // variables
     private String userId;
@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         SingletonProvider.setContext(getApplicationContext());
 
         // data
-        userDAO = new UserDAO(new DAOListener<User>() {
+        userDAO = new UserDAO(new BaseDAO.Listener<User>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(LoginActivity.this, "Could not retrieve user", Toast.LENGTH_SHORT).show();
@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // saved data
-        prefs = getSharedPreferences(AUTH_TOKEN_FILE, 0);
+        prefs = getSharedPreferences(DEFAULT_SHARED_PREFERENCES, 0);
         userId = prefs.getString(CURRENT_USER, null);
         authToken = prefs.getString(AUTH_TOKEN, null);
 
@@ -90,9 +90,10 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // view
-        editUsername = (EditText) findViewById(R.id.username);
-        editPassword = (EditText) findViewById(R.id.password);
-        buttonLogin = (Button) findViewById(R.id.email_sign_in_button);
+        editUsername = findViewById(R.id.username);
+        editPassword = findViewById(R.id.password);
+        buttonLogin = findViewById(R.id.email_sign_in_button);
+        registerTextButton = findViewById(R.id.register_text_button);
 
         editPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -104,10 +105,18 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
+
         buttonLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
+            }
+        });
+
+        registerTextButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                register(LoginActivity.this);
             }
         });
     }
@@ -156,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
             prefs.edit().putString(Arguments.AUTH_TOKEN, authToken).apply();
             Map<String, String> filters = new HashMap<>();
             filters.put(FILTER_USERNAME, username);
-            userDAO.getByFilters(filters);
+            userDAO.getByFilters(filters); // TODO: dirty hack
         } else {
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
@@ -165,17 +174,12 @@ public class LoginActivity extends AppCompatActivity {
     private void onUserListReady(List<User> users) {
         User user = users.get(0);
         prefs.edit().putString(CURRENT_USER, String.valueOf(user.getId())).apply();
-        startCourseListActivity(user);
+        startCourseListActivity(this, user, null);
+        finish();
     }
 
     private void onUserObjectReady(User user) {
-        startCourseListActivity(user);
-    }
-
-    private void startCourseListActivity(User user) {
-        Intent intent = new Intent(this, CourseListActivity.class);
-        intent.putExtra(EXTRA_USER, user.getId());
-        startActivity(intent);
+        startCourseListActivity(this, user, null);
         finish();
     }
 

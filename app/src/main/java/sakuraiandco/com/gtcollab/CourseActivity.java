@@ -1,7 +1,6 @@
 package sakuraiandco.com.gtcollab;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -25,260 +22,213 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sakuraiandco.com.gtcollab.adapters.CoursePagerAdapter;
 import sakuraiandco.com.gtcollab.adapters.GroupAdapter;
+import sakuraiandco.com.gtcollab.adapters.GroupAdapterListener;
 import sakuraiandco.com.gtcollab.adapters.MeetingAdapter;
+import sakuraiandco.com.gtcollab.adapters.MeetingAdapterListener;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.domain.Meeting;
+import sakuraiandco.com.gtcollab.domain.Term;
+import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.CourseDAO;
 import sakuraiandco.com.gtcollab.rest.GroupDAO;
 import sakuraiandco.com.gtcollab.rest.MeetingDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
+import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN_FILE;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
-import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.GROUP;
-import static sakuraiandco.com.gtcollab.constants.Arguments.MEETING;
-import static sakuraiandco.com.gtcollab.constants.Arguments.TITLE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE_TAB;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseListActivity;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCreateGroupActivity;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCreateMeetingActivity;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startUserListActivity;
 
-public class CourseActivity extends AppCompatActivity implements GroupAdapter.Listener, MeetingAdapter.Listener {
+public class CourseActivity extends AppCompatActivity {
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
+    final static String[] FILTER_OPTION_PREFIXES = {"All", "My"};
+    final static int FILTER_OPTION_ALL = 0;
+    final static int FILTER_OPTION_MY = 1;
+    final static String FILTER_TITLE = "Filter by";
 
-    private TextView textNoGroupsFound;
-    private TextView textNoMeetingsFound;
-    private RecyclerView groupsRecyclerView;
-    private RecyclerView meetingsRecyclerView;
-
-    private static GroupAdapter groupAdapter; // TODO: non-static?
-    private static MeetingAdapter meetingAdapter; // TODO: non-static?
-
-    TextView textCourseTermName;
-    TextView textCourseLongName;
-    TextView textCourseSections;
-    TextView textCourseNumMembers;
-
-    TextView meetingFilter;
-    TextView groupFilter;
-
-    SearchView meetingSearch;
-    SearchView groupSearch;
-
+    // data
     CourseDAO courseDAO;
     GroupDAO groupDAO;
     MeetingDAO meetingDAO;
 
+    // adapter
+    private CoursePagerAdapter coursePagerAdapter;
+    private GroupAdapter groupAdapter;
+    private MeetingAdapter meetingAdapter;
     List<Group> groupsList;
+    List<Group> myGroupsList;
     List<Meeting> meetingsList;
+    List<Meeting> myMeetingsList;
 
-    String userId;
-    String courseId;
+    // layout manager
+    private LinearLayoutManager groupsLayoutManager;
+    private LinearLayoutManager meetingsLayoutManager;
 
+    // view
+    CoordinatorLayout mainContent;
+    CollapsingToolbarLayout collapsingToolbarLayout;
+    TextView textCourseTermName;
+    TextView textCourseLongName;
+    TextView textCourseSections;
+    TextView textCourseNumMembers;
+    TabLayout tabLayout;
+    ViewPager viewPager;
+    TextView textNoGroupsFound;
+    TextView textNoMeetingsFound;
+    RecyclerView groupsRecyclerView;
+    RecyclerView meetingsRecyclerView;
+    LinearLayout groupFilterWrapper;
+    LinearLayout meetingFilterWrapper;
+    TextView meetingFilterText;
+    TextView groupFilterText;
+    SearchView meetingSearch;
+    SearchView groupSearch;
+    FloatingActionButton fab;
+
+    // context
+    User user;
+    Term term;
     Course course;
 
-    private Context context; // TODO
 //    private int currentTab;
-
-    CoordinatorLayout mainContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) { // TODO: make singleTop activity?
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course);
 
+        // toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_layout);
-
         // initialization
         SingletonProvider.setContext(getApplicationContext());
 
-        context = this;
-
         // data
-        courseDAO = new CourseDAO(new DAOListener<Course>() {
-            @Override
-            public void onListReady(List<Course> courses) {
-            }
-
-            @Override
-            public void onObjectReady(Course course) {
-                if (!course.getMembers().contains(Integer.valueOf(userId))) {
-                    // left course
-                    Toast.makeText(CourseActivity.this, "Left course: " + course.getSubjectCode() + " " + course.getCourseNumber(), Toast.LENGTH_SHORT).show();
-                    Intent courseListActivityIntent = new Intent(CourseActivity.this, CourseListActivity.class);
-                    startActivity(courseListActivityIntent);
-                }
-
-                CourseActivity.this.course = course;
-
-                collapsingToolbarLayout.setTitle(course.getSubjectCode() + " " + course.getCourseNumber());
-                String sections = "";
-                if (course.getSections().size() > 0) {
-                    for (String s : course.getSections()) {
-                        sections += s + ", ";
-                    }
-                    sections = sections.substring(0, sections.length() - 2);
-                } else {
-                    sections = "none";
-                }
-                textCourseTermName.setText("Fall 2017"); // TODO
-                textCourseLongName.setText(course.getName());
-                textCourseSections.setText(sections);
-                textCourseNumMembers.setText(String.valueOf(course.getNumMembers()));
-            }
-
+        courseDAO = new CourseDAO(new BaseDAO.Listener<Course>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
             }
+            @Override
+            public void onListReady(List<Course> courses) {}
+            @Override
+            public void onObjectReady(Course course) {
+                onCourseObjectReady(course);
+            }
         });
-        groupDAO = new GroupDAO(new DAOListener<Group>() {
-            @Override
-            public void onListReady(List<Group> groups) {
-                groupsList = groups;
-                groupAdapter.setData(groupsList);
-                if (groups.isEmpty()) {
-                    textNoGroupsFound.setVisibility(View.VISIBLE);
-                } else {
-                    textNoGroupsFound.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onObjectReady(Group group) {
-                List<Integer> members = group.getMembers();
-                boolean isMember = false;
-                for (int i = 0; i < groupsList.size(); i++) {
-                    Group g = groupsList.get(i);
-                    if (g.getId() == group.getId()) {
-                        groupsList.set(i, group);
-                        isMember = group.getMembers().contains(Integer.valueOf(userId));
-                        groupAdapter.notifyDataSetChanged();
-                        break;
-                    }
-                }
-                if (isMember) {
-                    Snackbar.make(mainContent, "Joined group: " + group.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
-                } else {
-                    Snackbar.make(mainContent, "Left group: " + group.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
-                }
-            }
-
+        groupDAO = new GroupDAO(new BaseDAO.Listener<Group>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "GroupDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
             }
+            @Override
+            public void onListReady(List<Group> groups) {
+                onGroupListReady(groups);
+            }
+            @Override
+            public void onObjectReady(Group group) {
+                onGroupObjectReady(group);
+            }
         });
-        meetingDAO = new MeetingDAO(new DAOListener<Meeting>() {
-            @Override
-            public void onListReady(List<Meeting> meetings) {
-                meetingsList = meetings;
-                meetingAdapter.setData(meetingsList);
-                if (meetings.isEmpty()) {
-                    textNoMeetingsFound.setVisibility(View.VISIBLE);
-                } else {
-                    textNoMeetingsFound.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onObjectReady(Meeting meeting) {
-                List<Integer> members = meeting.getMembers();
-                boolean isMember = false;
-                for (int i = 0; i < meetingsList.size(); i++) {
-                    Meeting m = meetingsList.get(i);
-                    if (m.getId() == meeting.getId()) {
-                        meetingsList.set(i, meeting);
-                        isMember = meeting.getMembers().contains(Integer.valueOf(userId));
-                        meetingAdapter.notifyDataSetChanged();
-                        break;
-                    }
-                }
-                if (isMember) {
-                    Snackbar.make(mainContent, "Joined meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
-                } else {
-                    Snackbar.make(mainContent, "Left meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show(); // TODO: view?
-                }
-            }
-
+        meetingDAO = new MeetingDAO(new BaseDAO.Listener<Meeting>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
             }
+            @Override
+            public void onListReady(List<Meeting> meetings) {
+                onMeetingListReady(meetings);
+            }
+            @Override
+            public void onObjectReady(Meeting meeting) {
+                onMeetingObjectReady(meeting);
+            }
         });
-
-        userId = getSharedPreferences(AUTH_TOKEN_FILE, 0).getString(CURRENT_USER, null);
 
         // adapter
-        groupAdapter = new GroupAdapter(this, userId);
-        meetingAdapter = new MeetingAdapter(this, userId);
+        user = getIntent().getParcelableExtra(EXTRA_USER); // TODO: put in handleIntent?
+        coursePagerAdapter = new CoursePagerAdapter(getSupportFragmentManager());
+        groupAdapter = new GroupAdapter(new GroupAdapterListener() {
+            @Override
+            public void onGroupCheckboxClick(Group group, boolean isChecked) {
+                onGroupCheckboxClickHandler(group, isChecked);
+            }
+            @Override
+            public void onGroupMembersClick(Group group) {
+                startUserListActivity(CourseActivity.this, user, term, course, group, null);
+            }
+            @Override
+            public void onClick(Group group) {}
+        }, user);
+        meetingAdapter = new MeetingAdapter(new MeetingAdapterListener() {
+            @Override
+            public void onMeetingCheckboxClick(Meeting meeting, boolean isChecked) {
+                onMeetingCheckboxClickHandler(meeting, isChecked);
+            }
+            @Override
+            public void onMeetingMembersClick(Meeting meeting) {
+                startUserListActivity(CourseActivity.this, user, term, course, null, meeting);
+            }
+            @Override
+            public void onClick(Meeting meeting) {}
+        }, user);
+
+        // layout manager
+        groupsLayoutManager = new LinearLayoutManager(this);
+        meetingsLayoutManager = new LinearLayoutManager(this);
 
         // view
-        mainContent = (CoordinatorLayout) findViewById(R.id.main_content);
+        mainContent = findViewById(R.id.main_content);
+        collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar_layout); // null check in courseDAO
+        textCourseTermName = findViewById(R.id.text_course_term_name);
+        textCourseLongName = findViewById(R.id.text_course_long_name);
+        textCourseSections = findViewById(R.id.text_course_sections);
+        textCourseNumMembers = findViewById(R.id.text_course_num_members);
+        viewPager = findViewById(R.id.container);
+        tabLayout = findViewById(R.id.tabs);
+        fab = findViewById(R.id.fab);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        viewPager.setAdapter(coursePagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int tab = mViewPager.getCurrentItem();
-                switch (tab) {
+                switch (viewPager.getCurrentItem()) {
                     case TAB_MEETINGS:
-                        createNewMeeting();
+                        startCreateMeetingActivity(CourseActivity.this, user, term, course);
                         break;
                     case TAB_GROUPS:
-                        createNewGroup();
+                        startCreateGroupActivity(CourseActivity.this, user, term, course);
                         break;
                     default:
-                        Toast.makeText(CourseActivity.this, "No context", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CourseActivity.this, "No tab context", Toast.LENGTH_SHORT).show();
                 }
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
-
-        textCourseTermName = (TextView) findViewById(R.id.text_course_term_name);
-        textCourseLongName = (TextView) findViewById(R.id.text_course_long_name);
-        textCourseSections = (TextView) findViewById(R.id.text_course_sections);
-        textCourseNumMembers = (TextView) findViewById(R.id.text_course_num_members);
 
         // retrieve data
         handleIntent(getIntent());
@@ -290,21 +240,34 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
     }
 
     private void handleIntent(Intent intent) {
-        courseId = getIntent().getStringExtra(COURSE_ID);
-        if (courseId != null) {
+        term = intent.getParcelableExtra(EXTRA_TERM);
+        course = intent.getParcelableExtra(EXTRA_COURSE);
+
+        if (course != null) {
             Map<String, String> filters = new HashMap<>();
-            filters.put(COURSE, courseId);
-            courseDAO.get(Integer.valueOf(courseId));
+            filters.put(FILTER_COURSE, String.valueOf(course.getId()));
             groupDAO.getByFilters(filters);
             meetingDAO.getByFilters(filters);
         } else {
-            Toast.makeText(this, "No course ID", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No course context", Toast.LENGTH_SHORT).show();
         }
+
+        switch (intent.getIntExtra(EXTRA_COURSE_TAB, -1)) {
+            case TAB_MEETINGS:
+                viewPager.setCurrentItem(TAB_MEETINGS);
+                break;
+            case TAB_GROUPS:
+                viewPager.setCurrentItem(TAB_GROUPS);
+                break;
+            default:
+                viewPager.setCurrentItem(TAB_MEETINGS);
+        }
+
+        updateCourseInfo();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_course, menu);
         return true;
     }
@@ -313,16 +276,16 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_course_members:
-                openUserList(COURSE, courseId, course.getShortName());
+                startUserListActivity(this, user, term, course, null, null);
                 return true;
             case R.id.action_new_meeting:
-                createNewMeeting();
+                startCreateMeetingActivity(this, user, term, course);
                 return true;
             case R.id.action_new_group:
-                createNewGroup();
+                startCreateGroupActivity(this, user, term, course);
                 return true;
             case R.id.action_leave_course:
-                courseDAO.leaveCourse(Integer.valueOf(courseId));
+                courseDAO.leaveCourse(course.getId());
                 return true;
             case R.id.action_settings:
                 // TODO
@@ -330,34 +293,6 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void onGroupCheckboxClick(View v, int objectId) {
-        if (((CheckBox) v).isChecked()) {
-            groupDAO.joinGroup(objectId);
-        } else {
-            groupDAO.leaveGroup(objectId);
-        }
-    }
-
-    @Override
-    public void onGroupMembersClick(View v, int objectId, String groupName) {
-        openUserList(GROUP, String.valueOf(objectId), groupName);
-    }
-
-    @Override
-    public void onMeetingCheckboxClick(View v, int objectId) {
-        if (((CheckBox) v).isChecked()) {
-            meetingDAO.joinMeeting(objectId);
-        } else {
-            meetingDAO.leaveMeeting(objectId);
-        }
-    }
-
-    @Override
-    public void onMeetingMembersClick(View v, int objectId, String meetingName) {
-        openUserList(MEETING, String.valueOf(objectId), meetingName);
     }
 
     public static class PlaceholderFragment extends Fragment {
@@ -383,48 +318,60 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
             if (sectionNum == TAB_GROUPS) {
                 rootView = inflater.inflate(R.layout.fragment_course_groups, container, false);
                 context.groupsRecyclerView = rootView.findViewById(R.id.groups_recycler_view);
-                context.groupsRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-                context.groupsRecyclerView.setAdapter(groupAdapter);
-                context.groupsRecyclerView.addItemDecoration(new DividerItemDecoration(context.groupsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
                 context.textNoGroupsFound = rootView.findViewById(R.id.text_no_groups_found);
-                context.groupFilter = rootView.findViewById(R.id.group_filter_text);
+                context.groupFilterWrapper = rootView.findViewById(R.id.group_filter_wrapper);
+                context.groupFilterText = rootView.findViewById(R.id.group_filter_text);
                 context.groupSearch = rootView.findViewById(R.id.group_search);
-
+                context.groupsRecyclerView.setLayoutManager(context.groupsLayoutManager);
+                context.groupsRecyclerView.setAdapter(context.groupAdapter);
+                context.groupsRecyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
+                context.groupsRecyclerView.addOnScrollListener(new PaginationScrollListener<>(context.groupsLayoutManager, context.groupDAO));
+                context.groupFilterWrapper.setTag(FILTER_OPTION_ALL); // TODO: show all by default
+                context.groupFilterWrapper.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        context.onGroupFilterClickHandler(v);
+                    }
+                });
                 context.groupSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
                     @Override
                     public boolean onQueryTextSubmit(String query) {
                         context.refreshGroupList(query);
-                        return false;
+                        return true;
                     }
-
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        context.refreshGroupList(newText);
+                        context.refreshGroupList(newText); // TODO: performance?
                         return false;
                     }
                 });
             } else { // meetings (e.g. sectionNum = 0)
                 rootView = inflater.inflate(R.layout.fragment_course_meetings, container, false);
                 context.meetingsRecyclerView = rootView.findViewById(R.id.meetings_recycler_view);
-                context.meetingsRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-                context.meetingsRecyclerView.setAdapter(meetingAdapter);
-                context.meetingsRecyclerView.addItemDecoration(new DividerItemDecoration(context.meetingsRecyclerView.getContext(), LinearLayoutManager.VERTICAL));
                 context.textNoMeetingsFound = rootView.findViewById(R.id.text_no_meetings_found);
-                context.meetingFilter = rootView.findViewById(R.id.meeting_filter_text);
+                context.meetingFilterWrapper = rootView.findViewById(R.id.meeting_filter_wrapper);
+                context.meetingFilterText = rootView.findViewById(R.id.meeting_filter_text);
                 context.meetingSearch = rootView.findViewById(R.id.meeting_search);
-
+                context.meetingsRecyclerView.setLayoutManager(context.meetingsLayoutManager);
+                context.meetingsRecyclerView.setAdapter(context.meetingAdapter);
+                context.meetingsRecyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
+                context.meetingsRecyclerView.addOnScrollListener(new PaginationScrollListener<>(context.meetingsLayoutManager, context.meetingDAO));
+                context.meetingFilterWrapper.setTag(FILTER_OPTION_ALL); // TODO: show all by default
+                context.meetingFilterWrapper.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        context.onMeetingFilterClickHandler(v);
+                    }
+                });
                 context.meetingSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
                     @Override
                     public boolean onQueryTextSubmit(String query) {
                         context.refreshMeetingList(query);
-                        return false;
+                        return true;
                     }
-
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        context.refreshMeetingList(newText);
+                        context.refreshMeetingList(newText);  // TODO: performance?
                         return false;
                     }
                 });
@@ -433,132 +380,238 @@ public class CourseActivity extends AppCompatActivity implements GroupAdapter.Li
         }
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return PlaceholderFragment.newInstance(position);
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case TAB_MEETINGS:
-                    return "Meetings";
-                case TAB_GROUPS:
-                    return "Groups";
+    private void updateCourseInfo() { //  TODO: unnecessary? courseDAO is only used to leave course - not change course info
+        String sections = "";
+        if (course.getSections().size() > 0) {
+            for (String s : course.getSections()) {
+                sections += s + ", ";
             }
-            return null;
+            sections = sections.substring(0, sections.length() - 2);
+        } else {
+            sections = "none";
+        }
+        collapsingToolbarLayout.setTitle(course.getShortName());
+        textCourseTermName.setText(term.getName());
+        textCourseLongName.setText(course.getName());
+        textCourseSections.setText(sections);
+        textCourseNumMembers.setText(String.valueOf(course.getNumMembers()));
+    }
+
+    private void onCourseObjectReady(Course course) {
+        if (!course.getMembers().contains(user.getId())) {
+            Toast.makeText(CourseActivity.this, "Left course: " + course.getShortName(), Toast.LENGTH_SHORT).show();
+            startCourseListActivity(this, user, term);
+        }
+
+        this.course = course;
+        updateCourseInfo();
+    }
+
+    private void onGroupListReady(List<Group> groups) {
+        if (groupDAO.hasPrev()) { // handle pagination - append results
+            groupsList.addAll(groups);
+            for (Group g : groups) {
+                if (g.getMembers().contains(user.getId())) {
+                    myGroupsList.add(g);
+                }
+            }
+        } else { // first page
+            groupsList = groups;
+            myGroupsList = new ArrayList<>();
+            for (Group g : groupsList) {
+                if (g.getMembers().contains(user.getId())) {
+                    myGroupsList.add(g);
+                }
+            }
+        }
+        switch((int) groupFilterWrapper.getTag()) {
+            case FILTER_OPTION_ALL:
+                showAllGroups();
+                break;
+            case FILTER_OPTION_MY:
+                showMyGroups();
+                break;
+            default:
+                Toast.makeText(CourseActivity.this, "Group Filter Error", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
     }
 
-    private void openUserList(String objectType, String objectId, String title) {
-        Intent userListActivityIntent = new Intent(this, UserListActivity.class);
-        userListActivityIntent.putExtra(objectType, objectId);
-        userListActivityIntent.putExtra(TITLE, title);
-        startActivity(userListActivityIntent);
+    private void onGroupObjectReady(Group group) {
+        for (Group g : groupsList) {
+            if (g.getId() == group.getId()) {
+                g.setMembers(group.getMembers()); //  TODO: this should update myGroupsList too
+                groupAdapter.notifyDataSetChanged();
+                break;
+            }
+        }
+        Snackbar.make(mainContent, (group.getMembers().contains(user.getId()) ? "Joined" : "Left") + " group: " + group.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
     }
 
-    private void createNewMeeting() {
-        Intent createMeetingActivityIntent = new Intent(this, CreateMeetingActivity.class);
-        createMeetingActivityIntent.putExtra(COURSE, courseId);
-        startActivity(createMeetingActivityIntent);
+    private void onMeetingListReady(List<Meeting> meetings) {
+        if (meetingDAO.hasPrev()) { // handle pagination - append results
+            meetingsList.addAll(meetings);
+            for (Meeting m : meetings) {
+                if (m.getMembers().contains(user.getId())) {
+                    myMeetingsList.add(m);
+                }
+            }
+        } else { // first page
+            meetingsList = meetings;
+            myMeetingsList = new ArrayList<>();
+            for (Meeting m : meetingsList) {
+                if (m.getMembers().contains(user.getId())) {
+                    myMeetingsList.add(m);
+                }
+            }
+        }
+        switch((int) meetingFilterWrapper.getTag()) {
+            case FILTER_OPTION_ALL:
+                showAllMeetings();
+                break;
+            case FILTER_OPTION_MY:
+                showMyMeetings();
+                break;
+            default:
+                Toast.makeText(CourseActivity.this, "Meeting Filter Error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+        }
     }
 
-    private void createNewGroup() {
-        Intent createGroupActivityIntent = new Intent(this, CreateGroupActivity.class);
-        createGroupActivityIntent.putExtra(COURSE, courseId);
-        startActivity(createGroupActivityIntent);
+    private void onMeetingObjectReady(Meeting meeting) {
+        for (Meeting m : meetingsList) {
+            if (m.getId() == meeting.getId()) {
+                m.setMembers(meeting.getMembers()); //  TODO: this should update myMeetingsList too
+                meetingAdapter.notifyDataSetChanged();
+                break;
+            }
+        }
+        Snackbar.make(mainContent, (meeting.getMembers().contains(user.getId()) ? "Joined" : "Left") + " meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
     }
 
-    public void onGroupFilterClick(View v) {
+    private void onGroupCheckboxClickHandler(Group group, boolean isChecked) {
+        if (isChecked) {
+            groupDAO.joinGroup(group.getId());
+        } else {
+            groupDAO.leaveGroup(group.getId());
+        }
+    }
+
+    public void onMeetingCheckboxClickHandler(Meeting meeting, boolean isChecked) {
+        if (isChecked) {
+            meetingDAO.joinMeeting(meeting.getId());
+        } else {
+            meetingDAO.leaveMeeting(meeting.getId());
+        }
+    }
+
+    public void onGroupFilterClickHandler(final View v) {
         final String category = "Groups";
 
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        final String[] prefixes = {"All", "My"};
-        final String[] options = new String[prefixes.length];
-        for (int i = 0; i < prefixes.length; i++) {
-            options[i] = prefixes[i] + " " + category;
+        final String[] filterOptions = Arrays.copyOf(FILTER_OPTION_PREFIXES, FILTER_OPTION_PREFIXES.length);
+        for (int i = 0; i < filterOptions.length; i++) {
+            filterOptions[i] += " " + category;
         }
 
-        builder.setTitle("Filter by")
-                .setItems(options, new DialogInterface.OnClickListener() {
+        builder.setTitle(FILTER_TITLE)
+                .setItems(filterOptions, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        groupFilter.setText(options[which]);
-                        refreshGroupList();
+                        if (which != (int) v.getTag()) {
+                            v.setTag(which);
+                            groupFilterText.setText(filterOptions[which]);
+                            switch(which) {
+                                case FILTER_OPTION_ALL:
+                                    showAllGroups();
+                                    break;
+                                case FILTER_OPTION_MY:
+                                    showMyGroups();
+                                    break;
+                                default:
+                                    break; // TODO: error handling
+                            }
+                        }
                     }
                 })
                 .show();
     }
 
-    public void onMeetingFilterClick(View v) {
+    public void onMeetingFilterClickHandler(final View v) {
         final String category = "Meetings";
 
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        final String[] prefixes = {"All", "My"};
-        final String[] options = new String[prefixes.length];
-        for (int i = 0; i < prefixes.length; i++) {
-            options[i] = prefixes[i] + " " + category;
+        final String[] filterOptions = Arrays.copyOf(FILTER_OPTION_PREFIXES, FILTER_OPTION_PREFIXES.length);
+        for (int i = 0; i < filterOptions.length; i++) {
+            filterOptions[i] += " " + category;
         }
 
-        builder.setTitle("Filter by")
-                .setItems(options, new DialogInterface.OnClickListener() {
+        builder.setTitle(FILTER_TITLE)
+                .setItems(filterOptions, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        meetingFilter.setText(options[which]);
-                        refreshMeetingList();
+                        if (which != (int) v.getTag()) {
+                            v.setTag(which);
+                            meetingFilterText.setText(filterOptions[which]);
+                            switch(which) {
+                                case FILTER_OPTION_ALL:
+                                    showAllMeetings();
+                                    break;
+                                case FILTER_OPTION_MY:
+                                    showMyMeetings();
+                                default:
+                                    break; // TODO: error handling
+                            }
+                        }
                     }
                 })
                 .show();
-    }
-
-    private void refreshMeetingList() {
-        refreshMeetingList(meetingSearch.getQuery().toString());
-    }
-
-    private void refreshGroupList() {
-        refreshGroupList(groupSearch.getQuery().toString());
-    }
-
-    private void refreshMeetingList(String query) {
-        Map<String, String> filters = new HashMap<>(5);
-        String option = meetingFilter.getText().toString().split("\\s")[0];
-        filters.put("course", String.valueOf(courseId));
-        if (option.equals("My")) {
-            filters.put("members", String.valueOf(userId));
-        }
-        if (!query.isEmpty()) {
-            meetingDAO.getBySearchAndFilters(query, filters);
-        } else {
-            meetingDAO.getByFilters(filters);
-        }
     }
 
     private void refreshGroupList(String query) {
-        Map<String, String> filters = new HashMap<>(5);
-        String option = groupFilter.getText().toString().split("\\s")[0];
-        filters.put("course", String.valueOf(courseId));
-        if (option.equals("My")) {
-            filters.put("members", String.valueOf(userId));
-        }
-        if (!query.isEmpty()) {
-            groupDAO.getBySearchAndFilters(query, filters);
+        Map<String, String> filters = new HashMap<>();
+        filters.put(FILTER_COURSE, String.valueOf(course.getId()));
+        groupDAO.getBySearchAndFilters(query, filters);
+    }
+
+    private void refreshMeetingList(String query) {
+        Map<String, String> filters = new HashMap<>();
+        filters.put(FILTER_COURSE, String.valueOf(course.getId()));
+        meetingDAO.getBySearchAndFilters(query, filters);
+    }
+
+    private void showAllGroups() { // TODO: unnecessary?
+        showGroups(groupsList);
+    }
+
+    private void showMyGroups() { // TODO: unnecessary?
+        showGroups(myGroupsList);
+    }
+
+    private void showAllMeetings() { // TODO: unnecessary?
+        showMeetings(meetingsList);
+    }
+
+    private void showMyMeetings() { // TODO: unnecessary?
+        showMeetings(myMeetingsList);
+    }
+
+    private void showGroups(List<Group> groups) {
+        groupAdapter.setData(groups);
+        if (groups.isEmpty()) {
+            textNoGroupsFound.setVisibility(View.VISIBLE);
         } else {
-            groupDAO.getByFilters(filters);
+            textNoGroupsFound.setVisibility(View.GONE);
         }
     }
+
+    private void showMeetings(List<Meeting> meetings) {
+        meetingAdapter.setData(meetings);
+        if (meetings.isEmpty()) {
+            textNoGroupsFound.setVisibility(View.VISIBLE);
+        } else {
+            textNoGroupsFound.setVisibility(View.GONE);
+        }
+    }
+
 }

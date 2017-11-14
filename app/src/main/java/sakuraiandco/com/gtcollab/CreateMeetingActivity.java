@@ -22,24 +22,25 @@ import org.joda.time.LocalTime;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
+import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.domain.Meeting;
+import sakuraiandco.com.gtcollab.domain.Term;
+import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.MeetingDAO;
-import sakuraiandco.com.gtcollab.rest.MeetingInvitationDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_TAB;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseActvitiy;
 
-public class CreateMeetingActivity extends AppCompatActivity implements DAOListener<Meeting> {
+public class CreateMeetingActivity extends AppCompatActivity {
 
-    String courseId;
-
+    // data
     MeetingDAO meetingDAO;
-    MeetingInvitationDAO meetingInvitationDAO;
 
+    // view
     EditText editMeetingName;
     EditText editMeetingLocation;
     EditText editMeetingDescription;
@@ -48,6 +49,12 @@ public class CreateMeetingActivity extends AppCompatActivity implements DAOListe
     EditText editMeetingDuration;
     Button buttonCreateMeeting;
 
+    // context
+    User user;
+    Term term;
+    Course course;
+
+    // variables
     DateTime now;
     LocalDate startDate;
     LocalTime startTime;
@@ -65,28 +72,31 @@ public class CreateMeetingActivity extends AppCompatActivity implements DAOListe
         SingletonProvider.setContext(getApplicationContext());
 
         // data
-        meetingDAO = new MeetingDAO(this);
-
-        // TODO
-//        String name;
-//        String location;
-//        String description;
-//        LocalDate startDate;
-//        LocalTime startTime;
-//        int durationMinutes;
-//        List<Integer> members; TODO: invite other users?
+        meetingDAO = new MeetingDAO(new BaseDAO.Listener<Meeting>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CreateMeetingActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling - handle server-side validation error
+            }
+            @Override
+            public void onListReady(List<Meeting> meetings) {}
+            @Override
+            public void onObjectReady(Meeting meeting) {
+                Toast.makeText(CreateMeetingActivity.this, "Created new meeting: " + meeting.getName(), Toast.LENGTH_SHORT).show();
+                startCourseActvitiy(CreateMeetingActivity.this, user, term, course, TAB_MEETINGS);
+            }
+        });
 
         // handle intent
         handleIntent(getIntent());
 
         // view
-        editMeetingName = (EditText) findViewById(R.id.edit_meeting_name);
-        editMeetingLocation = (EditText) findViewById(R.id.edit_meeting_location);
-        editMeetingDescription = (EditText) findViewById(R.id.edit_meeting_description);
-        editMeetingStartDate = (EditText) findViewById(R.id.edit_meeting_start_date);
-        editMeetingStartTime = (EditText) findViewById(R.id.edit_meeting_start_time);
-        editMeetingDuration = (EditText) findViewById(R.id.edit_meeting_duration);
-        buttonCreateMeeting = (Button) findViewById(R.id.button_create_meeting);
+        editMeetingName = findViewById(R.id.edit_meeting_name);
+        editMeetingLocation = findViewById(R.id.edit_meeting_location);
+        editMeetingDescription = findViewById(R.id.edit_meeting_description);
+        editMeetingStartDate = findViewById(R.id.edit_meeting_start_date);
+        editMeetingStartTime = findViewById(R.id.edit_meeting_start_time);
+        editMeetingDuration = findViewById(R.id.edit_meeting_duration);
+        buttonCreateMeeting = findViewById(R.id.button_create_meeting);
 
         editMeetingStartDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -150,7 +160,7 @@ public class CreateMeetingActivity extends AppCompatActivity implements DAOListe
                             .startDate(startDate)
                             .startTime(startTime)
                             .durationMinutes(Integer.valueOf(editMeetingDuration.getText().toString())) // TODO: validate
-                            .courseId(Integer.valueOf(courseId))
+                            .courseId(course.getId())
                             .build();
                     meetingDAO.create(m);
                 }
@@ -172,7 +182,9 @@ public class CreateMeetingActivity extends AppCompatActivity implements DAOListe
     }
 
     private void handleIntent(Intent intent) {
-        courseId = intent.getStringExtra(COURSE);
+        user = intent.getParcelableExtra(EXTRA_USER);
+        term = intent.getParcelableExtra(EXTRA_TERM);
+        course = intent.getParcelableExtra(EXTRA_COURSE);
         now = DateTime.now();
         startDate = now.toLocalDate();
         startTime = now.toLocalTime();
@@ -194,23 +206,6 @@ public class CreateMeetingActivity extends AppCompatActivity implements DAOListe
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void onListReady(List<Meeting> meetings) {}
-
-    @Override
-    public void onObjectReady(Meeting meeting) {
-        Toast.makeText(this, "Created new meeting: " + meeting.getName(), Toast.LENGTH_SHORT).show();
-        Intent courseActivityIntent = new Intent(CreateMeetingActivity.this, CourseActivity.class);
-        courseActivityIntent.putExtra(COURSE_ID, courseId);
-        courseActivityIntent.putExtra(COURSE_TAB, TAB_MEETINGS);
-        startActivity(courseActivityIntent);
-    }
-
-    @Override
-    public void onDAOError(BaseDAO.Error error) {
-        Toast.makeText(this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling - handle server-side validation error
     }
 
 }

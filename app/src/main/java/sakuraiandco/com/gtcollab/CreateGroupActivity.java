@@ -16,29 +16,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
+import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.domain.Group;
+import sakuraiandco.com.gtcollab.domain.Term;
+import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.GroupDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_ID;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE_TAB;
-import static sakuraiandco.com.gtcollab.constants.Arguments.SELECTED_USERS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_REQUEST_CODE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_RESULT_CODE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SELECTED_USERS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserIDs;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserNames;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseActvitiy;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startUserSelectActivityForResult;
 
-public class CreateGroupActivity extends AppCompatActivity implements DAOListener<Group> {
+public class CreateGroupActivity extends AppCompatActivity {
 
-    String courseId;
-
+    // data
     GroupDAO groupDAO;
 
+    //view
     EditText editGroupName;
     Button buttonAddMembers;
     TextView textGroupMembers;
     Button buttonCreateGroup;
 
-    List<Integer> members;
+    // context
+    User user;
+    Term term;
+    Course course;
+
+    // variables
+    List<User> members;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,27 +66,36 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
         SingletonProvider.setContext(getApplicationContext());
 
         // data
-        groupDAO = new GroupDAO(this);
+        groupDAO = new GroupDAO(new BaseDAO.Listener<Group>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CreateGroupActivity.this, "GroupDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling - handle server-side validation error
+            }
+            @Override
+            public void onListReady(List<Group> groups) {}
+            @Override
+            public void onObjectReady(Group group) {
+                Toast.makeText(CreateGroupActivity.this, "Created new group: " + group.getName(), Toast.LENGTH_SHORT).show();
+                startCourseActvitiy(CreateGroupActivity.this, user, term, course, TAB_GROUPS);
+            }
+        });
 
-        // TODO
-//        String name;
+        // TODO reorganize
         members = new ArrayList<>();
 
         // handle intent
         handleIntent(getIntent());
 
         // view
-        editGroupName = (EditText) findViewById(R.id.edit_group_name);
-        buttonAddMembers = (Button) findViewById(R.id.button_add_members);
-        textGroupMembers = (TextView) findViewById(R.id.text_group_members);
-        buttonCreateGroup = (Button) findViewById(R.id.button_create_group);
+        editGroupName = findViewById(R.id.edit_group_name);
+        buttonAddMembers = findViewById(R.id.button_add_members);
+        textGroupMembers = findViewById(R.id.text_group_members);
+        buttonCreateGroup = findViewById(R.id.button_create_group);
 
         buttonAddMembers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CreateGroupActivity.this, UserSelectActivity.class);
-                intent.putExtra(COURSE, courseId); // select users from course members
-                startActivityForResult(intent, 0); // TODO: refactor request code into constant
+                startUserSelectActivityForResult(CreateGroupActivity.this, user, term, course, members, DEFAULT_REQUEST_CODE);
             }
         });
 
@@ -82,8 +105,8 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
                 if (validate(editGroupName)) { // TODO: validate fields in order they appear on the screen
                     Group m = Group.builder()
                             .name(editGroupName.getText().toString().trim())
-                            .courseId(Integer.valueOf(courseId))
-                            .members(members)
+                            .courseId(course.getId())
+                            .members(getUserIDs(members))
                             .build();
                     groupDAO.create(m);
                 }
@@ -105,7 +128,9 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
     }
 
     private void handleIntent(Intent intent) {
-        courseId = intent.getStringExtra(COURSE);
+        user = intent.getParcelableExtra(EXTRA_USER);
+        term = intent.getParcelableExtra(EXTRA_TERM);
+        course = intent.getParcelableExtra(EXTRA_COURSE);
     }
 
     @Override
@@ -129,29 +154,15 @@ public class CreateGroupActivity extends AppCompatActivity implements DAOListene
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0) {
-            if (resultCode == 0) {
-                members = data.getIntegerArrayListExtra(SELECTED_USERS);
-                textGroupMembers.setText(members.toString());
+        if (requestCode == DEFAULT_REQUEST_CODE) {
+            if (resultCode == DEFAULT_RESULT_CODE) {
+                ArrayList<User> temp = data.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
+                if (temp != null) {
+                    members = temp;
+                    textGroupMembers.setText(String.join("\n", getUserNames(members))); // TODO display users on UI
+                }
             }
         }
-    }
-
-    @Override
-    public void onListReady(List<Group> groups) {}
-
-    @Override
-    public void onObjectReady(Group group) {
-        Toast.makeText(this, "Created new group: " + group.getName(), Toast.LENGTH_SHORT).show();
-        Intent courseActivityIntent = new Intent(CreateGroupActivity.this, CourseActivity.class);
-        courseActivityIntent.putExtra(COURSE_ID, courseId);
-        courseActivityIntent.putExtra(COURSE_TAB, TAB_GROUPS);
-        startActivity(courseActivityIntent);
-    }
-
-    @Override
-    public void onDAOError(BaseDAO.Error error) {
-        Toast.makeText(this, "GroupDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling - handle server-side validation error
     }
 
 }

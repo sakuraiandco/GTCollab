@@ -11,32 +11,25 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Setter;
 import sakuraiandco.com.gtcollab.R;
+import sakuraiandco.com.gtcollab.adapters.MeetingAdapter.MeetingViewHolder;
 import sakuraiandco.com.gtcollab.domain.Meeting;
+import sakuraiandco.com.gtcollab.domain.User;
 
 /**
  * Created by kaliq on 10/17/2017.
  */
 
-public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.MeetingViewHolder> {
+public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
 
-    public interface Listener {
-        void onMeetingCheckboxClick(View v, int objectId);
-        void onMeetingMembersClick(View v, int objectId, String meetingName);
-    }
-
-    private List<Meeting> data;
-    private Listener callback;
-    private String userId;
+    private User user;
     private MeetingViewHolder currentExpanded;
 
-    public MeetingAdapter(Listener callback, String userId) { this(new ArrayList<Meeting>(), callback, userId); }
+    public MeetingAdapter(MeetingAdapterListener callback, User user) { this(new ArrayList<Meeting>(), callback, user); }
 
-    public MeetingAdapter(List<Meeting> data, Listener callback, String userId) {
-        this.data = data;
-        this.callback = callback;
-        this.userId = userId;
+    public MeetingAdapter(List<Meeting> data, MeetingAdapterListener callback, User user) {
+        super(data, callback);
+        this.user = user;
     }
 
     @Override
@@ -54,37 +47,26 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.MeetingV
         holder.textMeetingDuration.setText(String.valueOf(m.getDurationMinutes() + "min"));
         holder.textMeetingCreator.setText(m.getCreator().getFirstName() + " " + m.getCreator().getLastName());
         holder.textMeetingNumMembers.setText(String.valueOf(m.getMembers().size()));
-        holder.textMeetingDescription.setText(m.getDescription());
-        holder.checkboxMeeting.setChecked(m.getMembers().contains(Integer.valueOf(userId)));
-        holder.setObjectId(m.getId());
+        holder.checkboxMeeting.setChecked(m.getMembers().contains(user.getId()));
+        holder.object = m;
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
+    class MeetingViewHolder extends RecyclerView.ViewHolder {
 
-    public void setData(List<Meeting> data) {
-        this.data = data;
-        notifyDataSetChanged();
-    }
+        LinearLayout meetingDetailsShort;
+        TextView textMeetingName;
+        TextView textMeetingLocation;
+        TextView textMeetingStartDate;
+        TextView textMeetingStartTime;
+        TextView textMeetingDuration;
+        TextView textMeetingCreator;
+        TextView textMeetingNumMembers;
+        TextView textMeetingDescription;
+        LinearLayout meetingNumMembers;
+        CheckBox checkboxMeeting;
+        Meeting object;
 
-    public class MeetingViewHolder extends RecyclerView.ViewHolder {
-
-        public LinearLayout meetingDetailsShort;
-        public TextView textMeetingName;
-        public TextView textMeetingLocation;
-        public TextView textMeetingStartDate;
-        public TextView textMeetingStartTime;
-        public TextView textMeetingDuration;
-        public TextView textMeetingCreator;
-        public TextView textMeetingNumMembers;
-        public TextView textMeetingDescription;
-        public LinearLayout meetingNumMembers;
-        public CheckBox checkboxMeeting;
-        @Setter public int objectId;
-
-        public MeetingViewHolder(View view) {
+        MeetingViewHolder(View view) {
             super(view);
             meetingDetailsShort = view.findViewById(R.id.meeting_details_short);
             textMeetingName = view.findViewById(R.id.text_meeting_name);
@@ -97,7 +79,6 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.MeetingV
             textMeetingDescription = view.findViewById(R.id.text_meeting_description);
             meetingNumMembers = view.findViewById(R.id.meeting_num_members);
             checkboxMeeting = view.findViewById(R.id.checkbox_meeting);
-            objectId = -1;
             meetingDetailsShort.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -116,13 +97,13 @@ public class MeetingAdapter extends RecyclerView.Adapter<MeetingAdapter.MeetingV
             meetingNumMembers.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callback.onMeetingMembersClick(v, objectId, textMeetingName.getText().toString());
+                    ((MeetingAdapterListener) callback).onMeetingMembersClick(object);
                 }
             });
             checkboxMeeting.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callback.onMeetingCheckboxClick(v, objectId);
+                    ((MeetingAdapterListener) callback).onMeetingCheckboxClick(object, ((CheckBox) v).isChecked());
                 }
             });
         }

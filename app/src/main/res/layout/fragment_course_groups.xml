@@ -21,11 +21,11 @@
 
 
             <LinearLayout
+                android:id="@+id/group_filter_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="true"
-                android:onClick="onGroupFilterClick">
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -56,13 +56,15 @@
 
             </RelativeLayout>
 
-
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/groups_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:paddingBottom="90dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
 
         <TextView
             android:id="@+id/text_no_groups_found"

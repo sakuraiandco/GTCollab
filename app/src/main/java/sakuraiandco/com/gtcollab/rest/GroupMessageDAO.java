@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import sakuraiandco.com.gtcollab.domain.GroupMessage;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 /**
  * Created by kaliq on 10/15/2017.
@@ -14,7 +13,7 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 public class GroupMessageDAO extends BaseDAO<GroupMessage> {
 
-    public GroupMessageDAO(DAOListener<GroupMessage> callback) {
+    public GroupMessageDAO(Listener<GroupMessage> callback) {
         super(GroupMessage.BASE_URL, callback);
     }
 

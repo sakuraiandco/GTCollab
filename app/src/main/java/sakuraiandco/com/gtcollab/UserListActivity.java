@@ -16,30 +16,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sakuraiandco.com.gtcollab.adapters.AdapterListener;
 import sakuraiandco.com.gtcollab.adapters.UserListAdapter;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
+import sakuraiandco.com.gtcollab.domain.Course;
+import sakuraiandco.com.gtcollab.domain.Group;
+import sakuraiandco.com.gtcollab.domain.Meeting;
+import sakuraiandco.com.gtcollab.domain.Term;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
+import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSES_AS_MEMBER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.GROUP;
-import static sakuraiandco.com.gtcollab.constants.Arguments.GROUPS_AS_MEMBER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.MEETING;
-import static sakuraiandco.com.gtcollab.constants.Arguments.MEETINGS_AS_MEMBER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.TITLE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_GROUP;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_MEETING;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSES_AS_MEMBER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_GROUPS_AS_MEMBER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_MEETINGS_AS_MEMBER;
 
-public class UserListActivity extends AppCompatActivity implements DAOListener<User>,UserListAdapter.Listener {
+public class UserListActivity extends AppCompatActivity {
 
+    // data
     UserDAO userDAO;
 
-    TextView textNoUsersFound;
-    RecyclerView usersRecyclerView;
+    // adapter
     UserListAdapter userListAdapter;
 
-    String actionBarTitle;
+    // layout manager
+    LinearLayoutManager linearLayoutManager;
+
+    //view
+    TextView textNoUsersFound;
+    RecyclerView usersRecyclerView;
+
+    // context
+    User user;
+    Term term;
+    Course course;
+    Group group;
+    Meeting meeting;
+
+    // variables
+    String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +74,37 @@ public class UserListActivity extends AppCompatActivity implements DAOListener<U
         SingletonProvider.setContext(getApplicationContext());
 
         // data
-        userDAO = new UserDAO(this);
+        userDAO = new UserDAO(new BaseDAO.Listener<User>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(UserListActivity.this, "UserDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<User> users) {
+                onUserListReady(users);
+            }
+            @Override
+            public void onObjectReady(User user) {}
+        });
 
         // adapter
-        userListAdapter = new UserListAdapter(this);
+        userListAdapter = new UserListAdapter(new AdapterListener<User>() {
+            @Override
+            public void onClick(User user) {
+                onClickUser(user);
+            }
+        });
+
+        // layout manager
+        linearLayoutManager = new LinearLayoutManager(this);
 
         // view
-        textNoUsersFound = (TextView) findViewById(R.id.text_no_users_found);
-        usersRecyclerView = (RecyclerView) findViewById(R.id.users_recycler_view);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this.getBaseContext(), LinearLayoutManager.VERTICAL, false));
-        usersRecyclerView.setHasFixedSize(true); // TODO: optimization
+        textNoUsersFound = findViewById(R.id.text_no_users_found);
+        usersRecyclerView = findViewById(R.id.users_recycler_view);
         usersRecyclerView.setAdapter(userListAdapter);
+        usersRecyclerView.setLayoutManager(linearLayoutManager);
+        usersRecyclerView.setHasFixedSize(true); // TODO: optimization
+        usersRecyclerView.addOnScrollListener(new PaginationScrollListener<>(linearLayoutManager, userDAO));
 
         // retrieve data
         handleIntent(getIntent());
@@ -75,23 +116,26 @@ public class UserListActivity extends AppCompatActivity implements DAOListener<U
     }
 
     private void handleIntent(Intent intent) {
-        String title = intent.getStringExtra(TITLE);
-        String courseId = intent.getStringExtra(COURSE);
-        String groupId = intent.getStringExtra(GROUP);
-        String meetingId = intent.getStringExtra(MEETING);
-
-        actionBarTitle = title;
+        user = intent.getParcelableExtra(EXTRA_USER);
+        term = intent.getParcelableExtra(EXTRA_TERM);
+        course = intent.getParcelableExtra(EXTRA_COURSE);
+        group = intent.getParcelableExtra(EXTRA_GROUP);
+        meeting = intent.getParcelableExtra(EXTRA_MEETING);
 
         Map<String, String> filters = new HashMap<>();
-        if (courseId != null) {
-            filters.put(COURSES_AS_MEMBER, courseId);
-        } else if (groupId != null) {
-            filters.put(GROUPS_AS_MEMBER, groupId);
-        } else if (meetingId != null) {
-            filters.put(MEETINGS_AS_MEMBER, meetingId);
+        if (group != null) {
+            filters.put(FILTER_GROUPS_AS_MEMBER, String.valueOf(group.getId()));
+            title = group.getName();
+        } else if (meeting != null) {
+            filters.put(FILTER_MEETINGS_AS_MEMBER, String.valueOf(meeting.getId()));
+            title = meeting.getName();
+        } else if (course != null) {
+            filters.put(FILTER_COURSES_AS_MEMBER, String.valueOf(course.getId()));
+            title = course.getShortName();
         } else {
             Toast.makeText(this, "No context", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
+        getSupportActionBar().setTitle(title);
         userDAO.getByFilters(filters);
     }
 
@@ -113,28 +157,17 @@ public class UserListActivity extends AppCompatActivity implements DAOListener<U
         }
     }
 
-    @Override
-    public void onListReady(List<User> users) {
-        if (!users.isEmpty()) {
+    public void onUserListReady(List<User> users) {
+        userListAdapter.addData(users);
+        if (!userListAdapter.getData().isEmpty()) {
             textNoUsersFound.setVisibility(View.GONE);
-            userListAdapter.setData(users);
         } else {
             textNoUsersFound.setVisibility(View.VISIBLE);
         }
-        actionBarTitle += " - " + users.size() + " Members";
-        getSupportActionBar().setTitle(actionBarTitle);
+        getSupportActionBar().setTitle(title + " - " + users.size() + " Members");
     }
 
-    @Override
-    public void onObjectReady(User user) {}
-
-    @Override
-    public void onDAOError(BaseDAO.Error error) {
-        Toast.makeText(this, "UserDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
-    }
-
-    @Override
-    public void onClickUserAdapter(View view, int objectId) {
+    public void onClickUser(User user) {
         // TODO: show user profile?
     }
 }

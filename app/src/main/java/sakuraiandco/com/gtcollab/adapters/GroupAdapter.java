@@ -5,39 +5,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Setter;
 import sakuraiandco.com.gtcollab.R;
+import sakuraiandco.com.gtcollab.adapters.GroupAdapter.GroupViewHolder;
 import sakuraiandco.com.gtcollab.domain.Group;
+import sakuraiandco.com.gtcollab.domain.User;
 
 /**
  * Created by kaliq on 10/17/2017.
  */
 
-public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> {
+public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
 
-    public interface Listener {
-        void onGroupCheckboxClick(View v, int objectId);
-        void onGroupMembersClick(View v, int objectId, String groupName);
-    }
-
-    private List<Group> data;
-    private Listener callback;
-    private String userId;
+    private User user;
     private GroupViewHolder currentExpanded;
 
-    public GroupAdapter(Listener callback, String userId) { this(new ArrayList<Group>(), callback, userId); }
+    public GroupAdapter(GroupAdapterListener callback, User user) { this(new ArrayList<Group>(), callback, user); }
 
-    public GroupAdapter(List<Group> data, Listener callback, String userId) {
-        this.data = data;
-        this.callback = callback;
-        this.userId = userId;
+    public GroupAdapter(List<Group> data, GroupAdapterListener callback, User user) {
+        super(data, callback);
+        this.user = user;
     }
 
     @Override
@@ -51,32 +43,22 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         holder.textGroupName.setText(g.getName());
         holder.textGroupCreator.setText(g.getCreator().getFirstName() + " " + g.getCreator().getLastName());
         holder.textGroupNumMembers.setText(String.valueOf(g.getMembers().size()));
-        holder.checkboxGroup.setChecked(g.getMembers().contains(Integer.valueOf(userId)));
-        holder.setObjectId(g.getId());
+        holder.checkboxGroup.setChecked(g.getMembers().contains(user.getId()));
+        holder.object = g;
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
+    class GroupViewHolder extends RecyclerView.ViewHolder {
 
-    public void setData(List<Group> data) {
-        this.data = data;
-        notifyDataSetChanged();
-    }
+        LinearLayout groupDetailsShort;
+        TextView textGroupName;
+        TextView textGroupCreator;
+        TextView textGroupNumMembers;
+        TextView textGroupDescription;
+        LinearLayout groupNumMembers;
+        CheckBox checkboxGroup;
+        Group object;
 
-    public class GroupViewHolder extends RecyclerView.ViewHolder {
-
-        public LinearLayout groupDetailsShort;
-        public TextView textGroupName;
-        public TextView textGroupCreator;
-        public TextView textGroupNumMembers;
-        public TextView textGroupDescription;
-        public LinearLayout groupNumMembers;
-        public CheckBox checkboxGroup;
-        @Setter public int objectId;
-
-        public GroupViewHolder(View view) {
+        GroupViewHolder(View view) {
             super(view);
             groupDetailsShort = view.findViewById(R.id.group_details_short);
             textGroupName = view.findViewById(R.id.text_group_name);
@@ -85,7 +67,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             textGroupDescription = view.findViewById(R.id.text_group_description);
             groupNumMembers = view.findViewById(R.id.group_num_members);
             checkboxGroup = view.findViewById(R.id.checkbox_group);
-            objectId = -1;
             groupDetailsShort.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -104,13 +85,13 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
             groupNumMembers.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callback.onGroupMembersClick(v, objectId, textGroupName.getText().toString());
+                    ((GroupAdapterListener) callback).onGroupMembersClick(object);
                 }
             });
             checkboxGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callback.onGroupCheckboxClick(v, objectId);
+                    ((GroupAdapterListener) callback).onGroupCheckboxClick(object, ((CheckBox) v).isChecked());
                 }
             });
         }

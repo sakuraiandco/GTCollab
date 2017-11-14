@@ -4,7 +4,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import sakuraiandco.com.gtcollab.domain.Subject;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 import sakuraiandco.com.gtcollab.rest.base.ReadOnlyDAO;
 
 /**
@@ -13,7 +12,7 @@ import sakuraiandco.com.gtcollab.rest.base.ReadOnlyDAO;
 
 public class SubjectDAO extends ReadOnlyDAO<Subject> {
 
-    public SubjectDAO(DAOListener<Subject> callback) {
+    public SubjectDAO(Listener<Subject> callback) {
         super(Subject.BASE_URL, callback);
     }
 
@@ -23,7 +22,7 @@ public class SubjectDAO extends ReadOnlyDAO<Subject> {
                 .id(o.getInt("id"))
                 .name(o.getString("name"))
                 .code(o.getString("code"))
-                .term_name(o.getJSONObject("term").getString("name"))
+                .termName(o.getJSONObject("term").getString("name"))
                 .coursesLoaded(o.getBoolean("courses_loaded"))
                 .build();
     }

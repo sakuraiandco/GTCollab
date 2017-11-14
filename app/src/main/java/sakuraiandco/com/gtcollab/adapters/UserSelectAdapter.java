@@ -9,23 +9,24 @@ import android.widget.CheckedTextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
 import lombok.Setter;
 import sakuraiandco.com.gtcollab.R;
+import sakuraiandco.com.gtcollab.adapters.UserSelectAdapter.UserViewHolder;
 import sakuraiandco.com.gtcollab.domain.User;
 
 /**
  * Created by kaliq on 10/17/2017.
  */
 
-public class UserSelectAdapter extends RecyclerView.Adapter<UserSelectAdapter.UserViewHolder> {
+public class UserSelectAdapter extends BaseAdapter<User, UserViewHolder> {
 
-    private List<User> data;
-    private List<Integer> selected;
+    @Getter @Setter private List<User> selected;
 
     public UserSelectAdapter() { this(new ArrayList<User>()); }
 
     public UserSelectAdapter(List<User> data) {
-        this.data = data;
+        super(data, null);
         this.selected = new ArrayList<>();
     }
 
@@ -38,45 +39,38 @@ public class UserSelectAdapter extends RecyclerView.Adapter<UserSelectAdapter.Us
     public void onBindViewHolder(UserViewHolder holder, int position) {
         User u = data.get(position);
         holder.checkedTextUserName.setText(u.getFirstName() + " " + u.getLastName());
-        holder.setObjectId(u.getId());
-        holder.setObject(u);
+        holder.object = u;
+        if (selected.contains(u)) {
+            holder.checkedTextUserName.setChecked(true);
+            holder.checkedTextUserName.setCheckMarkDrawable(R.drawable.ic_check_black_24dp);
+        } else {
+            holder.checkedTextUserName.setChecked(false);
+            holder.checkedTextUserName.setCheckMarkDrawable(null);
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
+    public void addSelected(User u) {
+        selected.add(u);
+        notifyDataSetChanged(); // TODO: this should call onBindViewHolder() and update checkmark?
     }
 
-    public void setData(List<User> data) {
-        this.data = data;
-        notifyDataSetChanged();
-    }
+    class UserViewHolder extends RecyclerView.ViewHolder {
 
-    public List<Integer> getSelected() {
-        return selected;
-    }
+        CheckedTextView checkedTextUserName;
+        User object;
 
-    public class UserViewHolder extends RecyclerView.ViewHolder {
-
-        public CheckedTextView checkedTextUserName;
-        @Setter public Integer objectId;
-        @Setter public User object;
-        boolean isSelected;
-
-        public UserViewHolder(View view) {
+        UserViewHolder(View view) {
             super(view);
             checkedTextUserName = view.findViewById(R.id.checked_text_user_name);
-            objectId = -1;
-            isSelected = false;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (checkedTextUserName.isChecked()) {
-                        selected.remove(UserViewHolder.this.objectId);
+                        selected.remove(object);
                         checkedTextUserName.setChecked(false);
                         checkedTextUserName.setCheckMarkDrawable(null);
                     } else {
-                        selected.add(UserViewHolder.this.objectId);
+                        selected.add(object); // TODO: check duplicates?
                         checkedTextUserName.setChecked(true);
                         checkedTextUserName.setCheckMarkDrawable(R.drawable.ic_check_black_24dp);
                     }

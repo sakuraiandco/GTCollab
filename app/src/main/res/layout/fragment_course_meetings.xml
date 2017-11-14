@@ -20,11 +20,11 @@
             android:layout_marginStart="10dp">
 
             <LinearLayout
+                android:id="@+id/meeting_filter_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="true"
-                android:onClick="onMeetingFilterClick">
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -53,13 +53,15 @@
 
             </RelativeLayout>
 
-
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/meetings_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:paddingBottom="90dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
 
         <TextView
             android:id="@+id/text_no_meetings_found"

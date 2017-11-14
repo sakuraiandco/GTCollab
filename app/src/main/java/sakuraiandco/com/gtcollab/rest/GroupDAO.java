@@ -9,7 +9,6 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.postRequest;
 
@@ -21,17 +20,17 @@ public class GroupDAO extends BaseDAO<Group> {
 
     private UserDAO userDAO;
 
-    public GroupDAO(DAOListener<Group> callback) {
+    public GroupDAO(Listener<Group> callback) {
         super(Group.BASE_URL, callback);
         this.userDAO = new UserDAO(null);
     }
 
     public void joinGroup(int id) {
-        postRequest(baseURL + id + "/join/", null, this);
+        postRequest(getBaseURL() + id + "/join/", null, this);
     }
 
     public void leaveGroup(int id) {
-        postRequest(baseURL + id + "/leave/", null, this);
+        postRequest(getBaseURL() + id + "/leave/", null, this);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class GroupDAO extends BaseDAO<Group> {
                 .id(o.getInt("id"))
                 .name(o.getString("name"))
                 .courseId(o.getInt("course"))
-                .creator(new UserDAO(null).toDomain(o.getJSONObject("creator")))
+                .creator(userDAO.toDomain(o.getJSONObject("creator")))
                 .members(members)
                 .build();
     }

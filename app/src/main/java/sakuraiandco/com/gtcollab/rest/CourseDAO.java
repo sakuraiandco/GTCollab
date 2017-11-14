@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.domain.Course;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 import sakuraiandco.com.gtcollab.rest.base.ReadOnlyDAO;
 
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.postRequest;
@@ -21,16 +20,16 @@ import static sakuraiandco.com.gtcollab.utils.NetworkUtils.postRequest;
 
 public class CourseDAO extends ReadOnlyDAO<Course> {
 
-    public CourseDAO(DAOListener<Course> callback) {
+    public CourseDAO(Listener<Course> callback) {
         super(Course.BASE_URL, callback);
     }
 
     public void joinCourse(int id) {
-        postRequest(baseURL + id + "/join/", null, this);
+        postRequest(getBaseURL() + id + "/join/", null, this);
     }
 
     public void leaveCourse(int id) {
-        postRequest(baseURL + id + "/leave/", null, this);
+        postRequest(getBaseURL() + id + "/leave/", null, this);
     }
 
     @Override

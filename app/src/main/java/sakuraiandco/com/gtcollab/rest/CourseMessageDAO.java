@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import sakuraiandco.com.gtcollab.domain.CourseMessage;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 /**
  * Created by kaliq on 10/15/2017.
@@ -14,7 +13,7 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 public class CourseMessageDAO extends BaseDAO<CourseMessage> {
 
-    public CourseMessageDAO(DAOListener<CourseMessage> callback) {
+    public CourseMessageDAO(Listener<CourseMessage> callback) {
         super(CourseMessage.BASE_URL, callback);
     }
 

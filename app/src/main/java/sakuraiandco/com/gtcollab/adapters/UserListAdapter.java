@@ -9,28 +9,20 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Setter;
 import sakuraiandco.com.gtcollab.R;
+import sakuraiandco.com.gtcollab.adapters.UserListAdapter.UserViewHolder;
 import sakuraiandco.com.gtcollab.domain.User;
 
 /**
  * Created by kaliq on 10/17/2017.
  */
 
-public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
+public class UserListAdapter extends BaseAdapter<User, UserViewHolder> {
 
-    public interface Listener {
-        void onClickUserAdapter(View view, int objectId);
-    }
+    public UserListAdapter(AdapterListener<User> callback) { this(new ArrayList<User>(), callback); }
 
-    private List<User> data;
-    private Listener callback;
-
-    public UserListAdapter(Listener callback) { this(new ArrayList<User>(), callback); }
-
-    public UserListAdapter(List<User> data, Listener callback) {
-        this.data = data;
-        this.callback = callback;
+    public UserListAdapter(List<User> data, AdapterListener<User> callback) {
+        super(data, callback);
     }
 
     @Override
@@ -42,34 +34,23 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     public void onBindViewHolder(UserViewHolder holder, int position) {
         User u = data.get(position);
         holder.textUserName.setText(u.getFirstName() + " " + u.getLastName());
-        holder.setObjectId(u.getId());
+        holder.object = u;
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
+    class UserViewHolder extends RecyclerView.ViewHolder {
 
-    public void setData(List<User> data) {
-        this.data = data;
-        notifyDataSetChanged();
-    }
+        TextView textUserName;
+        User object;
 
-    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public TextView textUserName;
-        @Setter public int objectId;
-
-        public UserViewHolder(View view) {
+        UserViewHolder(View view) {
             super(view);
             textUserName = view.findViewById(R.id.text_user_name);
-            objectId = -1;
-            view.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            callback.onClickUserAdapter(view, objectId);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callback.onClick(object);
+                }
+            });
         }
     }
 

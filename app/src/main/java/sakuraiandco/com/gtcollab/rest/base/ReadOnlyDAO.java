@@ -10,7 +10,7 @@ import sakuraiandco.com.gtcollab.domain.Entity;
 
 public abstract class ReadOnlyDAO<T extends Entity> extends BaseDAO<T> {
 
-    public ReadOnlyDAO(String baseURL, DAOListener<T> callback) {
+    public ReadOnlyDAO(String baseURL, Listener<T> callback) {
         super(baseURL, callback);
     }
 

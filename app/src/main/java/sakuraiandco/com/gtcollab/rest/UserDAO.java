@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 /**
  * Created by kaliq on 10/15/2017.
@@ -13,7 +12,7 @@ import sakuraiandco.com.gtcollab.rest.base.DAOListener;
 
 public class UserDAO extends BaseDAO<User> {
 
-    public UserDAO(DAOListener<User> callback) {
+    public UserDAO(Listener<User> callback) {
         super(User.BASE_URL, callback);
     }
 

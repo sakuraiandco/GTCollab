@@ -9,28 +9,20 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Setter;
 import sakuraiandco.com.gtcollab.R;
+import sakuraiandco.com.gtcollab.adapters.SubjectSearchAdapter.SubjectViewHolder;
 import sakuraiandco.com.gtcollab.domain.Subject;
 
 /**
  * Created by kaliq on 10/17/2017.
  */
 
-public class SubjectSearchAdapter extends RecyclerView.Adapter<SubjectSearchAdapter.SubjectViewHolder> {
+public class SubjectSearchAdapter extends BaseAdapter<Subject, SubjectViewHolder> {
 
-    public interface Listener {
-        void onClickSubjectAdapter(View view, int objectId);
-    }
+    public SubjectSearchAdapter(AdapterListener<Subject> callback) { this(new ArrayList<Subject>(), callback); }
 
-    private List<Subject> data;
-    private Listener callback;
-
-    public SubjectSearchAdapter(Listener callback) { this(new ArrayList<Subject>(), callback); }
-
-    public SubjectSearchAdapter(List<Subject> data, Listener callback) {
-        this.data = data;
-        this.callback = callback;
+    public SubjectSearchAdapter(List<Subject> data, AdapterListener<Subject> callback) {
+        super(data, callback);
     }
 
     @Override
@@ -42,34 +34,23 @@ public class SubjectSearchAdapter extends RecyclerView.Adapter<SubjectSearchAdap
     public void onBindViewHolder(SubjectViewHolder holder, int position) {
         Subject s = data.get(position);
         holder.textSubjectName.setText(s.getName());
-        holder.setObjectId(s.getId());
+        holder.object = s;
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
+    class SubjectViewHolder extends RecyclerView.ViewHolder {
 
-    public void setData(List<Subject> data) {
-        this.data = data;
-        notifyDataSetChanged();
-    }
+        TextView textSubjectName;
+        Subject object;
 
-    public class SubjectViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public TextView textSubjectName;
-        @Setter public int objectId;
-
-        public SubjectViewHolder(View view) {
+        SubjectViewHolder(View view) {
             super(view);
             textSubjectName = view.findViewById(R.id.text_subject_name);
-            objectId = -1;
-            view.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            callback.onClickSubjectAdapter(view, objectId);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callback.onClick(object);
+                }
+            });
         }
     }
 

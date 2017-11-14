@@ -17,32 +17,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sakuraiandco.com.gtcollab.adapters.UserListAdapter;
 import sakuraiandco.com.gtcollab.adapters.UserSelectAdapter;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
+import sakuraiandco.com.gtcollab.domain.Course;
+import sakuraiandco.com.gtcollab.domain.Term;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.rest.base.DAOListener;
+import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSE;
-import static sakuraiandco.com.gtcollab.constants.Arguments.COURSES_AS_MEMBER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.GROUP;
-import static sakuraiandco.com.gtcollab.constants.Arguments.GROUPS_AS_MEMBER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.MEETING;
-import static sakuraiandco.com.gtcollab.constants.Arguments.MEETINGS_AS_MEMBER;
-import static sakuraiandco.com.gtcollab.constants.Arguments.SELECTED_USERS;
-import static sakuraiandco.com.gtcollab.constants.Arguments.TITLE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_RESULT_CODE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SELECTED_USERS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSES_AS_MEMBER;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserIDs;
 
-public class UserSelectActivity extends AppCompatActivity implements DAOListener<User>,UserListAdapter.Listener {
+public class UserSelectActivity extends AppCompatActivity {
 
+    // data
     UserDAO userDAO;
 
-    TextView textNoUsersFound;
-    RecyclerView usersRecyclerView;
+    // adapter
     UserSelectAdapter userSelectAdapter;
 
-    String actionBarTitle;
+    // layout manager
+    LinearLayoutManager linearLayoutManager;
+
+    //view
+    TextView textNoUsersFound;
+    RecyclerView usersRecyclerView;
+
+    // context
+    User user;
+    Term term;
+    Course course;
+    List<User> selectedUsers;
+    List<Integer> selectedUsersIDs;
+
+    // variables
+    String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,17 +71,32 @@ public class UserSelectActivity extends AppCompatActivity implements DAOListener
         SingletonProvider.setContext(getApplicationContext());
 
         // data
-        userDAO = new UserDAO(this);
+        userDAO = new UserDAO(new BaseDAO.Listener<User>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(UserSelectActivity.this, "UserDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<User> users) {
+                onUserListReady(users);
+            }
+            @Override
+            public void onObjectReady(User user) {}
+        });
 
         // adapter
         userSelectAdapter = new UserSelectAdapter();
 
+        // layout manager
+        linearLayoutManager = new LinearLayoutManager(this);
+
         // view
-        textNoUsersFound = (TextView) findViewById(R.id.text_no_users_found);
-        usersRecyclerView = (RecyclerView) findViewById(R.id.users_recycler_view);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this.getBaseContext(), LinearLayoutManager.VERTICAL, false));
-        usersRecyclerView.setHasFixedSize(true); // TODO: optimization
+        textNoUsersFound = findViewById(R.id.text_no_users_found);
+        usersRecyclerView = findViewById(R.id.users_recycler_view);
         usersRecyclerView.setAdapter(userSelectAdapter);
+        usersRecyclerView.setLayoutManager(linearLayoutManager);
+        usersRecyclerView.setHasFixedSize(true); // TODO: optimization
+        usersRecyclerView.addOnScrollListener(new PaginationScrollListener<>(linearLayoutManager, userDAO));
 
         // retrieve data
         handleIntent(getIntent());
@@ -78,23 +108,20 @@ public class UserSelectActivity extends AppCompatActivity implements DAOListener
     }
 
     private void handleIntent(Intent intent) {
-        String title = intent.getStringExtra(TITLE);
-        String courseId = intent.getStringExtra(COURSE);
-        String groupId = intent.getStringExtra(GROUP);
-        String meetingId = intent.getStringExtra(MEETING);
-
-        actionBarTitle = title;
+        user = intent.getParcelableExtra(EXTRA_USER);
+        term = intent.getParcelableExtra(EXTRA_TERM);
+        course = intent.getParcelableExtra(EXTRA_COURSE);
+        selectedUsers = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
+        selectedUsersIDs = getUserIDs(selectedUsers);
 
         Map<String, String> filters = new HashMap<>();
-        if (courseId != null) {
-            filters.put(COURSES_AS_MEMBER, courseId);
-        } else if (groupId != null) {
-            filters.put(GROUPS_AS_MEMBER, groupId);
-        } else if (meetingId != null) {
-            filters.put(MEETINGS_AS_MEMBER, meetingId);
+        if (course != null) {
+            filters.put(FILTER_COURSES_AS_MEMBER, String.valueOf(course.getId()));
+            title = course.getShortName();
         } else {
             Toast.makeText(this, "No context", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
+        getSupportActionBar().setTitle(title);
         userDAO.getByFilters(filters);
     }
 
@@ -107,42 +134,40 @@ public class UserSelectActivity extends AppCompatActivity implements DAOListener
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent();
+        setResult(DEFAULT_RESULT_CODE, intent);
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed(); // TODO: use NavUtils instead?
+                finish();
                 return true;
             case R.id.submit:
-                Intent intent = new Intent();
-                intent.putIntegerArrayListExtra(SELECTED_USERS, new ArrayList<Integer>(userSelectAdapter.getSelected()));
-                setResult(0, intent); // TODO: set result code constant
+                intent.putParcelableArrayListExtra(EXTRA_SELECTED_USERS, new ArrayList<>(userSelectAdapter.getSelected()));
                 finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    @Override
-    public void onListReady(List<User> users) {
-        if (!users.isEmpty()) {
+    public void onUserListReady(List<User> users) {
+        userSelectAdapter.addData(users);
+        if (!selectedUsersIDs.isEmpty()) {
+            for (User u : users) {
+                if (selectedUsersIDs.contains(u.getId())) {
+                    selectedUsersIDs.remove((Integer) u.getId());
+                    userSelectAdapter.addSelected(u);
+                }
+            }
+        }
+        if (!userSelectAdapter.getData().isEmpty()) {
             textNoUsersFound.setVisibility(View.GONE);
-            userSelectAdapter.setData(users);
         } else {
             textNoUsersFound.setVisibility(View.VISIBLE);
         }
-        actionBarTitle += " - " + users.size() + " Members";
-        getSupportActionBar().setTitle(actionBarTitle);
+        getSupportActionBar().setTitle(title + " - " + users.size() + " Members");
     }
 
-    @Override
-    public void onObjectReady(User user) {}
-
-    @Override
-    public void onDAOError(BaseDAO.Error error) {
-        Toast.makeText(this, "UserDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
-    }
-
-    @Override
-    public void onClickUserAdapter(View view, int objectId) {
+    public void onClickUser(User user) {
         // TODO: show user profile?
     }
 }
