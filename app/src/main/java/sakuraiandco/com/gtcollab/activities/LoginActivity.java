@@ -1,4 +1,4 @@
-package sakuraiandco.com.gtcollab;
+package sakuraiandco.com.gtcollab.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,20 +20,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.constants.Arguments;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.RESTServices;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
-import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
+import sakuraiandco.com.gtcollab.utils.NetworkUtils;
 
 import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_USERNAME;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.register;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseListActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.register;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -145,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            RESTServices.authUser(username, password, new VolleyResponseListener() {
+            RESTServices.authUser(username, password, new NetworkUtils.VolleyResponseListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Toast.makeText(LoginActivity.this, "Could not get auth token", Toast.LENGTH_SHORT).show();

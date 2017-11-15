@@ -1,4 +1,4 @@
-package sakuraiandco.com.gtcollab;
+package sakuraiandco.com.gtcollab.activities;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -21,6 +21,7 @@ import org.joda.time.LocalTime;
 
 import java.util.List;
 
+import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.domain.Meeting;
@@ -33,7 +34,7 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseActvitiy;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
 
 public class CreateMeetingActivity extends AppCompatActivity {
 

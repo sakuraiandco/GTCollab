@@ -18,7 +18,7 @@
         completions."
     </string>
     <string name="search_title">Search</string>
-    <string name="search_hint">Search courses...</string>
+    <string name="search_hint">Search for something...</string>
     <string name="title_activity_subject_search">Subject Search</string>
     <string name="title_activity_course_search">Course Search</string>
     <string name="title_activity_course_list">My Courses</string>

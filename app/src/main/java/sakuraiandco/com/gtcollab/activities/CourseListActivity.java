@@ -1,4 +1,4 @@
-package sakuraiandco.com.gtcollab;
+package sakuraiandco.com.gtcollab.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.AdapterListener;
 import sakuraiandco.com.gtcollab.adapters.CourseListAdapter;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
@@ -36,10 +37,10 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_MEMBERS;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_TERM;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.forceDeviceTokenRefresh;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.login;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.logout;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseActvitiy;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startSubjectSearchActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.login;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.logout;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startSubjectSearchActivity;
 
 public class CourseListActivity extends AppCompatActivity {
 
@@ -73,11 +74,6 @@ public class CourseListActivity extends AppCompatActivity {
 
         // initialization
         SingletonProvider.setContext(getApplicationContext());
-
-        // TODO: put in handleIntent()?
-        Intent intent = getIntent();
-        user = intent.getParcelableExtra(EXTRA_USER);
-        term = intent.getParcelableExtra(EXTRA_TERM);
 
         // device registration
         forceDeviceTokenRefresh(); // TODO: ASSUMES CourseListActivity is launcher activity; best place to put this? LoginActivity instead?
@@ -113,13 +109,21 @@ public class CourseListActivity extends AppCompatActivity {
         userId = prefs.getString(CURRENT_USER, null); // TODO: not needed? how to use this to verify authentication?
         authToken = prefs.getString(AUTH_TOKEN, null); // TODO: not needed? how to use this to verify authentication?
 
+
         // adapter
+        // TODO: put in handleIntent()?
+        Intent intent = getIntent();
+        user = intent.getParcelableExtra(EXTRA_USER);
+        term = intent.getParcelableExtra(EXTRA_TERM);
         courseListAdapter = new CourseListAdapter(new AdapterListener<Course>() {
             @Override
             public void onClick(Course course) {
                 startCourseActvitiy(CourseListActivity.this, user, term, course);
             }
         });
+
+        // retrieve data
+        handleIntent(intent);
 
         // view
         textNoCoursesFound = findViewById(R.id.text_no_courses_found);
@@ -140,9 +144,6 @@ public class CourseListActivity extends AppCompatActivity {
                 }
             }
         });
-
-        // retrieve data
-        handleIntent(intent);
     }
 
     @Override
@@ -151,7 +152,7 @@ public class CourseListActivity extends AppCompatActivity {
     }
 
     private void handleIntent(Intent intent) {
-        if (user != null) {
+        if (userId != null && authToken != null) {
             if (term != null) {
                 getCourses();
             } else {
@@ -174,13 +175,6 @@ public class CourseListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_add_course:
-                if (term != null) { // Wait for current term to be loaded
-                    startSubjectSearchActivity(this, user, term);
-                } else {
-                    Toast.makeText(this, "Server busy", Toast.LENGTH_SHORT).show(); // TODO: error handling
-                }
-                return true;
             case R.id.action_logout:
                 logout(this);
                 return true;

@@ -1,4 +1,4 @@
-package sakuraiandco.com.gtcollab;
+package sakuraiandco.com.gtcollab.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
 import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.domain.Group;
@@ -32,8 +33,9 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserIDs;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserNames;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseActvitiy;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startUserSelectActivityForResult;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.joinStrings;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserSelectActivityForResult;
 
 public class CreateGroupActivity extends AppCompatActivity {
 
@@ -159,7 +161,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 ArrayList<User> temp = data.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
                 if (temp != null) {
                     members = temp;
-                    textGroupMembers.setText(String.join("\n", getUserNames(members))); // TODO display users on UI
+                    textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
                 }
             }
         }

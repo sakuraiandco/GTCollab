@@ -27,13 +27,21 @@ public class Arguments {
     public static final String EXTRA_COURSE = "course";
     public static final String EXTRA_GROUP = "group";
     public static final String EXTRA_MEETING = "meeting";
-    public static final String EXTRA_GROUP_INVITATION = "groupInvitation";
-    public static final String EXTRA_MEETING_INVITATION = "meetingInvitation";
-    public static final String EXTRA_COURSE_MESSAGE = "courseMessage";
-    public static final String EXTRA_GROUP_MESSAGE = "groupMessage";
-    public static final String EXTRA_SEARCH_RESULTS = "searchResults";
-    public static final String EXTRA_SELECTED_USERS = "selectedUsers";
-    public static final String EXTRA_COURSE_TAB = "courseTab";
+    public static final String EXTRA_GROUP_INVITATION = "group_invitation";
+    public static final String EXTRA_MEETING_INVITATION = "meeting_invitation";
+    public static final String EXTRA_COURSE_MESSAGE = "course_message";
+    public static final String EXTRA_GROUP_MESSAGE = "group_message";
+    public static final String EXTRA_SEARCH_RESULTS = "search_results";
+    public static final String EXTRA_SELECTED_USERS = "selected_users";
+    public static final String EXTRA_COURSE_TAB = "course_tab";
+
+    public static final String EXTRA_NOTIFICATION_ID = "notification_id";
+
+        // search
+    public static final String EXTRA_CALLING_ACTIVITY = "calling_activity";
+    public static final int SUBJECT_SEARCH_ACTIVITY = 1;
+    public static final int COURSE_SEARCH_ACTIVITY = 2;
+    public static final int COURSE_ACTIVITY = 3;
 
     // Shared Preferences arguments (arbitrary)
 

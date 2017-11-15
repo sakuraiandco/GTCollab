@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="sakuraiandco.com.gtcollab.CourseActivity">
+    tools:context="sakuraiandco.com.gtcollab.activities.CourseActivity">
     <item
         android:id="@+id/action_new_meeting"
         android:orderInCategory="0"

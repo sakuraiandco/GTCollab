@@ -13,7 +13,7 @@ import java.util.Map;
 
 import lombok.Getter;
 import sakuraiandco.com.gtcollab.domain.Entity;
-import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
+import sakuraiandco.com.gtcollab.utils.NetworkUtils;
 
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.deleteRequest;
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.getRequest;
@@ -24,7 +24,7 @@ import static sakuraiandco.com.gtcollab.utils.NetworkUtils.postRequest;
  * Created by kaliq on 10/15/2017.
  */
 
-public abstract class BaseDAO<T extends Entity> implements VolleyResponseListener {
+public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyResponseListener {
 
     /**************** DAO Listeners ***************************************************************/
 

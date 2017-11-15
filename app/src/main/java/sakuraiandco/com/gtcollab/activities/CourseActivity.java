@@ -1,4 +1,4 @@
-package sakuraiandco.com.gtcollab;
+package sakuraiandco.com.gtcollab.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.CoursePagerAdapter;
 import sakuraiandco.com.gtcollab.adapters.GroupAdapter;
 import sakuraiandco.com.gtcollab.adapters.GroupAdapterListener;
@@ -56,10 +57,10 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCourseListActivity;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCreateGroupActivity;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startCreateMeetingActivity;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.startUserListActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateGroupActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateMeetingActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserListActivity;
 
 public class CourseActivity extends AppCompatActivity {
 
@@ -171,7 +172,6 @@ public class CourseActivity extends AppCompatActivity {
 
         // adapter
         user = getIntent().getParcelableExtra(EXTRA_USER); // TODO: put in handleIntent?
-        coursePagerAdapter = new CoursePagerAdapter(getSupportFragmentManager());
         groupAdapter = new GroupAdapter(new GroupAdapterListener() {
             @Override
             public void onGroupCheckboxClick(Group group, boolean isChecked) {
@@ -196,6 +196,7 @@ public class CourseActivity extends AppCompatActivity {
             @Override
             public void onClick(Meeting meeting) {}
         }, user);
+        coursePagerAdapter = new CoursePagerAdapter(getSupportFragmentManager(), groupAdapter, meetingAdapter);
 
         // layout manager
         groupsLayoutManager = new LinearLayoutManager(this);
@@ -434,6 +435,7 @@ public class CourseActivity extends AppCompatActivity {
             default:
                 Toast.makeText(CourseActivity.this, "Group Filter Error", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
+        tabLayout.getTabAt(TAB_GROUPS).setText("Groups (" + groupsList.size() + ")");
     }
 
     private void onGroupObjectReady(Group group) {
@@ -474,6 +476,7 @@ public class CourseActivity extends AppCompatActivity {
             default:
                 Toast.makeText(CourseActivity.this, "Meeting Filter Error", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
+        tabLayout.getTabAt(TAB_MEETINGS).setText("Meetings (" + meetingsList.size() + ")");
     }
 
     private void onMeetingObjectReady(Meeting meeting) {

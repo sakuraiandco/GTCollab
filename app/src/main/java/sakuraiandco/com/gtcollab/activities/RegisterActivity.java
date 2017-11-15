@@ -1,4 +1,4 @@
-package sakuraiandco.com.gtcollab;
+package sakuraiandco.com.gtcollab.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,12 +16,13 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.constants.Arguments;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.login;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.login;
 
 public class RegisterActivity extends AppCompatActivity {
 

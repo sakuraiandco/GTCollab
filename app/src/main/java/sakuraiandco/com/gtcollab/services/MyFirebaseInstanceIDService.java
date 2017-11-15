@@ -1,4 +1,4 @@
-package sakuraiandco.com.gtcollab;
+package sakuraiandco.com.gtcollab.services;
 
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -9,9 +9,7 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-
-import sakuraiandco.com.gtcollab.utils.VolleyResponseListener;
+import sakuraiandco.com.gtcollab.utils.NetworkUtils;
 
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEVICE_REGISTRATION_ID;
@@ -42,16 +40,10 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         prefs.edit().putString(DEVICE_REGISTRATION_ID, refreshedToken).apply();
 
         // Register new device registration ID with server
-        registerDevice(refreshedToken, new VolleyResponseListener() {
+        registerDevice(refreshedToken, new NetworkUtils.VolleyResponseListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                try {
-                    if (error.networkResponse.data != null) { // TODO: ?
-                        Log.d(TAG, new String(error.networkResponse.data,"UTF-8"));
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                Log.d(TAG, String.valueOf(error.networkResponse.statusCode)); // TODO: ?
             } // if user is not logged in, fail silently...
             @Override
             public void onResponse(JSONObject response) {

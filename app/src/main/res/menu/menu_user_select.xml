@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="sakuraiandco.com.gtcollab.UserSelectActivity">
+    tools:context="sakuraiandco.com.gtcollab.activities.UserSelectActivity">
     <item
         android:id="@+id/submit"
         android:orderInCategory="0"

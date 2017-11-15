@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
@@ -20,6 +21,8 @@ import sakuraiandco.com.gtcollab.constants.SingletonProvider;
  */
 
 public class NetworkUtils {
+
+    public interface VolleyResponseListener extends Response.Listener<JSONObject>, Response.ErrorListener {}
 
     public static void getRequest(String url, VolleyResponseListener callback) {
         getRequest(url, null, callback);
