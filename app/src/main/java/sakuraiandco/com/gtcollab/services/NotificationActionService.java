@@ -28,7 +28,7 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_NOTIFICATION_I
 
 public class NotificationActionService extends IntentService {
 
-    public static final String TAG = "NOTIFICATION_ACTION_SERVICE";
+    public static final String TAG = "NOTIFICATION_ACTION";
 
     GroupDAO groupDAO;
     MeetingDAO meetingDAO;
@@ -72,12 +72,16 @@ public class NotificationActionService extends IntentService {
                 Group group = intent.getParcelableExtra(EXTRA_GROUP);
                 if (group != null) {
                     groupDAO.joinGroup(group.getId());
+                } else {
+                    Log.d(TAG, "No group - ignore was pressed");
                 }
                 break;
             case ACTION_2: // Join Meeting
                 Meeting meeting = intent.getParcelableExtra(EXTRA_MEETING);
                 if (meeting != null) {
                     meetingDAO.joinMeeting(meeting.getId());
+                } else {
+                    Log.d(TAG, "No meeting - ignore was pressed");
                 }
                 break;
             case ACTION_3:
@@ -85,6 +89,7 @@ public class NotificationActionService extends IntentService {
             case ACTION_4: // Meeting Proposal
                 break;
             default:
+                // TODO: error handling
         }
         // If you want to cancel the notification: NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
     }

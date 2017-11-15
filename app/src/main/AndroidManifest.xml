@@ -114,7 +114,7 @@
             </intent-filter>
         </service>
 
-        <service android:name="sakuraiandco.com.gtcollab.services.NotificationActionService$NotificationActionService" />
+        <service android:name="sakuraiandco.com.gtcollab.services.NotificationActionService" />
 
     </application>
 

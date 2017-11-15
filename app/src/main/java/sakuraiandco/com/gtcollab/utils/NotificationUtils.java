@@ -158,7 +158,6 @@ public class NotificationUtils {
         joinMeetingIntent.setAction(ACTION_2);
         joinMeetingIntent.putExtra(EXTRA_MEETING, meeting); // TODO: refactor key
         joinMeetingIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationID);
-
         PendingIntent joinMeetingPendingIntent = PendingIntent.getService(context, 0, joinMeetingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Ignore Invite Action

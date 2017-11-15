@@ -47,6 +47,7 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
         holder.textMeetingDuration.setText(String.valueOf(m.getDurationMinutes() + "min"));
         holder.textMeetingCreator.setText(m.getCreator().getFirstName() + " " + m.getCreator().getLastName());
         holder.textMeetingNumMembers.setText(String.valueOf(m.getMembers().size()));
+        holder.textMeetingDescription.setText(m.getDescription());
         holder.checkboxMeeting.setChecked(m.getMembers().contains(user.getId()));
         holder.object = m;
     }
