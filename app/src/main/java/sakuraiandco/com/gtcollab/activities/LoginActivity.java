@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView registerTextButton;
 
     // variables
-    private String userId;
+    private String userId; // TODO: make int?
     private String authToken;
     private String username;
     private String password;

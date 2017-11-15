@@ -439,14 +439,18 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     private void onGroupObjectReady(Group group) {
+        boolean joined = group.getMembers().contains(user.getId());
         for (Group g : groupsList) {
             if (g.getId() == group.getId()) {
                 g.setMembers(group.getMembers()); //  TODO: this should update myGroupsList too
+                if (!joined) {
+                    myGroupsList.remove(g);
+                }
                 groupAdapter.notifyDataSetChanged();
                 break;
             }
         }
-        Snackbar.make(mainContent, (group.getMembers().contains(user.getId()) ? "Joined" : "Left") + " group: " + group.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        Snackbar.make(mainContent, (joined ? "Joined" : "Left") + " group: " + group.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
     }
 
     private void onMeetingListReady(List<Meeting> meetings) {
@@ -480,14 +484,18 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     private void onMeetingObjectReady(Meeting meeting) {
+        boolean joined = meeting.getMembers().contains(user.getId());
         for (Meeting m : meetingsList) {
             if (m.getId() == meeting.getId()) {
                 m.setMembers(meeting.getMembers()); //  TODO: this should update myMeetingsList too
+                if (!joined) {
+                    myMeetingsList.remove(m);
+                }
                 meetingAdapter.notifyDataSetChanged();
                 break;
             }
         }
-        Snackbar.make(mainContent, (meeting.getMembers().contains(user.getId()) ? "Joined" : "Left") + " meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        Snackbar.make(mainContent, (joined ? "Joined" : "Left") + " meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
     }
 
     private void onGroupCheckboxClickHandler(Group group, boolean isChecked) {

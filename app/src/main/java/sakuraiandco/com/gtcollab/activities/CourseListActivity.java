@@ -27,6 +27,7 @@ import sakuraiandco.com.gtcollab.domain.Term;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.CourseDAO;
 import sakuraiandco.com.gtcollab.rest.TermDAO;
+import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 
 import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN;
@@ -45,6 +46,7 @@ import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startSubjectSearch
 public class CourseListActivity extends AppCompatActivity {
 
     // data
+    UserDAO userDAO;
     TermDAO termDAO;
     CourseDAO courseDAO;
 
@@ -79,6 +81,18 @@ public class CourseListActivity extends AppCompatActivity {
         forceDeviceTokenRefresh(); // TODO: ASSUMES CourseListActivity is launcher activity; best place to put this? LoginActivity instead?
 
         // data
+        userDAO = new UserDAO(new BaseDAO.Listener<User>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CourseListActivity.this, "UserDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<User> users) {}
+            @Override
+            public void onObjectReady(User user) {
+                onUserObjectReady(user);
+            }
+        });
         termDAO = new TermDAO(new BaseDAO.Listener<Term>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
@@ -153,11 +167,7 @@ public class CourseListActivity extends AppCompatActivity {
 
     private void handleIntent(Intent intent) {
         if (userId != null && authToken != null) {
-            if (term != null) {
-                getCourses();
-            } else {
-                termDAO.getCurrent();
-            }
+            userDAO.get(Integer.valueOf(userId));
         } else {
             login(this);
         }
@@ -188,6 +198,15 @@ public class CourseListActivity extends AppCompatActivity {
         filters.put(FILTER_TERM, String.valueOf(term.getId()));
         filters.put(FILTER_MEMBERS, String.valueOf(user.getId()));
         courseDAO.getByFilters(filters);
+    }
+
+    private void onUserObjectReady(User user) {
+        this.user = user;
+        if (term != null) {
+            getCourses();
+        } else {
+            termDAO.getCurrent();
+        }
     }
 
     private void onTermObjectReady(Term term) {
