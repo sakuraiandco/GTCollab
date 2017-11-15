@@ -338,7 +338,7 @@ public class CourseActivity extends AppCompatActivity {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
                         context.refreshGroupList(query);
-                        return true;
+                        return false;
                     }
                     @Override
                     public boolean onQueryTextChange(String newText) {
@@ -368,7 +368,7 @@ public class CourseActivity extends AppCompatActivity {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
                         context.refreshMeetingList(query);
-                        return true;
+                        return false;
                     }
                     @Override
                     public boolean onQueryTextChange(String newText) {
