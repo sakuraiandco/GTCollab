@@ -159,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void onAuthResponse(JSONObject response) {
+    private void onAuthResponse(JSONObject response) {
         authToken = response.optString("token", null);
         if (authToken != null) {
             Toast.makeText(this, "Authentication successful", Toast.LENGTH_SHORT).show(); // TODO: remove?

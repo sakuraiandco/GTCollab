@@ -84,8 +84,7 @@ public class CourseSearchActivity extends AppCompatActivity {
             }
             @Override
             public void onObjectReady(Course course) {
-                Toast.makeText(CourseSearchActivity.this, "Joined " + course.getShortName(), Toast.LENGTH_SHORT).show();
-                startCourseListActivity(CourseSearchActivity.this, user, term);
+                onCourseObjectReady(course);
             }
         });
 
@@ -93,7 +92,12 @@ public class CourseSearchActivity extends AppCompatActivity {
         courseSearchAdapter = new CourseSearchAdapter(new AdapterListener<Course>() {
             @Override
             public void onClick(Course course) {
-                courseDAO.joinCourse(course.getId()); // TODO: show dialog first?
+                if (course.getMembers().contains(user.getId())) {
+                    Toast.makeText(CourseSearchActivity.this, "Already joined " + course.getShortName(), Toast.LENGTH_SHORT).show();
+                    startCourseListActivity(CourseSearchActivity.this, user, term);
+                } else {
+                    courseDAO.joinCourse(course.getId()); // TODO: show dialog first?
+                }
             }
         });
 
@@ -169,13 +173,18 @@ public class CourseSearchActivity extends AppCompatActivity {
         super.startActivity(intent);
     }
 
-    public void onCourseListReady(List<Course> courses) {
+    private void onCourseListReady(List<Course> courses) {
         courseSearchAdapter.addData(courses);
         if (courseSearchAdapter.getData().isEmpty()) {
             textNoCoursesFound.setVisibility(View.VISIBLE);
         } else {
             textNoCoursesFound.setVisibility(View.GONE);
         }
+    }
+
+    private void onCourseObjectReady(Course course) {
+        Toast.makeText(CourseSearchActivity.this, "Joined " + course.getShortName(), Toast.LENGTH_SHORT).show();
+        startCourseListActivity(CourseSearchActivity.this, user, term);
     }
 
 }

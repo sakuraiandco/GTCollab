@@ -154,7 +154,7 @@ public class SubjectSearchActivity extends AppCompatActivity {
     }
 
 
-    public void onSubjectListReady(List<Subject> subjects) {
+    private void onSubjectListReady(List<Subject> subjects) {
         subjectSearchAdapter.addData(subjects);
         if (!subjectSearchAdapter.getData().isEmpty()) {
             textNoSubjectsFound.setVisibility(View.GONE);

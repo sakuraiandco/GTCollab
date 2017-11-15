@@ -443,7 +443,9 @@ public class CourseActivity extends AppCompatActivity {
         for (Group g : groupsList) {
             if (g.getId() == group.getId()) {
                 g.setMembers(group.getMembers()); //  TODO: this should update myGroupsList too
-                if (!joined) {
+                if (joined) {
+                    myGroupsList.add(g); // TODO: check for duplicates?
+                } else {
                     myGroupsList.remove(g);
                 }
                 groupAdapter.notifyDataSetChanged();
@@ -488,7 +490,9 @@ public class CourseActivity extends AppCompatActivity {
         for (Meeting m : meetingsList) {
             if (m.getId() == meeting.getId()) {
                 m.setMembers(meeting.getMembers()); //  TODO: this should update myMeetingsList too
-                if (!joined) {
+                if (joined) {
+                    myMeetingsList.add(m); // TODO: check for duplicates?
+                } else {
                     myMeetingsList.remove(m);
                 }
                 meetingAdapter.notifyDataSetChanged();
@@ -506,7 +510,7 @@ public class CourseActivity extends AppCompatActivity {
         }
     }
 
-    public void onMeetingCheckboxClickHandler(Meeting meeting, boolean isChecked) {
+    private void onMeetingCheckboxClickHandler(Meeting meeting, boolean isChecked) {
         if (isChecked) {
             meetingDAO.joinMeeting(meeting.getId());
         } else {
@@ -514,7 +518,7 @@ public class CourseActivity extends AppCompatActivity {
         }
     }
 
-    public void onGroupFilterClickHandler(final View v) {
+    private void onGroupFilterClickHandler(final View v) {
         final String category = "Groups";
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -547,7 +551,7 @@ public class CourseActivity extends AppCompatActivity {
                 .show();
     }
 
-    public void onMeetingFilterClickHandler(final View v) {
+    private void onMeetingFilterClickHandler(final View v) {
         final String category = "Meetings";
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

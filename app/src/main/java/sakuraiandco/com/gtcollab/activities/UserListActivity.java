@@ -158,7 +158,7 @@ public class UserListActivity extends AppCompatActivity {
         }
     }
 
-    public void onUserListReady(List<User> users) {
+    private void onUserListReady(List<User> users) {
         userListAdapter.addData(users);
         if (!userListAdapter.getData().isEmpty()) {
             textNoUsersFound.setVisibility(View.GONE);
@@ -168,7 +168,7 @@ public class UserListActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(title + " - " + users.size() + " Members");
     }
 
-    public void onClickUser(User user) {
+    private void onClickUser(User user) {
         // TODO: show user profile?
     }
 }

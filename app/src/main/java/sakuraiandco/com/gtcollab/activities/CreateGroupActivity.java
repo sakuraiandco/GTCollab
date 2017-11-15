@@ -116,14 +116,6 @@ public class CreateGroupActivity extends AppCompatActivity {
         });
     }
 
-    private boolean validate(EditText editText) {
-        if (editText.getText().toString().trim().isEmpty()) {
-            editText.setError(getString(R.string.error_field_required));
-            return false;
-        }
-        return true;
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         handleIntent(intent);
@@ -165,6 +157,14 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private boolean validate(EditText editText) {
+        if (editText.getText().toString().trim().isEmpty()) {
+            editText.setError(getString(R.string.error_field_required));
+            return false;
+        }
+        return true;
     }
 
 }

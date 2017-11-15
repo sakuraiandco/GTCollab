@@ -150,7 +150,7 @@ public class UserSelectActivity extends AppCompatActivity {
         }
     }
 
-    public void onUserListReady(List<User> users) {
+    private void onUserListReady(List<User> users) {
         userSelectAdapter.addData(users);
         if (!selectedUsersIDs.isEmpty()) {
             for (User u : users) {
@@ -168,7 +168,7 @@ public class UserSelectActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(title + " - " + users.size() + " Members");
     }
 
-    public void onClickUser(User user) {
+    private void onClickUser(User user) {
         // TODO: show user profile?
     }
 }
