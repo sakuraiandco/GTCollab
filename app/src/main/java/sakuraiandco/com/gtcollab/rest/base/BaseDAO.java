@@ -1,5 +1,7 @@
 package sakuraiandco.com.gtcollab.rest.base;
 
+import android.util.Log;
+
 import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
@@ -32,6 +34,7 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
         void onDAOError(Error error);
         void onListReady(List<T> tList);
         void onObjectReady(T t);
+        void onObjectDeleted();
     }
 
     public static class Error {
@@ -184,8 +187,10 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
     @Override
     public void onResponse(JSONObject response) { // TODO: deliver pagination and count info to callback?
         numRequestsWaitingForResponse--;
+        Log.d("TEMP_TEST", response.toString()); // TODO: remove
         if (callback != null) {
             JSONArray resultsJSON = response.optJSONArray("results");
+            int id = response.optInt("id", -1);
             if (resultsJSON != null) { // list of objects
                 List<T> results = new ArrayList<>();
                 try {
@@ -202,13 +207,17 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
                     e.printStackTrace();
                     callback.onDAOError(new Error(null, e));
                 }
-            } else { // single object
+            } else if (id != -1){ // single object
                 try {
                     callback.onObjectReady(toDomain(response));
                 } catch (JSONException e) {
                     e.printStackTrace();
                     callback.onDAOError(new Error(null, e));
                 }
+            } else { // deleted object
+                count--;
+                // TODO: possibly need to invalidate nextPageURL and prevPageURL?
+                callback.onObjectDeleted();
             }
         }
     }

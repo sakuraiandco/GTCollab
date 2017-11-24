@@ -86,6 +86,8 @@ public class UserListActivity extends AppCompatActivity {
             }
             @Override
             public void onObjectReady(User user) {}
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // adapter

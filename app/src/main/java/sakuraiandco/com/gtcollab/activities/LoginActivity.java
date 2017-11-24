@@ -78,6 +78,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onObjectReady(User user) {
                 onUserObjectReady(user);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // saved data

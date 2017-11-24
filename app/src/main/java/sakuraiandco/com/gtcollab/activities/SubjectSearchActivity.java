@@ -79,6 +79,8 @@ public class SubjectSearchActivity extends AppCompatActivity {
             }
             @Override
             public void onObjectReady(Subject subject) {}
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // adapter

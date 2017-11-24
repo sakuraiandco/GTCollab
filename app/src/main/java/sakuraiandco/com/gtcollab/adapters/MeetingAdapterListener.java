@@ -8,6 +8,8 @@ import sakuraiandco.com.gtcollab.domain.Meeting;
 
 public interface MeetingAdapterListener extends AdapterListener<Meeting> {
 
+    void onButtonDeleteMeetingClick(Meeting meeting);
+    void onButtonProposeNewTimeLocationClick(Meeting meeting);
     void onMeetingCheckboxClick(Meeting meeting, boolean isChecked);
     void onMeetingMembersClick(Meeting meeting);
 

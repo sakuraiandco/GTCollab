@@ -35,6 +35,11 @@ public class Arguments {
     public static final String EXTRA_SELECTED_USERS = "selected_users";
     public static final String EXTRA_COURSE_TAB = "course_tab";
 
+    public static final String EXTRA_MEETING_PROPOSAL_ID = "meeting_proposal_id";
+    public static final String EXTRA_MEETING_PROPOSAL_RESPONSE = "meeting_proposal_response";
+    public static final int ACCEPTED = 1;
+    public static final int REJECTED = 2;
+
     public static final String EXTRA_NOTIFICATION_ID = "notification_id";
 
         // search
@@ -56,8 +61,13 @@ public class Arguments {
     public static final String ACTION_2  = "action_2"; // TODO
     public static final String ACTION_3  = "action_3"; // TODO
     public static final String ACTION_4  = "action_4"; // TODO
+    public static final String ACTION_5  = "action_5"; // TODO
 
     // startActivityForResult()
     public static final int DEFAULT_REQUEST_CODE = 0;
     public static final int DEFAULT_RESULT_CODE = 0;
+
+    // Tags TODO
+    public static final String TAG_MEETING_PROPOSAL_DIALOG = "meeting_proposal_dialog";
+
 }

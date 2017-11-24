@@ -39,14 +39,17 @@ import sakuraiandco.com.gtcollab.adapters.GroupAdapterListener;
 import sakuraiandco.com.gtcollab.adapters.MeetingAdapter;
 import sakuraiandco.com.gtcollab.adapters.MeetingAdapterListener;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
+import sakuraiandco.com.gtcollab.dialogs.MeetingProposalDialogFragment;
 import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.domain.Meeting;
+import sakuraiandco.com.gtcollab.domain.MeetingProposal;
 import sakuraiandco.com.gtcollab.domain.Term;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.CourseDAO;
 import sakuraiandco.com.gtcollab.rest.GroupDAO;
 import sakuraiandco.com.gtcollab.rest.MeetingDAO;
+import sakuraiandco.com.gtcollab.rest.MeetingProposalDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
@@ -55,6 +58,7 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE_TAB;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.TAG_MEETING_PROPOSAL_DIALOG;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
@@ -73,6 +77,7 @@ public class CourseActivity extends AppCompatActivity {
     CourseDAO courseDAO;
     GroupDAO groupDAO;
     MeetingDAO meetingDAO;
+    MeetingProposalDAO meetingProposalDAO;
 
     // adapter
     private CoursePagerAdapter coursePagerAdapter;
@@ -140,6 +145,8 @@ public class CourseActivity extends AppCompatActivity {
             public void onObjectReady(Course course) {
                 onCourseObjectReady(course);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
         groupDAO = new GroupDAO(new BaseDAO.Listener<Group>() {
             @Override
@@ -154,6 +161,8 @@ public class CourseActivity extends AppCompatActivity {
             public void onObjectReady(Group group) {
                 onGroupObjectReady(group);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
         meetingDAO = new MeetingDAO(new BaseDAO.Listener<Meeting>() {
             @Override
@@ -168,6 +177,24 @@ public class CourseActivity extends AppCompatActivity {
             public void onObjectReady(Meeting meeting) {
                 onMeetingObjectReady(meeting);
             }
+            @Override
+            public void onObjectDeleted() {
+                onMeetingObjectDeleted();
+            }
+        });
+        meetingProposalDAO = new MeetingProposalDAO(new BaseDAO.Listener<MeetingProposal>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CourseActivity.this, "MeetingProposalDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<MeetingProposal> meetingProposals) {}
+            @Override
+            public void onObjectReady(MeetingProposal meetingProposal) {
+                onMeetingProposalObjectReady(meetingProposal);
+            }
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // adapter
@@ -185,6 +212,14 @@ public class CourseActivity extends AppCompatActivity {
             public void onClick(Group group) {}
         }, user);
         meetingAdapter = new MeetingAdapter(new MeetingAdapterListener() {
+            @Override
+            public void onButtonDeleteMeetingClick(Meeting meeting) {
+                onButtonDeleteMeetingClickHandler(meeting);
+            }
+            @Override
+            public void onButtonProposeNewTimeLocationClick(Meeting meeting) {
+                onButtonProposeNewTimeLocationClickHandler(meeting);
+            }
             @Override
             public void onMeetingCheckboxClick(Meeting meeting, boolean isChecked) {
                 onMeetingCheckboxClickHandler(meeting, isChecked);
@@ -435,7 +470,7 @@ public class CourseActivity extends AppCompatActivity {
             default:
                 Toast.makeText(CourseActivity.this, "Group Filter Error", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
-        tabLayout.getTabAt(TAB_GROUPS).setText("Groups (" + groupsList.size() + ")");
+        tabLayout.getTabAt(TAB_GROUPS).setText("Groups (" + groupDAO.getCount() + ")");
     }
 
     private void onGroupObjectReady(Group group) {
@@ -482,7 +517,7 @@ public class CourseActivity extends AppCompatActivity {
             default:
                 Toast.makeText(CourseActivity.this, "Meeting Filter Error", Toast.LENGTH_SHORT).show(); // TODO: error handling
         }
-        tabLayout.getTabAt(TAB_MEETINGS).setText("Meetings (" + meetingsList.size() + ")");
+        tabLayout.getTabAt(TAB_MEETINGS).setText("Meetings (" + meetingDAO.getCount() + ")");
     }
 
     private void onMeetingObjectReady(Meeting meeting) {
@@ -502,12 +537,38 @@ public class CourseActivity extends AppCompatActivity {
         Snackbar.make(mainContent, (joined ? "Joined" : "Left") + " meeting: " + meeting.getName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
     }
 
+    private void onMeetingObjectDeleted() {
+        tabLayout.getTabAt(TAB_MEETINGS).setText("Meetings (" + meetingDAO.getCount() + ")");
+        Snackbar.make(mainContent, "Meeting deleted", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+    }
+
+    private void onMeetingProposalObjectReady(MeetingProposal meetingProposal) {
+        Toast.makeText(this, "Successfully created meeting proposal", Toast.LENGTH_SHORT).show(); // TODO: how to indicate ongoing meeting proposal in UI?
+    }
+
     private void onGroupCheckboxClickHandler(Group group, boolean isChecked) {
         if (isChecked) {
             groupDAO.joinGroup(group.getId());
         } else {
             groupDAO.leaveGroup(group.getId());
         }
+    }
+
+    private void onButtonDeleteMeetingClickHandler(Meeting meeting) { // TODO: show confirmation dialog
+        meetingDAO.delete(meeting.getId());
+        meetingsList.remove(meeting); // TODO: ok to do before deleting for real?
+        myMeetingsList.remove(meeting); // TODO: ok to do before deleting for real?
+        meetingAdapter.notifyDataSetChanged();
+    }
+
+    private void onButtonProposeNewTimeLocationClickHandler(Meeting meeting) {
+        MeetingProposalDialogFragment mp = MeetingProposalDialogFragment.newInstance(new MeetingProposalDialogFragment.MeetingProposalDialogListener() {
+            @Override
+            public void onMeetingProposalDialogSubmit(MeetingProposal meetingProposal) {
+                meetingProposalDAO.create(meetingProposal);
+            }
+        }, meeting);
+        mp.show(getFragmentManager(), TAG_MEETING_PROPOSAL_DIALOG);
     }
 
     private void onMeetingCheckboxClickHandler(Meeting meeting, boolean isChecked) {

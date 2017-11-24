@@ -13,6 +13,9 @@
     <dimen name="appbar_padding_top">8dp</dimen>
     <dimen name="form_field_margin">8dp</dimen>
     <dimen name="form_padding">32dp</dimen>
+    <dimen name="dialog_padding">8dp</dimen>
+    <dimen name="dialog_title_text_size">18sp</dimen>
+    <dimen name="error_message_text_size">14dp</dimen>
 
 
 </resources>

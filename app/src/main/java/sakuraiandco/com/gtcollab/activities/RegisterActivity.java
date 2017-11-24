@@ -88,6 +88,8 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(RegisterActivity.this, "Registered successfully.", Toast.LENGTH_SHORT).show();
                 login(RegisterActivity.this);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
 
         firstName = findViewById(R.id.first_name);

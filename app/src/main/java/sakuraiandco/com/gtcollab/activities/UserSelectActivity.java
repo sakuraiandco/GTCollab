@@ -83,6 +83,8 @@ public class UserSelectActivity extends AppCompatActivity {
             }
             @Override
             public void onObjectReady(User user) {}
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // adapter

@@ -92,6 +92,8 @@ public class CourseListActivity extends AppCompatActivity {
             public void onObjectReady(User user) {
                 onUserObjectReady(user);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
         termDAO = new TermDAO(new BaseDAO.Listener<Term>() {
             @Override
@@ -104,6 +106,8 @@ public class CourseListActivity extends AppCompatActivity {
             public void onObjectReady(Term term) {
                 onTermObjectReady(term);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
         courseDAO = new CourseDAO(new BaseDAO.Listener<Course>() {
             @Override
@@ -116,6 +120,8 @@ public class CourseListActivity extends AppCompatActivity {
             }
             @Override
             public void onObjectReady(Course course) {}
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // saved data

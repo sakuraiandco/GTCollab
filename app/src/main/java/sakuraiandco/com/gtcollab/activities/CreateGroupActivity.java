@@ -80,6 +80,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                 Toast.makeText(CreateGroupActivity.this, "Created new group: " + group.getName(), Toast.LENGTH_SHORT).show();
                 startCourseActvitiy(CreateGroupActivity.this, user, term, course, TAB_GROUPS);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // TODO reorganize

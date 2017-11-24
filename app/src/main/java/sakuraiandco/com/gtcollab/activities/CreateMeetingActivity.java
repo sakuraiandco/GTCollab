@@ -85,6 +85,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
                 Toast.makeText(CreateMeetingActivity.this, "Created new meeting: " + meeting.getName(), Toast.LENGTH_SHORT).show();
                 startCourseActvitiy(CreateMeetingActivity.this, user, term, course, TAB_MEETINGS);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // handle intent
@@ -108,13 +110,13 @@ public class CreateMeetingActivity extends AppCompatActivity {
                             new DatePickerDialog.OnDateSetListener() {
                                 @Override
                                 public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                    startDate = new LocalDate(year, month, dayOfMonth);
+                                    startDate = new LocalDate(year, month + 1, dayOfMonth);
                                     editMeetingStartDate.setText(startDate.toString("EEE MMM dd"));
                                     editMeetingStartDate.setError(null);
                                 }
                             },
                             startDate.getYear(),
-                            startDate.getMonthOfYear(),
+                            startDate.getMonthOfYear() - 1,
                             startDate.getDayOfMonth());
                     datePicker.setTitle("Select date");
                     datePicker.show();
@@ -169,7 +171,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
         });
     }
 
-    private boolean validate(EditText editText) {
+    private boolean validate(EditText editText) { // TODO: refactor into utils
         if (editText.getText().toString().trim().isEmpty()) {
             editText.setError(getString(R.string.error_field_required));
             return false;

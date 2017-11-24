@@ -58,6 +58,8 @@ public class SearchResultsActivity extends AppCompatActivity {
             }
             @Override
             public void onObjectReady(Course course) {}
+            @Override
+            public void onObjectDeleted() {}
         });
         handleIntent(getIntent());
     }

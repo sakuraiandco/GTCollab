@@ -86,6 +86,8 @@ public class CourseSearchActivity extends AppCompatActivity {
             public void onObjectReady(Course course) {
                 onCourseObjectReady(course);
             }
+            @Override
+            public void onObjectDeleted() {}
         });
 
         // adapter

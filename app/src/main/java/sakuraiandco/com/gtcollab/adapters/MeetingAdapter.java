@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,17 +40,7 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
 
     @Override
     public void onBindViewHolder(MeetingViewHolder holder, int position) {
-        Meeting m = data.get(position);
-        holder.textMeetingName.setText(m.getName());
-        holder.textMeetingLocation.setText(m.getLocation());
-        holder.textMeetingStartDate.setText(m.getStartDate().toString("EEE MMM dd"));
-        holder.textMeetingStartTime.setText(m.getStartTime().toString("h:mm a"));
-        holder.textMeetingDuration.setText(String.valueOf(m.getDurationMinutes() + "min"));
-        holder.textMeetingCreator.setText(m.getCreator().getFirstName() + " " + m.getCreator().getLastName());
-        holder.textMeetingNumMembers.setText(String.valueOf(m.getMembers().size()));
-        holder.textMeetingDescription.setText(m.getDescription());
-        holder.checkboxMeeting.setChecked(m.getMembers().contains(user.getId()));
-        holder.object = m;
+        holder.bind(data.get(position));
     }
 
     class MeetingViewHolder extends RecyclerView.ViewHolder {
@@ -62,7 +53,10 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
         TextView textMeetingDuration;
         TextView textMeetingCreator;
         TextView textMeetingNumMembers;
+        LinearLayout meetingDetailsExpanded;
         TextView textMeetingDescription;
+        Button buttonProposeNewTimeLocation;
+        Button buttonDeleteMeeting;
         LinearLayout meetingNumMembers;
         CheckBox checkboxMeeting;
         Meeting object;
@@ -77,7 +71,10 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
             textMeetingDuration = view.findViewById(R.id.text_meeting_duration);
             textMeetingCreator = view.findViewById(R.id.text_meeting_creator);
             textMeetingNumMembers = view.findViewById(R.id.text_meeting_num_members);
+            meetingDetailsExpanded = view.findViewById(R.id.meeting_details_expanded);
             textMeetingDescription = view.findViewById(R.id.text_meeting_description);
+            buttonProposeNewTimeLocation = view.findViewById(R.id.button_propose_new_time_location);
+            buttonDeleteMeeting = view.findViewById(R.id.button_delete_meeting);
             meetingNumMembers = view.findViewById(R.id.meeting_num_members);
             checkboxMeeting = view.findViewById(R.id.checkbox_meeting);
             meetingDetailsShort.setOnClickListener(new View.OnClickListener() {
@@ -85,14 +82,26 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
                 public void onClick(View v) {
                     if (MeetingViewHolder.this != currentExpanded) {
                         if (currentExpanded != null) {
-                            currentExpanded.textMeetingDescription.setVisibility(View.GONE);
+                            currentExpanded.meetingDetailsExpanded.setVisibility(View.GONE);
                         }
-                        textMeetingDescription.setVisibility(View.VISIBLE);
+                        meetingDetailsExpanded.setVisibility(View.VISIBLE);
                         currentExpanded = MeetingViewHolder.this;
                     } else {
-                        textMeetingDescription.setVisibility(View.GONE);
+                        meetingDetailsExpanded.setVisibility(View.GONE);
                         currentExpanded = null;
                     }
+                }
+            });
+            buttonProposeNewTimeLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((MeetingAdapterListener) callback).onButtonProposeNewTimeLocationClick(object);
+                }
+            });
+            buttonDeleteMeeting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((MeetingAdapterListener) callback).onButtonDeleteMeetingClick(object);
                 }
             });
             meetingNumMembers.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +116,24 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
                     ((MeetingAdapterListener) callback).onMeetingCheckboxClick(object, ((CheckBox) v).isChecked());
                 }
             });
+
+        }
+
+        void bind(Meeting m) {
+            boolean isMember = m.getMembers().contains(user.getId());
+            boolean isCreator = m.getCreator().getId() == user.getId();
+            textMeetingName.setText(m.getName());
+            textMeetingLocation.setText(m.getLocation());
+            textMeetingStartDate.setText(m.getStartDate().toString("EEE MMM dd"));
+            textMeetingStartTime.setText(m.getStartTime().toString("h:mm a"));
+            textMeetingDuration.setText(String.valueOf(m.getDurationMinutes() + "min"));
+            textMeetingCreator.setText(m.getCreator().getFirstName() + " " + m.getCreator().getLastName()); // TODO: "Created by: you" if user is creator
+            textMeetingNumMembers.setText(String.valueOf(m.getMembers().size()));
+            textMeetingDescription.setText(m.getDescription());
+            checkboxMeeting.setChecked(isMember);
+            buttonProposeNewTimeLocation.setVisibility(isMember ? View.VISIBLE : View.GONE);
+            buttonDeleteMeeting.setVisibility(isCreator ? View.VISIBLE : View.GONE);
+            object = m;
         }
 
     }

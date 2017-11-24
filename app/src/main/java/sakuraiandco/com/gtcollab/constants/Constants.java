@@ -22,5 +22,6 @@ public abstract class Constants {
     public static final int MEETING_INVITATION = 2;
     public static final int GROUP_NOTIFICATION = 3;
     public static final int MEETING_PROPOSAL = 4;
+    public static final int MEETING_PROPOSAL_RESULT = 5;
 
 }
