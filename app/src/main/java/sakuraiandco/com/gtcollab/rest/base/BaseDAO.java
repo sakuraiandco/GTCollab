@@ -81,7 +81,7 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
 
     public void update(int id, T t) {
         try {
-            patchRequest(baseURL + id, toJSON(t), this);
+            patchRequest(baseURL + id + '/', toJSON(t), this);
             numRequestsWaitingForResponse++;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -89,13 +89,14 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
         }
     }
 
+    // NOTE: Django requires a terminating slash at the end of the url for DELETE and PATCH (will turn into GET otherwise)
     public void delete(int id) {
-        deleteRequest(baseURL + id, this);
+        deleteRequest(baseURL + id + '/', this);
         numRequestsWaitingForResponse++;
     }
 
     public void get(int id) {
-        getRequest(baseURL + id, this);
+        getRequest(baseURL + id + '/', this);
         numRequestsWaitingForResponse++;
     }
 

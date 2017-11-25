@@ -26,6 +26,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -167,7 +169,12 @@ public class CourseActivity extends AppCompatActivity {
         meetingDAO = new MeetingDAO(new BaseDAO.Listener<Meeting>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
-                Toast.makeText(CourseActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+                // TODO: replace hacky solution after refactoring helper libraries to handle empty response bodies
+                if (error.volleyError.getCause() instanceof JSONException) {
+                    onMeetingObjectDeleted();
+                } else {
+                    Toast.makeText(CourseActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+                }
             }
             @Override
             public void onListReady(List<Meeting> meetings) {
