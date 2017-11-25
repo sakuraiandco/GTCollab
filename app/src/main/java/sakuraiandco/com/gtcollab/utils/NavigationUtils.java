@@ -12,6 +12,7 @@ import sakuraiandco.com.gtcollab.activities.CourseListActivity;
 import sakuraiandco.com.gtcollab.activities.CourseSearchActivity;
 import sakuraiandco.com.gtcollab.activities.CreateGroupActivity;
 import sakuraiandco.com.gtcollab.activities.CreateMeetingActivity;
+import sakuraiandco.com.gtcollab.activities.GroupChatActivity;
 import sakuraiandco.com.gtcollab.activities.LoginActivity;
 import sakuraiandco.com.gtcollab.activities.RegisterActivity;
 import sakuraiandco.com.gtcollab.activities.SubjectSearchActivity;
@@ -112,13 +113,21 @@ public class NavigationUtils {
     }
 
     public static void startCreateMeetingActivity(Context context, User user, Term term, Course course) {
-        Intent intent = new Intent(context, CreateMeetingActivity.class);;
+        Intent intent = new Intent(context, CreateMeetingActivity.class);
         startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
     }
 
     public static void startCreateGroupActivity(Context context, User user, Term term, Course course) {
-        Intent intent = new Intent(context, CreateGroupActivity.class);;
+        Intent intent = new Intent(context, CreateGroupActivity.class);
         startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
+    }
+
+    public static void startGropChatActivity(Context context, User user, Group group) {
+        Intent intent = new Intent(context, GroupChatActivity.class);
+        intent.putExtra(EXTRA_USER, user);
+        intent.putExtra("group", group);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     /**************** Helper Methods **************************************************************/

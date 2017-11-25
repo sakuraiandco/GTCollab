@@ -44,7 +44,7 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
         holder.textGroupCreator.setText(g.getCreator().getFirstName() + " " + g.getCreator().getLastName());
         holder.textGroupNumMembers.setText(String.valueOf(g.getMembers().size()));
         holder.checkboxGroup.setChecked(g.getMembers().contains(user.getId()));
-        holder.object = g;
+        holder.group = g;
     }
 
     class GroupViewHolder extends RecyclerView.ViewHolder {
@@ -53,10 +53,9 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
         TextView textGroupName;
         TextView textGroupCreator;
         TextView textGroupNumMembers;
-        TextView textGroupDescription;
         LinearLayout groupNumMembers;
         CheckBox checkboxGroup;
-        Group object;
+        Group group;
 
         GroupViewHolder(View view) {
             super(view);
@@ -64,34 +63,24 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
             textGroupName = view.findViewById(R.id.text_group_name);
             textGroupCreator = view.findViewById(R.id.text_group_creator);
             textGroupNumMembers = view.findViewById(R.id.text_group_num_members);
-            textGroupDescription = view.findViewById(R.id.text_group_description);
             groupNumMembers = view.findViewById(R.id.group_num_members);
             checkboxGroup = view.findViewById(R.id.checkbox_group);
             groupDetailsShort.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (GroupViewHolder.this != currentExpanded) {
-                        if (currentExpanded != null) {
-                            currentExpanded.textGroupDescription.setVisibility(View.GONE);
-                        }
-                        textGroupDescription.setVisibility(View.VISIBLE);
-                        currentExpanded = GroupViewHolder.this;
-                    } else {
-                        textGroupDescription.setVisibility(View.GONE);
-                        currentExpanded = null;
-                    }
+                    callback.onClick(group);
                 }
             });
             groupNumMembers.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((GroupAdapterListener) callback).onGroupMembersClick(object);
+                    ((GroupAdapterListener) callback).onGroupMembersClick(group);
                 }
             });
             checkboxGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((GroupAdapterListener) callback).onGroupCheckboxClick(object, ((CheckBox) v).isChecked());
+                    ((GroupAdapterListener) callback).onGroupCheckboxClick(group, ((CheckBox) v).isChecked());
                 }
             });
         }

@@ -34,7 +34,6 @@
     <string name="text_meeting_creator_sample">John Smith</string>
     <string name="text_meeting_num_members_sample">4</string>
     <string name="text_meeting_description_sample">Meeting Description</string>
-    <string name="text_group_description_sample">Group Description</string>
     <string name="text_group_num_members_sample">4</string>
     <string name="text_group_creator_sample">John Smith</string>
     <string name="text_group_name_sample">Group 1</string>
@@ -80,4 +79,5 @@
     <string name="prompt_last_name">Last Name</string>
     <string name="button_create_meeting_proposal_text">Submit</string>
     <string name="button_cancel_meeting_proposal_text">Cancel</string>
+    <string name="title_activity_group_message">Group Chat</string>
 </resources>

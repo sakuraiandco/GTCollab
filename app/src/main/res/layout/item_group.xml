@@ -101,12 +101,4 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/text_group_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/item_padding"
-        android:visibility="gone"
-        android:text="@string/text_group_description_sample" />
-
 </LinearLayout>

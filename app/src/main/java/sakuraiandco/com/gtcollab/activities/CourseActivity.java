@@ -1,6 +1,7 @@
 package sakuraiandco.com.gtcollab.activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -66,6 +67,7 @@ import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateGroupActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateMeetingActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startGropChatActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserListActivity;
 
 public class CourseActivity extends AppCompatActivity {
@@ -216,7 +218,13 @@ public class CourseActivity extends AppCompatActivity {
                 startUserListActivity(CourseActivity.this, user, term, course, group, null);
             }
             @Override
-            public void onClick(Group group) {}
+            public void onClick(Group group) {
+                List<Integer> members = group.getMembers();
+                if (members.contains(user.getId())) {
+                    Context context = SingletonProvider.getContext();
+                    startGropChatActivity(context, user, group);
+                }
+            }
         }, user);
         meetingAdapter = new MeetingAdapter(new MeetingAdapterListener() {
             @Override

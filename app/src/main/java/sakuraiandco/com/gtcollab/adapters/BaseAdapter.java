@@ -32,8 +32,14 @@ abstract class BaseAdapter<T extends Entity, V extends RecyclerView.ViewHolder> 
     }
 
     public void addData(List<T> data) {
+        int startPosition = this.data.size() - 1;
         this.data.addAll(data);
-        notifyDataSetChanged();
+        notifyItemRangeInserted(startPosition, data.size());
+    }
+
+    public void addItem(T item) {
+        this.data.add(item);
+        notifyItemInserted(this.data.size() - 1);
     }
 
 }

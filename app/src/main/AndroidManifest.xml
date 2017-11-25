@@ -6,45 +6,40 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="@string/app_name"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".activities.LoginActivity"
-            android:label="@string/title_activity_login">
-        </activity>
-
+            android:label="@string/title_activity_login"></activity>
         <activity
             android:name=".activities.RegisterActivity"
             android:label="@string/title_activity_register"
-            android:launchMode="singleTop">
-        </activity>
-
+            android:launchMode="singleTop"></activity>
         <activity
             android:name=".activities.SearchResultsActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
         <activity
             android:name=".activities.CourseListActivity"
             android:label="@string/title_activity_course_list"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.SubjectSearchActivity"
             android:label="@string/title_activity_subject_search"
@@ -54,7 +49,6 @@
                 android:name="android.app.default_searchable"
                 android:value=".activities.SearchResultsActivity" />
         </activity>
-
         <activity
             android:name=".activities.CourseSearchActivity"
             android:label="@string/title_activity_course_search"
@@ -64,58 +58,48 @@
                 android:name="android.app.default_searchable"
                 android:value=".activities.SearchResultsActivity" />
         </activity>
-
         <activity
             android:name=".activities.CourseActivity"
             android:label="@string/title_activity_course"
             android:launchMode="singleTop"
             android:parentActivityName=".activities.CourseListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".activities.UserListActivity"
             android:label="@string/title_activity_user_list"
-            android:launchMode="singleTop">
-        </activity>
-
+            android:launchMode="singleTop"></activity>
         <activity
             android:name=".activities.CreateMeetingActivity"
             android:label="@string/title_activity_create_meeting"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.CourseActivity">
-        </activity>
-
+            android:parentActivityName=".activities.CourseActivity"></activity>
         <activity
             android:name=".activities.CreateGroupActivity"
             android:label="@string/title_activity_create_group"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.CourseActivity">
-        </activity>
-
+            android:parentActivityName=".activities.CourseActivity"></activity>
         <activity
             android:name=".activities.UserSelectActivity"
             android:label="@string/title_activity_user_select"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.CreateGroupActivity">
-        </activity>
+            android:parentActivityName=".activities.CreateGroupActivity"></activity>
 
-        <service
-            android:name=".services.MyFirebaseMessagingService">
+        <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <service
-            android:name=".services.MyFirebaseInstanceIDService">
+        <service android:name=".services.MyFirebaseInstanceIDService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+        <service android:name=".services.NotificationActionService" />
 
-        <service android:name="sakuraiandco.com.gtcollab.services.NotificationActionService" />
-
+        <activity
+            android:name=".activities.GroupChatActivity"
+            android:label="@string/title_activity_group_message"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
