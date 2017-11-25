@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="sakuraiandco.com.gtcollab.activities.GroupChatActivity">
+
+    <item
+        android:id="@+id/app_bar_members"
+        android:icon="@drawable/ic_group_white_24dp"
+        android:title="Members"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:title="Settings"
+        app:showAsAction="never" />
+
+</menu>
