@@ -1,8 +1,6 @@
 package sakuraiandco.com.gtcollab.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import java.util.List;
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
 import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
-import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.domain.GroupMessage;
 import sakuraiandco.com.gtcollab.domain.User;
 
@@ -49,13 +46,6 @@ public class GroupMessageAdapter extends BaseAdapter<GroupMessage, GroupMessageA
             return new ReceivedMessageViewHolder(view);
         }
     }
-//
-//    @Override
-//    public void onBindViewHolder(GroupMessageViewHolder holder, int position) {
-//        GroupMessage message = data.get(position);
-//        // TODO: check if getItemViewType needed
-//        holder.bind(message);
-//    }
 
     @Override
     public int getItemViewType(int position) {
@@ -86,7 +76,7 @@ public class GroupMessageAdapter extends BaseAdapter<GroupMessage, GroupMessageA
         }
 
         private String formatDate(DateTime dateTime) {
-            return DateFormat.getDateFormat(context).format(dateTime);
+            return dateTime.toString("HH:mm");
         }
     }
 

@@ -1,23 +1,21 @@
 package sakuraiandco.com.gtcollab.activities;
 
-import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ListView;
 
+import org.joda.time.DateTime;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,8 +35,9 @@ public class GroupChatActivity extends AppCompatActivity {
     private Group group;
     private User user;
     private RecyclerView messageRecycler;
-
     private GroupMessageAdapter messageAdapter;
+    private EditText messageText;
+    private LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +54,15 @@ public class GroupChatActivity extends AppCompatActivity {
 
         SingletonProvider.setContext(getApplicationContext());
 
+        messageText = findViewById(R.id.edittext_message);
         group = getIntent().getParcelableExtra("group");
         user = getIntent().getParcelableExtra(EXTRA_USER);
         getSupportActionBar().setTitle(group.getName());
 
         messageRecycler = findViewById(R.id.reyclerview_message_list);
         messageAdapter = new GroupMessageAdapter(user);
-        messageRecycler.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager.setStackFromEnd(true);
+        messageRecycler.setLayoutManager(layoutManager);
         messageRecycler.setAdapter(messageAdapter);
 
         HashMap<String, String> filters = new HashMap<>();
@@ -73,6 +74,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
                     @Override
                     public void onListReady(List<GroupMessage> groupMessages) {
+                        Collections.reverse(groupMessages);
                         messageAdapter.setData(groupMessages);
                     }
 
@@ -106,5 +108,35 @@ public class GroupChatActivity extends AppCompatActivity {
 
     public void sendMessage(View view) {
         // TODO: implement
+        String message = messageText.getText().toString();
+        if (!message.isEmpty()) {
+            GroupMessage groupMessage = GroupMessage.builder()
+                    .content(message)
+                    .groupId(group.getId())
+                    .creator(user)
+                    .timestamp(DateTime.now())
+                    .build();
+            new GroupMessageDAO(new BaseDAO.Listener<GroupMessage>() {
+                @Override
+                public void onDAOError(BaseDAO.Error error) {}
+
+                @Override
+                public void onListReady(List<GroupMessage> groupMessages) {}
+
+                @Override
+                public void onObjectReady(GroupMessage groupMessage) {
+                    View view = getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                    messageAdapter.addItem(groupMessage);
+                    messageRecycler.scrollToPosition(messageAdapter.getItemCount() - 1);
+                }
+
+                @Override
+                public void onObjectDeleted() {}
+            }).create(groupMessage);
+        }
     }
 }
