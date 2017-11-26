@@ -59,7 +59,7 @@ public class GroupChatActivity extends AppCompatActivity {
         user = getIntent().getParcelableExtra(EXTRA_USER);
         getSupportActionBar().setTitle(group.getName());
 
-        messageRecycler = findViewById(R.id.reyclerview_message_list);
+        messageRecycler = findViewById(R.id.recyclerview_message_list);
         messageAdapter = new GroupMessageAdapter(user);
         layoutManager.setStackFromEnd(true);
         messageRecycler.setLayoutManager(layoutManager);
@@ -107,7 +107,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
 
     public void sendMessage(View view) {
-        // TODO: implement
         String message = messageText.getText().toString();
         if (!message.isEmpty()) {
             GroupMessage groupMessage = GroupMessage.builder()
@@ -116,27 +115,31 @@ public class GroupChatActivity extends AppCompatActivity {
                     .creator(user)
                     .timestamp(DateTime.now())
                     .build();
-            new GroupMessageDAO(new BaseDAO.Listener<GroupMessage>() {
-                @Override
-                public void onDAOError(BaseDAO.Error error) {}
-
-                @Override
-                public void onListReady(List<GroupMessage> groupMessages) {}
-
-                @Override
-                public void onObjectReady(GroupMessage groupMessage) {
-                    View view = getCurrentFocus();
-                    if (view != null) {
-                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    }
-                    messageAdapter.addItem(groupMessage);
-                    messageRecycler.scrollToPosition(messageAdapter.getItemCount() - 1);
-                }
-
-                @Override
-                public void onObjectDeleted() {}
-            }).create(groupMessage);
+            sendMessage(groupMessage);
         }
+    }
+
+    public void sendMessage(GroupMessage message) {
+        new GroupMessageDAO(new BaseDAO.Listener<GroupMessage>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {}
+
+            @Override
+            public void onListReady(List<GroupMessage> groupMessages) {}
+
+            @Override
+            public void onObjectReady(GroupMessage groupMessage) {
+                View view = getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+                messageAdapter.addItem(groupMessage);
+                messageRecycler.scrollToPosition(messageAdapter.getItemCount() - 1);
+            }
+
+            @Override
+            public void onObjectDeleted() {}
+        }).create(message);
     }
 }
