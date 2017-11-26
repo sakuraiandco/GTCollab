@@ -8,6 +8,7 @@
         android:id="@+id/app_bar_members"
         android:icon="@drawable/ic_group_white_24dp"
         android:title="Members"
+        android:onClick="viewMembers"
         app:showAsAction="ifRoom" />
 
     <item

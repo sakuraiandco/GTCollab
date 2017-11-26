@@ -1,6 +1,7 @@
 package sakuraiandco.com.gtcollab.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +29,7 @@ import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.GroupMessageDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_GROUP;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 
 public class GroupChatActivity extends AppCompatActivity {
@@ -141,5 +143,12 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onObjectDeleted() {}
         }).create(message);
+    }
+
+
+    public void viewMembers(MenuItem item) {
+        Intent intent = new Intent(this, UserListActivity.class);
+        intent.putExtra(EXTRA_GROUP, group);
+        this.startActivity(intent);
     }
 }
