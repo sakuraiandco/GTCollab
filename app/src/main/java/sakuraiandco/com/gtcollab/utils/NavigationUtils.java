@@ -16,6 +16,7 @@ import sakuraiandco.com.gtcollab.activities.GroupChatActivity;
 import sakuraiandco.com.gtcollab.activities.LoginActivity;
 import sakuraiandco.com.gtcollab.activities.RegisterActivity;
 import sakuraiandco.com.gtcollab.activities.SubjectSearchActivity;
+import sakuraiandco.com.gtcollab.activities.TermListActivity;
 import sakuraiandco.com.gtcollab.activities.UserListActivity;
 import sakuraiandco.com.gtcollab.activities.UserSelectActivity;
 import sakuraiandco.com.gtcollab.domain.Course;
@@ -76,6 +77,11 @@ public class NavigationUtils {
         Intent intent = new Intent(context, CourseActivity.class);
         intent.putExtra(EXTRA_COURSE_TAB, courseTab);
         startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
+    }
+
+    public static void startTermActivity(Context context, User user) {
+        Intent intent = new Intent(context, TermListActivity.class);
+        startActivityWithUser(context, intent, user);
     }
 
     public static void startSubjectSearchActivity(Context context, User user, Term term) {
@@ -143,8 +149,12 @@ public class NavigationUtils {
     }
 
     private static void startActivityWithUserAndTerm(Context context, Intent intent, User user, Term term) {
-        intent.putExtra(EXTRA_USER, user);
         intent.putExtra(EXTRA_TERM, term);
+        startActivityWithUser(context, intent, user);
+    }
+
+    private static void startActivityWithUser(Context context, Intent intent, User user) {
+        intent.putExtra(EXTRA_USER, user);
         context.startActivity(intent);
     }
 

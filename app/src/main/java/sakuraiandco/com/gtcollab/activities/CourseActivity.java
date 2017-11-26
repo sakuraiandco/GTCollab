@@ -84,6 +84,7 @@ import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateMeeting
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startGroupChatActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startNotificationsActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startSubjectSearchActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startTermActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserListActivity;
 
 public class CourseActivity extends AppCompatActivity {
@@ -183,6 +184,7 @@ public class CourseActivity extends AppCompatActivity {
                 switch(id) {
                     case R.id.menu_item_term:
                         // TODO: start term-select activity
+                        startTermActivity(CourseActivity.this, user);
                         break;
                     case R.id.menu_item_add_course:
                         startSubjectSearchActivity(CourseActivity.this, user, term); // TODO: startActivityForResult instead?

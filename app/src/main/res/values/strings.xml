@@ -83,4 +83,7 @@
     <string name="title_activity_group_member_list">Members</string>
     <string name="drawer_open">open drawer</string>
     <string name="drawer_close">close drawer</string>
+    <string name="text_term_name_sample">Fall 2017</string>
+    <string name="no_terms_found">No Terms Found</string>
+    <string name="title_activity_term_list">Term List</string>
 </resources>
