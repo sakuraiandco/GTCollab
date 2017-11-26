@@ -67,7 +67,7 @@ import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateGroupActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateMeetingActivity;
-import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startGropChatActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startGroupChatActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserListActivity;
 
 public class CourseActivity extends AppCompatActivity {
@@ -171,12 +171,7 @@ public class CourseActivity extends AppCompatActivity {
         meetingDAO = new MeetingDAO(new BaseDAO.Listener<Meeting>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
-                // TODO: replace hacky solution after refactoring helper libraries to handle empty response bodies
-                if (error.volleyError.getCause() instanceof JSONException) {
-                    onMeetingObjectDeleted();
-                } else {
-                    Toast.makeText(CourseActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
-                }
+                Toast.makeText(CourseActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
             }
             @Override
             public void onListReady(List<Meeting> meetings) {
@@ -222,7 +217,7 @@ public class CourseActivity extends AppCompatActivity {
                 List<Integer> members = group.getMembers();
                 if (members.contains(user.getId())) {
                     Context context = SingletonProvider.getContext();
-                    startGropChatActivity(context, user, group);
+                    startGroupChatActivity(context, user, group);
                 }
             }
         }, user);

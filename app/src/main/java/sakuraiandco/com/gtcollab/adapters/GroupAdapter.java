@@ -44,7 +44,6 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
         TextView textGroupName;
         TextView textGroupCreator;
         TextView textGroupNumMembers;
-        TextView textGroupDescription;
         LinearLayout groupNumMembers;
         CheckBox checkboxGroup;
         Group object;
@@ -55,22 +54,12 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
             textGroupName = view.findViewById(R.id.text_group_name);
             textGroupCreator = view.findViewById(R.id.text_group_creator);
             textGroupNumMembers = view.findViewById(R.id.text_group_num_members);
-            textGroupDescription = view.findViewById(R.id.text_group_description);
             groupNumMembers = view.findViewById(R.id.group_num_members);
             checkboxGroup = view.findViewById(R.id.checkbox_group);
             groupDetailsShort.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (GroupViewHolder.this != currentExpanded) {
-                        if (currentExpanded != null) {
-                            currentExpanded.textGroupDescription.setVisibility(View.GONE);
-                        }
-                        textGroupDescription.setVisibility(View.VISIBLE);
-                        currentExpanded = GroupViewHolder.this;
-                    } else {
-                        textGroupDescription.setVisibility(View.GONE);
-                        currentExpanded = null;
-                    }
+                    callback.onClick(object);
                 }
             });
             groupNumMembers.setOnClickListener(new View.OnClickListener() {

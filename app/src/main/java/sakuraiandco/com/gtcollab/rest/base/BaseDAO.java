@@ -59,9 +59,9 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
     private int numRequestsWaitingForResponse;
 
     public BaseDAO(String baseURL, Listener<T> callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("Constructor argument BaseDAO.Listener callback must be non-null");
-        }
+//        if (callback == null) {
+//            throw new IllegalArgumentException("Constructor argument BaseDAO.Listener callback must be non-null");
+//        }
         this.baseURL = baseURL;
         this.callback = callback;
         this.count = null;

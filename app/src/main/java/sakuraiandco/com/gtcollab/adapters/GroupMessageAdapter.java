@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.R;
+import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
+import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
 import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.domain.GroupMessage;
 import sakuraiandco.com.gtcollab.domain.User;
@@ -47,15 +49,13 @@ public class GroupMessageAdapter extends BaseAdapter<GroupMessage, GroupMessageA
             return new ReceivedMessageViewHolder(view);
         }
     }
-
-    @Override
-    public void onBindViewHolder(GroupMessageViewHolder holder, int position) {
-        Log.d("log", "bind view holder");
-
-        GroupMessage message = data.get(position);
-        // TODO: check if getItemViewType needed
-        holder.bind(message);
-    }
+//
+//    @Override
+//    public void onBindViewHolder(GroupMessageViewHolder holder, int position) {
+//        GroupMessage message = data.get(position);
+//        // TODO: check if getItemViewType needed
+//        holder.bind(message);
+//    }
 
     @Override
     public int getItemViewType(int position) {
@@ -67,7 +67,7 @@ public class GroupMessageAdapter extends BaseAdapter<GroupMessage, GroupMessageA
         }
     }
 
-    class GroupMessageViewHolder extends RecyclerView.ViewHolder {
+    class GroupMessageViewHolder extends BaseViewHolder<GroupMessage> {
 
         TextView messageText;
         TextView timeText;
@@ -80,7 +80,7 @@ public class GroupMessageAdapter extends BaseAdapter<GroupMessage, GroupMessageA
             context = view.getContext();
         }
 
-        void bind(GroupMessage message) {
+        public void bind(GroupMessage message) {
             messageText.setText(message.getContent());
             timeText.setText(formatDate(message.getTimestamp()));
         }
@@ -101,7 +101,7 @@ public class GroupMessageAdapter extends BaseAdapter<GroupMessage, GroupMessageA
             avatarText = itemView.findViewById(R.id.text_sender_avatar);
         }
 
-        void bind(GroupMessage message) {
+        public void bind(GroupMessage message) {
             super.bind(message);
             User sender = message.getCreator();
             senderText.setText(sender.getFullName());

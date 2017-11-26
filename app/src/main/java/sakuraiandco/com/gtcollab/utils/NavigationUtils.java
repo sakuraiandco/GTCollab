@@ -122,7 +122,7 @@ public class NavigationUtils {
         startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
     }
 
-    public static void startGropChatActivity(Context context, User user, Group group) {
+    public static void startGroupChatActivity(Context context, User user, Group group) {
         Intent intent = new Intent(context, GroupChatActivity.class);
         intent.putExtra(EXTRA_USER, user);
         intent.putExtra("group", group);

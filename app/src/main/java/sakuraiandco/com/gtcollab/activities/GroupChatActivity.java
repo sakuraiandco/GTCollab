@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -28,6 +29,8 @@ import sakuraiandco.com.gtcollab.domain.GroupMessage;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.GroupMessageDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
+
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 
 public class GroupChatActivity extends AppCompatActivity {
 
@@ -53,7 +56,7 @@ public class GroupChatActivity extends AppCompatActivity {
         SingletonProvider.setContext(getApplicationContext());
 
         group = getIntent().getParcelableExtra("group");
-        user = getIntent().getParcelableExtra(Intent.EXTRA_USER);
+        user = getIntent().getParcelableExtra(EXTRA_USER);
         getSupportActionBar().setTitle(group.getName());
 
         messageRecycler = findViewById(R.id.reyclerview_message_list);
@@ -101,4 +104,7 @@ public class GroupChatActivity extends AppCompatActivity {
     }
 
 
+    public void sendMessage(View view) {
+        // TODO: implement
+    }
 }
