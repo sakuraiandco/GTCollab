@@ -1,6 +1,5 @@
 package sakuraiandco.com.gtcollab.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,8 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.GroupAdapter.GroupViewHolder;
+import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
+import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
 import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.domain.User;
 
@@ -37,17 +38,7 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
         return new GroupViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_group, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(GroupViewHolder holder, int position) {
-        Group g = data.get(position);
-        holder.textGroupName.setText(g.getName());
-        holder.textGroupCreator.setText(g.getCreator().getFirstName() + " " + g.getCreator().getLastName());
-        holder.textGroupNumMembers.setText(String.valueOf(g.getMembers().size()));
-        holder.checkboxGroup.setChecked(g.getMembers().contains(user.getId()));
-        holder.object = g;
-    }
-
-    class GroupViewHolder extends RecyclerView.ViewHolder {
+    class GroupViewHolder extends BaseViewHolder<Group> {
 
         LinearLayout groupDetailsShort;
         TextView textGroupName;
@@ -95,6 +86,16 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
                 }
             });
         }
+
+        @Override
+        public void bind(Group g) {
+            textGroupName.setText(g.getName());
+            textGroupCreator.setText(g.getCreator().getFirstName() + " " + g.getCreator().getLastName());
+            textGroupNumMembers.setText(String.valueOf(g.getMembers().size()));
+            checkboxGroup.setChecked(g.getMembers().contains(user.getId()));
+            object = g;
+        }
+
     }
 
 }

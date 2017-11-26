@@ -1,6 +1,5 @@
 package sakuraiandco.com.gtcollab.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,8 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.MeetingAdapter.MeetingViewHolder;
+import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
+import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
 import sakuraiandco.com.gtcollab.domain.Meeting;
 import sakuraiandco.com.gtcollab.domain.User;
 
@@ -38,12 +39,7 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
         return new MeetingViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_meeting, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(MeetingViewHolder holder, int position) {
-        holder.bind(data.get(position));
-    }
-
-    class MeetingViewHolder extends RecyclerView.ViewHolder {
+    class MeetingViewHolder extends BaseViewHolder<Meeting> {
 
         LinearLayout meetingDetailsShort;
         TextView textMeetingName;
@@ -119,7 +115,8 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
 
         }
 
-        void bind(Meeting m) {
+        @Override
+        public void bind(Meeting m) {
             boolean isMember = m.getMembers().contains(user.getId());
             boolean isCreator = m.getCreator().getId() == user.getId();
             textMeetingName.setText(m.getName());

@@ -1,6 +1,5 @@
 package sakuraiandco.com.gtcollab.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,8 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.SubjectSearchAdapter.SubjectViewHolder;
+import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
+import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
 import sakuraiandco.com.gtcollab.domain.Subject;
 
 /**
@@ -30,14 +31,7 @@ public class SubjectSearchAdapter extends BaseAdapter<Subject, SubjectViewHolder
         return new SubjectViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_subject, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(SubjectViewHolder holder, int position) {
-        Subject s = data.get(position);
-        holder.textSubjectName.setText(s.getName());
-        holder.object = s;
-    }
-
-    class SubjectViewHolder extends RecyclerView.ViewHolder {
+    class SubjectViewHolder extends BaseViewHolder<Subject> {
 
         TextView textSubjectName;
         Subject object;
@@ -52,6 +46,13 @@ public class SubjectSearchAdapter extends BaseAdapter<Subject, SubjectViewHolder
                 }
             });
         }
+
+        @Override
+        public void bind(Subject s) {
+            textSubjectName.setText(s.getName());
+            object = s;
+        }
+
     }
 
 }
