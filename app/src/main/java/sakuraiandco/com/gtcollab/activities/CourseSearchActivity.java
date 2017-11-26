@@ -38,6 +38,7 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SUBJECT;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_SUBJECT;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
 
 public class CourseSearchActivity extends AppCompatActivity {
@@ -186,7 +187,8 @@ public class CourseSearchActivity extends AppCompatActivity {
 
     private void onCourseObjectReady(Course course) {
         Toast.makeText(CourseSearchActivity.this, "Joined " + course.getShortName(), Toast.LENGTH_SHORT).show();
-        startCourseListActivity(CourseSearchActivity.this, user, term);
+        startCourseActvitiy(CourseSearchActivity.this, user, term, course);
+//        startCourseListActivity(CourseSearchActivity.this, user, term);
     }
 
 }

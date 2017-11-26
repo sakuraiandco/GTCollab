@@ -26,10 +26,16 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
     private User user;
     private GroupViewHolder currentExpanded;
 
+    public GroupAdapter(GroupAdapterListener callback) { this(callback, null); }
+
     public GroupAdapter(GroupAdapterListener callback, User user) { this(new ArrayList<Group>(), callback, user); }
 
     public GroupAdapter(List<Group> data, GroupAdapterListener callback, User user) {
         super(data, callback);
+        this.user = user;
+    }
+
+    public void setUser(User user) {
         this.user = user;
     }
 

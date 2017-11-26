@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:id="@+id/group_courses"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_item_term"
+            android:title="Select Term"
+            android:orderInCategory="0"
+            android:checkable="false"/>
+        <item
+            android:id="@+id/menu_item_add_course"
+            android:icon="@drawable/ic_add_black_24dp"
+            android:title="Add Course"
+            android:orderInCategory="2"
+            android:checkable="false"/>
+    </group>
+
+    <group
+        android:id="@+id/group_other"
+        android:checkableBehavior="single"
+        android:orderInCategory="3" >
+        <item
+            android:id="@+id/menu_item_notifications"
+            android:icon="@drawable/ic_notifications_black_24dp"
+            android:title="Notifications" />
+        <item
+            android:id="@+id/menu_item_sign_out"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="Sign out"
+            android:checkable="false"/>
+    </group>
+
+</menu>

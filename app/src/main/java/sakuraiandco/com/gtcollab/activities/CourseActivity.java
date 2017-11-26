@@ -4,14 +4,21 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,8 +33,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,21 +58,32 @@ import sakuraiandco.com.gtcollab.rest.CourseDAO;
 import sakuraiandco.com.gtcollab.rest.GroupDAO;
 import sakuraiandco.com.gtcollab.rest.MeetingDAO;
 import sakuraiandco.com.gtcollab.rest.MeetingProposalDAO;
+import sakuraiandco.com.gtcollab.rest.TermDAO;
+import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
+import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN;
+import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE_TAB;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
-import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_MEMBERS;
+import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_TERM;
+import static sakuraiandco.com.gtcollab.constants.Arguments.LAST_OPENED_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.TAG_MEETING_PROPOSAL_DIALOG;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
-import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.forceDeviceTokenRefresh;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.login;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.logout;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateGroupActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateMeetingActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startGroupChatActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startNotificationsActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startSubjectSearchActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserListActivity;
 
 public class CourseActivity extends AppCompatActivity {
@@ -78,10 +94,15 @@ public class CourseActivity extends AppCompatActivity {
     final static String FILTER_TITLE = "Filter by";
 
     // data
+    UserDAO userDAO;
+    TermDAO termDAO;
     CourseDAO courseDAO;
     GroupDAO groupDAO;
     MeetingDAO meetingDAO;
     MeetingProposalDAO meetingProposalDAO;
+
+    // saved data
+    SharedPreferences prefs;
 
     // adapter
     private CoursePagerAdapter coursePagerAdapter;
@@ -97,6 +118,8 @@ public class CourseActivity extends AppCompatActivity {
     private LinearLayoutManager meetingsLayoutManager;
 
     // view
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
     CoordinatorLayout mainContent;
     CollapsingToolbarLayout collapsingToolbarLayout;
     TextView textCourseTermName;
@@ -117,11 +140,20 @@ public class CourseActivity extends AppCompatActivity {
     SearchView groupSearch;
     FloatingActionButton fab;
 
+    // other TODO
+    ActionBarDrawerToggle drawerToggle;
+
     // context
     User user;
     Term term;
     Course course;
+    List<Course> myCoursesList; // replace with map; key with course id
 
+    // variables
+    private String userId;
+    private String authToken;
+    private Term intentTerm;
+    private Course intentCourse;
 //    private int currentTab;
 
     @Override
@@ -133,18 +165,89 @@ public class CourseActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         // initialization
         SingletonProvider.setContext(getApplicationContext());
 
+        // navigation drawer
+        myCoursesList = new ArrayList<>();
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+//        drawerLayout.setDrawerListener(drawerToggle);
+        navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch(id) {
+                    case R.id.menu_item_term:
+                        // TODO: start term-select activity
+                        break;
+                    case R.id.menu_item_add_course:
+                        startSubjectSearchActivity(CourseActivity.this, user, term); // TODO: startActivityForResult instead?
+                        break;
+                    case R.id.menu_item_notifications:
+                        startNotificationsActivity(CourseActivity.this, user, term); // TODO: only after term and user have been retrieved; do if-check, else display error Toast
+                        break;
+                    case R.id.menu_item_sign_out:
+                        logout(CourseActivity.this);
+                        break;
+                    default:
+                        for (Course c : myCoursesList) {
+                            if (c.getId() == id) {
+                                updateCourseContext(c);
+                                break;
+                            }
+                        }
+//                        return false; // TODO
+                }
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+
+        // device registration
+        forceDeviceTokenRefresh(); // TODO: ASSUMES CourseListActivity is launcher activity; best place to put this? LoginActivity instead?
+
         // data
+        userDAO = new UserDAO(new BaseDAO.Listener<User>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CourseActivity.this, "UserDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<User> users) {}
+            @Override
+            public void onObjectReady(User user) {
+                onUserObjectReady(user);
+            }
+            @Override
+            public void onObjectDeleted() {}
+        });
+        termDAO = new TermDAO(new BaseDAO.Listener<Term>() {
+            @Override
+            public void onDAOError(BaseDAO.Error error) {
+                Toast.makeText(CourseActivity.this, "TermDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+            }
+            @Override
+            public void onListReady(List<Term> terms) {}
+            @Override
+            public void onObjectReady(Term term) {
+                onTermObjectReady(term);
+            }
+            @Override
+            public void onObjectDeleted() {}
+        });
         courseDAO = new CourseDAO(new BaseDAO.Listener<Course>() {
             @Override
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CourseActivity.this, "CourseDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
             }
             @Override
-            public void onListReady(List<Course> courses) {}
+            public void onListReady(List<Course> courses) {
+                onCourseListReady(courses);
+            }
             @Override
             public void onObjectReady(Course course) {
                 onCourseObjectReady(course);
@@ -201,8 +304,12 @@ public class CourseActivity extends AppCompatActivity {
             public void onObjectDeleted() {}
         });
 
+        // saved data
+        prefs = getSharedPreferences(DEFAULT_SHARED_PREFERENCES, 0);
+        userId = prefs.getString(CURRENT_USER, null); // TODO: not needed? how to use this to verify authentication?
+        authToken = prefs.getString(AUTH_TOKEN, null); // TODO: not needed? how to use this to verify authentication?
+
         // adapter
-        user = getIntent().getParcelableExtra(EXTRA_USER); // TODO: put in handleIntent?
         groupAdapter = new GroupAdapter(new GroupAdapterListener() {
             @Override
             public void onGroupCheckboxClick(Group group, boolean isChecked) {
@@ -220,7 +327,7 @@ public class CourseActivity extends AppCompatActivity {
                     startGroupChatActivity(context, user, group);
                 }
             }
-        }, user);
+        });
         meetingAdapter = new MeetingAdapter(new MeetingAdapterListener() {
             @Override
             public void onButtonDeleteMeetingClick(Meeting meeting) {
@@ -240,7 +347,7 @@ public class CourseActivity extends AppCompatActivity {
             }
             @Override
             public void onClick(Meeting meeting) {}
-        }, user);
+        });
         coursePagerAdapter = new CoursePagerAdapter(getSupportFragmentManager(), groupAdapter, meetingAdapter);
 
         // layout manager
@@ -286,17 +393,16 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     private void handleIntent(Intent intent) {
-        term = intent.getParcelableExtra(EXTRA_TERM);
-        course = intent.getParcelableExtra(EXTRA_COURSE);
+        intentTerm = intent.getParcelableExtra(EXTRA_TERM);
+        intentCourse = intent.getParcelableExtra(EXTRA_COURSE);
 
-        if (course != null) {
-            Map<String, String> filters = new HashMap<>();
-            filters.put(FILTER_COURSE, String.valueOf(course.getId()));
-            groupDAO.getByFilters(filters);
-            meetingDAO.getByFilters(filters);
+        if (userId != null && authToken != null) {
+            userDAO.get(Integer.valueOf(userId));
         } else {
-            Toast.makeText(this, "No course context", Toast.LENGTH_SHORT).show();
+            login(this);
         }
+
+        // TODO: update course status (e.g. new activity bubble)
 
         switch (intent.getIntExtra(EXTRA_COURSE_TAB, -1)) {
             case TAB_MEETINGS:
@@ -309,7 +415,42 @@ public class CourseActivity extends AppCompatActivity {
                 viewPager.setCurrentItem(TAB_MEETINGS);
         }
 
-        updateCourseInfo();
+    }
+
+    private void getCourses() { // TODO: refactor into static utils method getMyCourses(CourseDAO courseDAO)
+        Map<String, String> filters = new HashMap<>();
+        filters.put(FILTER_TERM, String.valueOf(term.getId()));
+        filters.put(FILTER_MEMBERS, String.valueOf(user.getId()));
+        courseDAO.getByFilters(filters);
+    }
+
+    private void onUserObjectReady(User user) {
+        this.user = user;
+        groupAdapter.setUser(user);
+        meetingAdapter.setUser(user);
+        this.term = intentTerm;
+        if (this.term != null) {
+            getCourses();
+        } else {
+            termDAO.getCurrent();
+        }
+    }
+
+    private void onTermObjectReady(Term term) {
+        this.term = term;
+        getCourses();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) { // TODO: what is this for?
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) { // TODO: what is this for?
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -320,6 +461,9 @@ public class CourseActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch (item.getItemId()) {
             case R.id.action_course_members:
                 startUserListActivity(this, user, term, course, null, null);
@@ -437,19 +581,77 @@ public class CourseActivity extends AppCompatActivity {
             sections = "none";
         }
         collapsingToolbarLayout.setTitle(course.getShortName());
-        textCourseTermName.setText(term.getName());
+        textCourseTermName.setText(term.getName()); // refactor into updateTermInfo()?
         textCourseLongName.setText(course.getName());
         textCourseSections.setText(sections);
         textCourseNumMembers.setText(String.valueOf(course.getNumMembers()));
     }
 
     private void onCourseObjectReady(Course course) {
-        if (!course.getMembers().contains(user.getId())) {
+        if (!course.getMembers().contains(user.getId())) { // TODO: is this check needed?
             Toast.makeText(CourseActivity.this, "Left course: " + course.getShortName(), Toast.LENGTH_SHORT).show();
-            startCourseListActivity(this, user, term);
+            Menu menu = navigationView.getMenu();
+            for (int i = 0; i < myCoursesList.size(); i++) {
+                Course c = myCoursesList.get(i);
+                if (c.getId() == course.getId()) {
+                    menu.removeItem(c.getId());
+                    myCoursesList.remove(c);
+                    break;
+                }
+            }
+            if (!myCoursesList.isEmpty()) {
+                menu.getItem(1).setChecked(true);
+                updateCourseContext(myCoursesList.get(0)); // TODO: default to first course?
+            } else {
+                startSubjectSearchActivity(this, user, term); // TODO: default to subject search activity?
+            }
         }
+    }
 
-        this.course = course;
+    private void onCourseListReady(List<Course> courses) {
+        if (courses.isEmpty()) {
+            startSubjectSearchActivity(this, user, term); // TODO: default to subject search activity?
+        }
+        Menu menu = navigationView.getMenu();
+        MenuItem menuItemTerm = menu.findItem(R.id.menu_item_term);
+        menuItemTerm.setTitle(term.getName());
+        for (int i = 0; i < myCoursesList.size(); i++) {
+            menu.removeItem(myCoursesList.get(i).getId());
+        }
+        myCoursesList = courses; // TODO: memory leak?
+
+        int selectedCourseId = prefs.getInt(LAST_OPENED_COURSE, -1); // TODO: refactor out -1 as INVALID or something
+        if (intentCourse != null) {
+            selectedCourseId = intentCourse.getId();
+        }
+        boolean courseSelected = false;
+        for (int i = 0; i < myCoursesList.size(); i++) { // TODO: put in handleIntent() after retrieving all courses
+            Course c = myCoursesList.get(i);
+            MenuItem item = menu.add(R.id.group_courses, c.getId(), 1, c.getShortName()); // TODO: long name? member count?
+            item.setIcon(R.drawable.ic_school_black_24dp); // TODO: icon displaying number of new meetings?
+            item.setCheckable(true);
+            if (!courseSelected && c.getId() == selectedCourseId) {
+                item.setChecked(true);
+                updateCourseContext(c);
+                courseSelected = true;
+            }
+        }
+        if (!courseSelected) {
+            menu.getItem(1).setChecked(true);
+            updateCourseContext(myCoursesList.get(0)); // TODO: default to first course?
+        }
+    }
+
+    private void updateCourseContext(Course c) {
+        if (course != null && course.getId() == c.getId()) {
+            return;
+        }
+        course = c;
+        prefs.edit().putInt(LAST_OPENED_COURSE, course.getId()).apply();
+        Map<String, String> filters = new HashMap<>();
+        filters.put(FILTER_COURSE, String.valueOf(course.getId()));
+        groupDAO.getByFilters(filters);
+        meetingDAO.getByFilters(filters);
         updateCourseInfo();
     }
 

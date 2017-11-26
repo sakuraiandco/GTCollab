@@ -81,4 +81,6 @@
     <string name="button_cancel_meeting_proposal_text">Cancel</string>
     <string name="title_activity_group_message">Group Chat</string>
     <string name="title_activity_group_member_list">Members</string>
+    <string name="drawer_open">open drawer</string>
+    <string name="drawer_close">close drawer</string>
 </resources>

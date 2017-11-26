@@ -27,10 +27,16 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
     private User user;
     private MeetingViewHolder currentExpanded;
 
+    public MeetingAdapter(MeetingAdapterListener callback) { this(callback, null); }
+
     public MeetingAdapter(MeetingAdapterListener callback, User user) { this(new ArrayList<Meeting>(), callback, user); }
 
     public MeetingAdapter(List<Meeting> data, MeetingAdapterListener callback, User user) {
         super(data, callback);
+        this.user = user;
+    }
+
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -124,7 +130,7 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
             textMeetingStartDate.setText(m.getStartDate().toString("EEE MMM dd"));
             textMeetingStartTime.setText(m.getStartTime().toString("h:mm a"));
             textMeetingDuration.setText(String.valueOf(m.getDurationMinutes() + "min"));
-            textMeetingCreator.setText(m.getCreator().getFirstName() + " " + m.getCreator().getLastName()); // TODO: "Created by: you" if user is creator
+            textMeetingCreator.setText(m.getCreator().getFullName()); // TODO: "Created by: you" if user is creator
             textMeetingNumMembers.setText(String.valueOf(m.getMembers().size()));
             textMeetingDescription.setText(m.getDescription());
             checkboxMeeting.setChecked(isMember);

@@ -34,7 +34,7 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_USERNAME;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.register;
-import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseListActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -177,12 +177,14 @@ public class LoginActivity extends AppCompatActivity {
     private void onUserListReady(List<User> users) {
         User user = users.get(0);
         prefs.edit().putString(CURRENT_USER, String.valueOf(user.getId())).apply();
-        startCourseListActivity(this, user, null);
+        startCourseActvitiy(this, user, null, null);
+//        startCourseListActivity(this, user, null); // TODO: remove
         finish();
     }
 
     private void onUserObjectReady(User user) {
-        startCourseListActivity(this, user, null);
+        startCourseActvitiy(this, user, null, null);
+//        startCourseListActivity(this, user, null); // TODO: remove
         finish();
     }
 

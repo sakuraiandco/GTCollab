@@ -199,7 +199,7 @@ public class CourseListActivity extends AppCompatActivity {
         }
     }
 
-    private void getCourses() {
+    private void getCourses() { // TODO: refactor into static utils method getMyCourses(CourseDAO courseDAO)
         Map<String, String> filters = new HashMap<>();
         filters.put(FILTER_TERM, String.valueOf(term.getId()));
         filters.put(FILTER_MEMBERS, String.valueOf(user.getId()));

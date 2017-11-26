@@ -54,6 +54,7 @@ public class Arguments {
     public static final String AUTH_TOKEN = "auth_token";
     public static final String CURRENT_USER = "current_user";
     public static final String DEVICE_REGISTRATION_ID = "device_registration_id";
+    public static final String LAST_OPENED_COURSE = "last_opened_course";
 
     // Intent actions for notifications (arbitrary)
 

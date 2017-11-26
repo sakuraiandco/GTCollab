@@ -16,6 +16,7 @@
     <dimen name="dialog_padding">8dp</dimen>
     <dimen name="dialog_title_text_size">18sp</dimen>
     <dimen name="error_message_text_size">14dp</dimen>
+    <dimen name="nav_drawer_header_height">170dp</dimen>
 
 
 </resources>
