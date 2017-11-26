@@ -1,6 +1,5 @@
 package sakuraiandco.com.gtcollab.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.R;
-import sakuraiandco.com.gtcollab.domain.Course;
-
 import sakuraiandco.com.gtcollab.adapters.CourseSearchAdapter.CourseViewHolder;
+import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
+import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
+import sakuraiandco.com.gtcollab.domain.Course;
 
 /**
  * Created by kaliq on 10/17/2017.
@@ -31,16 +31,7 @@ public class CourseSearchAdapter extends BaseAdapter<Course, CourseViewHolder> {
         return new CourseViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_course, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(CourseViewHolder holder, int position) {
-        Course c = data.get(position);
-        holder.textCourseShortName.setText(c.getSubjectCode() + " " + c.getCourseNumber());
-        holder.textCourseLongName.setText(c.getName());
-        holder.textCourseNumMembers.setText(String.valueOf(c.getNumMembers()));
-        holder.object = c;
-    }
-
-    class CourseViewHolder extends RecyclerView.ViewHolder {
+    class CourseViewHolder extends BaseViewHolder<Course> {
 
         TextView textCourseShortName;
         TextView textCourseLongName;
@@ -59,6 +50,15 @@ public class CourseSearchAdapter extends BaseAdapter<Course, CourseViewHolder> {
                 }
             });
         }
+
+        @Override
+        public void bind(Course c) {
+            textCourseShortName.setText(c.getSubjectCode() + " " + c.getCourseNumber());
+            textCourseLongName.setText(c.getName());
+            textCourseNumMembers.setText(String.valueOf(c.getNumMembers()));
+            object = c;
+        }
+
     }
 
 }

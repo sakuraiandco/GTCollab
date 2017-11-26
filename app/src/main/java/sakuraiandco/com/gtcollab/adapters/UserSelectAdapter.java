@@ -1,6 +1,5 @@
 package sakuraiandco.com.gtcollab.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,8 @@ import lombok.Getter;
 import lombok.Setter;
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.UserSelectAdapter.UserViewHolder;
+import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
+import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
 import sakuraiandco.com.gtcollab.domain.User;
 
 /**
@@ -35,26 +36,12 @@ public class UserSelectAdapter extends BaseAdapter<User, UserViewHolder> {
         return new UserViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user_select, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(UserViewHolder holder, int position) {
-        User u = data.get(position);
-        holder.checkedTextUserName.setText(u.getFirstName() + " " + u.getLastName());
-        holder.object = u;
-        if (selected.contains(u)) {
-            holder.checkedTextUserName.setChecked(true);
-            holder.checkedTextUserName.setCheckMarkDrawable(R.drawable.ic_check_black_24dp);
-        } else {
-            holder.checkedTextUserName.setChecked(false);
-            holder.checkedTextUserName.setCheckMarkDrawable(null);
-        }
-    }
-
     public void addSelected(User u) {
         selected.add(u);
         notifyDataSetChanged(); // TODO: this should call onBindViewHolder() and update checkmark?
     }
 
-    class UserViewHolder extends RecyclerView.ViewHolder {
+    class UserViewHolder extends BaseViewHolder<User> {
 
         CheckedTextView checkedTextUserName;
         User object;
@@ -76,6 +63,18 @@ public class UserSelectAdapter extends BaseAdapter<User, UserViewHolder> {
                     }
                 }
             });
+        }
+
+        public void bind(User u) {
+            checkedTextUserName.setText(u.getFirstName() + " " + u.getLastName());
+            object = u;
+            if (selected.contains(u)) {
+                checkedTextUserName.setChecked(true);
+                checkedTextUserName.setCheckMarkDrawable(R.drawable.ic_check_black_24dp);
+            } else {
+                checkedTextUserName.setChecked(false);
+                checkedTextUserName.setCheckMarkDrawable(null);
+            }
         }
 
     }

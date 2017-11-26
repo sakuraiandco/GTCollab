@@ -59,6 +59,9 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
     private int numRequestsWaitingForResponse;
 
     public BaseDAO(String baseURL, Listener<T> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Constructor argument BaseDAO.Listener callback must be non-null");
+        }
         this.baseURL = baseURL;
         this.callback = callback;
         this.count = null;
@@ -81,7 +84,7 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
 
     public void update(int id, T t) {
         try {
-            patchRequest(baseURL + id + '/', toJSON(t), this);
+            patchRequest(baseURL + id + "/", toJSON(t), this);
             numRequestsWaitingForResponse++;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -91,12 +94,12 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
 
     // NOTE: Django requires a terminating slash at the end of the url for DELETE and PATCH (will turn into GET otherwise)
     public void delete(int id) {
-        deleteRequest(baseURL + id + '/', this);
+        deleteRequest(baseURL + id + "/", this);
         numRequestsWaitingForResponse++;
     }
 
     public void get(int id) {
-        getRequest(baseURL + id + '/', this);
+        getRequest(baseURL + id + "/", this);
         numRequestsWaitingForResponse++;
     }
 
@@ -189,44 +192,44 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
     public void onResponse(JSONObject response) { // TODO: deliver pagination and count info to callback?
         numRequestsWaitingForResponse--;
         Log.d("TEMP_TEST", response.toString()); // TODO: remove
-        if (callback != null) {
-            JSONArray resultsJSON = response.optJSONArray("results");
-            int id = response.optInt("id", -1);
-            if (resultsJSON != null) { // list of objects
-                List<T> results = new ArrayList<>();
-                try {
-                    // handle pagination
-                    count = response.getInt("count");
-                    nextPageURL = response.getString("next");
-                    prevPageURL = response.getString("previous");
-                    // process results
-                    for (int i = 0; i < resultsJSON.length(); i++) {
-                        results.add(toDomain(resultsJSON.getJSONObject(i)));
-                    }
-                    callback.onListReady(results);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    callback.onDAOError(new Error(null, e));
+        JSONArray resultsJSON = response.optJSONArray("results");
+        int id = response.optInt("id", -1);
+        if (resultsJSON != null) { // list of objects
+            List<T> results = new ArrayList<>();
+            try {
+                // handle pagination
+                count = response.getInt("count");
+                nextPageURL = response.getString("next");
+                prevPageURL = response.getString("previous");
+                // process results
+                for (int i = 0; i < resultsJSON.length(); i++) {
+                    results.add(toDomain(resultsJSON.getJSONObject(i)));
                 }
-            } else if (id != -1){ // single object
-                try {
-                    callback.onObjectReady(toDomain(response));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    callback.onDAOError(new Error(null, e));
-                }
-            } else { // deleted object
-                count--;
-                // TODO: possibly need to invalidate nextPageURL and prevPageURL?
-                callback.onObjectDeleted();
+                callback.onListReady(results);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                callback.onDAOError(new Error(null, e));
             }
+        } else if (id != -1){ // single object
+            try {
+                callback.onObjectReady(toDomain(response));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                callback.onDAOError(new Error(null, e));
+            }
+        } else {
+            // TODO: error handing
         }
     }
 
     @Override
     public void onErrorResponse(VolleyError error) {
         numRequestsWaitingForResponse--;
-        if (callback != null) {
+        if (error.getCause() instanceof JSONException ) { // delete request
+            // TODO: possibly need to invalidate nextPageURL and prevPageURL?
+            count--;
+            callback.onObjectDeleted();
+        } else {
             callback.onDAOError(new Error(error, null));
         }
     }

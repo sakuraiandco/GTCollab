@@ -1,6 +1,5 @@
 package sakuraiandco.com.gtcollab.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,8 @@ import java.util.List;
 
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.GroupAdapter.GroupViewHolder;
+import sakuraiandco.com.gtcollab.adapters.base.BaseAdapter;
+import sakuraiandco.com.gtcollab.adapters.base.BaseViewHolder;
 import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.domain.User;
 
@@ -37,25 +38,16 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
         return new GroupViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_group, parent, false));
     }
 
-    @Override
-    public void onBindViewHolder(GroupViewHolder holder, int position) {
-        Group g = data.get(position);
-        holder.textGroupName.setText(g.getName());
-        holder.textGroupCreator.setText(g.getCreator().getFirstName() + " " + g.getCreator().getLastName());
-        holder.textGroupNumMembers.setText(String.valueOf(g.getMembers().size()));
-        holder.checkboxGroup.setChecked(g.getMembers().contains(user.getId()));
-        holder.group = g;
-    }
-
-    class GroupViewHolder extends RecyclerView.ViewHolder {
+    class GroupViewHolder extends BaseViewHolder<Group> {
 
         LinearLayout groupDetailsShort;
         TextView textGroupName;
         TextView textGroupCreator;
         TextView textGroupNumMembers;
+        TextView textGroupDescription;
         LinearLayout groupNumMembers;
         CheckBox checkboxGroup;
-        Group group;
+        Group object;
 
         GroupViewHolder(View view) {
             super(view);
@@ -63,27 +55,47 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
             textGroupName = view.findViewById(R.id.text_group_name);
             textGroupCreator = view.findViewById(R.id.text_group_creator);
             textGroupNumMembers = view.findViewById(R.id.text_group_num_members);
+            textGroupDescription = view.findViewById(R.id.text_group_description);
             groupNumMembers = view.findViewById(R.id.group_num_members);
             checkboxGroup = view.findViewById(R.id.checkbox_group);
             groupDetailsShort.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callback.onClick(group);
+                    if (GroupViewHolder.this != currentExpanded) {
+                        if (currentExpanded != null) {
+                            currentExpanded.textGroupDescription.setVisibility(View.GONE);
+                        }
+                        textGroupDescription.setVisibility(View.VISIBLE);
+                        currentExpanded = GroupViewHolder.this;
+                    } else {
+                        textGroupDescription.setVisibility(View.GONE);
+                        currentExpanded = null;
+                    }
                 }
             });
             groupNumMembers.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((GroupAdapterListener) callback).onGroupMembersClick(group);
+                    ((GroupAdapterListener) callback).onGroupMembersClick(object);
                 }
             });
             checkboxGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((GroupAdapterListener) callback).onGroupCheckboxClick(group, ((CheckBox) v).isChecked());
+                    ((GroupAdapterListener) callback).onGroupCheckboxClick(object, ((CheckBox) v).isChecked());
                 }
             });
         }
+
+        @Override
+        public void bind(Group g) {
+            textGroupName.setText(g.getName());
+            textGroupCreator.setText(g.getCreator().getFirstName() + " " + g.getCreator().getLastName());
+            textGroupNumMembers.setText(String.valueOf(g.getMembers().size()));
+            checkboxGroup.setChecked(g.getMembers().contains(user.getId()));
+            object = g;
+        }
+
     }
 
 }
