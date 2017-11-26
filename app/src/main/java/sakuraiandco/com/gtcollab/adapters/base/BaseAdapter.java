@@ -38,9 +38,13 @@ public abstract class BaseAdapter<T extends Entity, V extends BaseViewHolder<T>>
     }
 
     public void addData(List<T> data) {
-        int startPosition = this.data.size() - 1;
-        this.data.addAll(data);
-        notifyItemRangeInserted(startPosition, data.size());
+        if (this.data.isEmpty()) {
+            setData(data);
+        } else {
+            int startPosition = this.data.size() - 1;
+            this.data.addAll(data);
+            notifyItemRangeInserted(startPosition, data.size());
+        }
     }
 
     public void addItem(T item) {
