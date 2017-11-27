@@ -613,6 +613,7 @@ public class CourseActivity extends AppCompatActivity {
     private void onCourseListReady(List<Course> courses) {
         if (courses.isEmpty()) {
             startSubjectSearchActivity(this, user, term); // TODO: default to subject search activity?
+            return;
         }
         Menu menu = navigationView.getMenu();
         MenuItem menuItemTerm = menu.findItem(R.id.menu_item_term);
