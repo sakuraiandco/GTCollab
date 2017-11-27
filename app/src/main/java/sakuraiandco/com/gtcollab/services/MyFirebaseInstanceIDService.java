@@ -47,7 +47,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, error.toString());
                 if (error instanceof AuthFailureError) {
-                    login(MyFirebaseInstanceIDService.this); // TODO: can pass in service as context?
+                    login(getApplicationContext());
                 }
             } // if user is not logged in, fail silently...
             @Override
