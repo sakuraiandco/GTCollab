@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/item_padding_inner"
+    android:paddingBottom="@dimen/item_padding_inner">
 
     <LinearLayout
         android:id="@+id/group_details_short"
@@ -10,93 +12,149 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/text_group_name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingLeft="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding_inner"
+            android:text="@string/text_group_name_sample"
+            android:textSize="@dimen/item_text_size_large" />
+
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/group_members_wrapper"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/item_padding"
+            android:paddingRight="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding">
+            <ImageView
+                android:id="@+id/icon_check"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="top"
+                android:src="@drawable/ic_check_accent_24dp"
+                android:visibility="gone"/>
+            <ImageView
+                android:id="@+id/icon_members"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="top"
+                android:src="@drawable/ic_people_dark_24dp" />
+            <TextView
+                android:id="@+id/text_group_num_members"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding_inner"
+                android:text="@string/text_group_num_members_sample"
+                android:textSize="@dimen/item_text_size_large" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/group_container_expanded"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1">
-
+            android:paddingTop="@dimen/item_padding_inner"
+            android:paddingLeft="@dimen/item_padding"
+            android:paddingRight="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding_inner">
             <TextView
-                android:id="@+id/text_group_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/item_padding"
-                android:paddingLeft="@dimen/item_padding"
-                android:paddingRight="@dimen/item_padding"
-                android:paddingBottom="@dimen/item_padding_inner"
-                android:text="@string/text_group_name_sample"
-                android:textSize="@dimen/item_text_size_large" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/item_padding_inner"
-                android:paddingLeft="@dimen/item_padding"
-                android:paddingRight="@dimen/item_padding"
-                android:paddingBottom="@dimen/item_padding">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Created by:"
-                    android:textSize="@dimen/item_text_size_default" />
-
-                <TextView
-                    android:id="@+id/text_group_creator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:paddingLeft="@dimen/item_padding_inner"
-                    android:text="@string/text_group_creator_sample"
-                    android:textSize="@dimen/item_text_size_default" />
-
-            </LinearLayout>
-
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Created by:"
+                android:textSize="@dimen/item_text_size_default" />
+            <TextView
+                android:id="@+id/text_group_creator"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding_inner"
+                android:text="@string/text_group_creator_sample"
+                android:textSize="@dimen/item_text_size_default" />
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/row_group_buttons"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="2"
-            android:padding="@dimen/item_padding">
-
-            <LinearLayout
-                android:id="@+id/group_num_members"
-                android:orientation="horizontal"
+            android:gravity="right">
+            <Button
+                android:id="@+id/button_group_chat"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="@dimen/item_padding_inner"
-                    android:src="@drawable/ic_group_black_24dp" />
-
-                <TextView
-                    android:id="@+id/text_group_num_members"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="@dimen/item_padding_inner"
-                    android:text="@string/text_group_num_members_sample"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/item_text_size_large" />
-
-            </LinearLayout>
-
-            <CheckBox
-                android:id="@+id/checkbox_group"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:drawablePadding="@dimen/item_padding_inner"
+                android:textSize="@dimen/item_text_size_default"
+                android:drawableLeft="@drawable/ic_chat_bubble_outline_accent_24dp"
+                android:text="Chat"
+                android:visibility="gone" />
+            <Button
+                android:id="@+id/button_delete_group"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layoutDirection="rtl"
-                android:checked="false"
-                android:duplicateParentState="false"
-                android:text="Join" />
-
+                android:drawableLeft="@drawable/ic_delete_accent_24dp"
+                android:text="Delete"
+                android:visibility="gone"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:drawablePadding="@dimen/item_padding_inner"
+                android:textSize="@dimen/item_text_size_default"/>
+            <Button
+                android:id="@+id/button_leave_group"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_close_accent_24dp"
+                android:text="Leave"
+                android:visibility="gone"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:drawablePadding="@dimen/item_padding_inner"
+                android:textSize="@dimen/item_text_size_default"/>
+            <Button
+                android:id="@+id/button_join_group"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_check_accent_24dp"
+                android:text="Join"
+                android:visibility="gone"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:drawablePadding="@dimen/item_padding_inner"
+                android:textSize="@dimen/item_text_size_default"
+                />
+            <Button
+                android:id="@+id/button_group_members"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:drawablePadding="@dimen/item_padding_inner"
+                android:textSize="@dimen/item_text_size_default"
+                android:drawableLeft="@drawable/ic_people_accent_24dp"
+                android:text="Members" />
         </LinearLayout>
 
     </LinearLayout>

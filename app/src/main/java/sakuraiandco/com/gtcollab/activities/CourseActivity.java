@@ -319,26 +319,58 @@ public class CourseActivity extends AppCompatActivity {
         authToken = prefs.getString(AUTH_TOKEN, null); // TODO: not needed? how to use this to verify authentication?
 
         // adapter
-        groupAdapter = new GroupAdapter(new GroupAdapterListener() {
+//        groupAdapter = new GroupAdapter(new GroupAdapterListener() {
+//            @Override
+//            public void onGroupCheckboxClick(Group group, boolean isChecked) {
+//                onGroupCheckboxClickHandler(group, isChecked);
+//            }
+//            @Override
+//            public void onGroupMembersClick(Group group) {
+//                startUserListActivity(CourseActivity.this, user, term, course, group, null);
+//            }
+//            @Override
+//            public void onClick(Group group) {
+//                List<Integer> members = group.getMembers();
+//                if (members.contains(user.getId())) {
+//                    startGroupChatActivity(CourseActivity.this, user, group, course);
+//                }
+//            }
+//        });
+
+        // TODO: group chat icon
+        groupAdapter = new GroupAdapter(this, new GroupAdapterListener() {
+            @Override
+            public void onButtonDeleteGroupClick(Group group) {
+                groupDAO.delete(group.getId());
+                groupsList.remove(group); // TODO: ok to do before deleting for real?
+                myGroupsList.remove(group); // TODO: ok to do before deleting for real?
+                groupAdapter.notifyDataSetChanged();
+            }
+
             @Override
             public void onGroupCheckboxClick(Group group, boolean isChecked) {
-                onGroupCheckboxClickHandler(group, isChecked);
+                if (isChecked) {
+                    groupDAO.joinGroup(group.getId());
+                } else {
+                    groupDAO.leaveGroup(group.getId());
+                }
             }
+
             @Override
             public void onGroupMembersClick(Group group) {
                 startUserListActivity(CourseActivity.this, user, term, course, group, null);
             }
+
             @Override
-            public void onClick(Group group) {
-                List<Integer> members = group.getMembers();
-                if (members.contains(user.getId())) {
-                    Log.d("TEMP_TEST", "MADE IT HERE");
-                    startGroupChatActivity(CourseActivity.this, user, group, course);
-                } else {
-                    Toast.makeText(CourseActivity.this, "Must join to view group chat", Toast.LENGTH_SHORT).show(); // TODO: error handling
-                }
+            public void onGroupChatClick(Group group) {
+                // TODO: only show icon if member of group
+                startGroupChatActivity(CourseActivity.this, user, group, course);
             }
+
+            @Override
+            public void onClick(Group group) {}
         });
+
         meetingAdapter = new MeetingAdapter(this, new MeetingAdapterListener() {
             @Override
             public void onButtonDeleteMeetingClick(Meeting meeting) {

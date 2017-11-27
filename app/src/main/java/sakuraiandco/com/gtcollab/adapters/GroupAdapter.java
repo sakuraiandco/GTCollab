@@ -1,9 +1,13 @@
 package sakuraiandco.com.gtcollab.adapters;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,14 +28,17 @@ import sakuraiandco.com.gtcollab.domain.User;
 public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
 
     private User user;
-    private GroupViewHolder currentExpanded;
+    private int expandedGroupId;
+    private Context context;
+    boolean selected;
 
-    public GroupAdapter(GroupAdapterListener callback) { this(callback, null); }
+    public GroupAdapter(Context context, GroupAdapterListener callback) { this(context, callback, null); }
 
-    public GroupAdapter(GroupAdapterListener callback, User user) { this(new ArrayList<Group>(), callback, user); }
+    public GroupAdapter(Context context, GroupAdapterListener callback, User user) { this(context, new ArrayList<Group>(), callback, user); }
 
-    public GroupAdapter(List<Group> data, GroupAdapterListener callback, User user) {
+    public GroupAdapter(Context context, List<Group> data, GroupAdapterListener callback, User user) {
         super(data, callback);
+        this.context = context;
         this.user = user;
     }
 
@@ -47,12 +54,22 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
     class GroupViewHolder extends BaseViewHolder<Group> {
 
         LinearLayout groupDetailsShort;
+        LinearLayout groupDetailsContainer;
+
         TextView textGroupName;
         TextView textGroupCreator;
         TextView textGroupNumMembers;
-        LinearLayout groupNumMembers;
-        CheckBox checkboxGroup;
+
         Group object;
+
+        ImageView iconCheck;
+        ImageView iconMembers;
+
+        Button buttonDeleteGroup;
+        Button buttonJoinGroup;
+        Button buttonLeaveGroup;
+        Button buttonGroupMembers;
+        Button buttonOpenChat;
 
         GroupViewHolder(View view) {
             super(view);
@@ -60,34 +77,101 @@ public class GroupAdapter extends BaseAdapter<Group, GroupViewHolder> {
             textGroupName = view.findViewById(R.id.text_group_name);
             textGroupCreator = view.findViewById(R.id.text_group_creator);
             textGroupNumMembers = view.findViewById(R.id.text_group_num_members);
-            groupNumMembers = view.findViewById(R.id.group_num_members);
-            checkboxGroup = view.findViewById(R.id.checkbox_group);
+            groupDetailsContainer = view.findViewById(R.id.group_container_expanded);
+
+            iconCheck = view.findViewById(R.id.icon_check);
+            iconMembers = view.findViewById(R.id.icon_members);
+
+            buttonDeleteGroup = view.findViewById(R.id.button_delete_group);
+            buttonJoinGroup = view.findViewById(R.id.button_join_group);
+            buttonLeaveGroup = view.findViewById(R.id.button_leave_group);
+            buttonGroupMembers = view.findViewById(R.id.button_group_members);
+            buttonOpenChat = view.findViewById(R.id.button_group_chat);
+
             groupDetailsShort.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callback.onClick(object);
+                    if (expandedGroupId == object.getId()) {
+                        expandedGroupId = -1;
+                        groupDetailsContainer.setVisibility(View.GONE);
+                    } else {
+                        notifyDataSetChanged();
+                        expandedGroupId = object.getId();
+                        groupDetailsContainer.setVisibility(View.VISIBLE);
+                    }
                 }
             });
-            groupNumMembers.setOnClickListener(new View.OnClickListener() {
+            buttonDeleteGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((GroupAdapterListener) callback).onButtonDeleteGroupClick(object);
+                }
+            });
+            buttonGroupMembers.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ((GroupAdapterListener) callback).onGroupMembersClick(object);
                 }
             });
-            checkboxGroup.setOnClickListener(new View.OnClickListener() {
+            buttonJoinGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((GroupAdapterListener) callback).onGroupCheckboxClick(object, ((CheckBox) v).isChecked());
+                    selected = true;
+                    v.setVisibility(View.GONE);
+                    buttonLeaveGroup.setVisibility(View.VISIBLE);
+                    textGroupNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                    iconMembers.setImageResource(R.drawable.ic_people_accent_24dp);
+                    iconCheck.setVisibility(View.VISIBLE);
+                    ((GroupAdapterListener) callback).onGroupCheckboxClick(object, selected);
+                }
+            });
+            buttonLeaveGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selected = false;
+                    v.setVisibility(View.GONE);
+                    buttonJoinGroup.setVisibility(View.VISIBLE);
+                    textGroupNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorDark));
+                    iconMembers.setImageResource(R.drawable.ic_people_dark_24dp);
+                    iconCheck.setVisibility(View.GONE);
+                    ((GroupAdapterListener) callback).onGroupCheckboxClick(object, selected);
+                }
+            });
+            buttonOpenChat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((GroupAdapterListener) callback).onGroupChatClick(object);
                 }
             });
         }
 
         @Override
         public void bind(Group g) {
+            boolean isMember = g.getMembers().contains(user.getId());
+            boolean isCreator = g.getCreator().getId() == user.getId();
+
             textGroupName.setText(g.getName());
-            textGroupCreator.setText(g.getCreator().getFirstName() + " " + g.getCreator().getLastName());
+            if (isMember) {
+                selected = true;
+                buttonJoinGroup.setVisibility(View.GONE);
+                buttonLeaveGroup.setVisibility(View.VISIBLE);
+                textGroupNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                iconMembers.setImageResource(R.drawable.ic_people_accent_24dp);
+                iconCheck.setVisibility(View.VISIBLE);
+            } else {
+                selected = false;
+                buttonLeaveGroup.setVisibility(View.GONE);
+                buttonJoinGroup.setVisibility(View.VISIBLE);
+                textGroupNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorDark));
+                iconMembers.setImageResource(R.drawable.ic_people_dark_24dp);
+                iconCheck.setVisibility(View.GONE);
+            }
+            textGroupName.setText(g.getName());
+            textGroupCreator.setText(g.getCreator().getFullName()); // TODO: "Created by: you" if user is creator
             textGroupNumMembers.setText(String.valueOf(g.getMembers().size()));
-            checkboxGroup.setChecked(g.getMembers().contains(user.getId()));
+            groupDetailsContainer.setVisibility((expandedGroupId == g.getId()) ? View.VISIBLE : View.GONE);
+            buttonDeleteGroup.setVisibility(isCreator ? View.VISIBLE : View.GONE);
+            buttonOpenChat.setVisibility(isMember ? View.VISIBLE : View.GONE);
             object = g;
         }
 
