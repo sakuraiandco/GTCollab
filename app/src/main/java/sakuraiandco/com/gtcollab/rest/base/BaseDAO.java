@@ -22,10 +22,6 @@ import static sakuraiandco.com.gtcollab.utils.NetworkUtils.getRequest;
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.patchRequest;
 import static sakuraiandco.com.gtcollab.utils.NetworkUtils.postRequest;
 
-/**
- * Created by kaliq on 10/15/2017.
- */
-
 public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyResponseListener {
 
     /**************** DAO Listeners ***************************************************************/
@@ -92,7 +88,6 @@ public abstract class BaseDAO<T extends Entity> implements NetworkUtils.VolleyRe
         }
     }
 
-    // NOTE: Django requires a terminating slash at the end of the url for DELETE and PATCH (will turn into GET otherwise)
     public void delete(int id) {
         deleteRequest(baseURL + id + "/", this);
         numRequestsWaitingForResponse++;

@@ -1,8 +1,9 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="sakuraiandco.com.gtcollab.activities.CourseActivity$PlaceholderFragment">
 
     <LinearLayout
@@ -14,46 +15,47 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="10dp">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:id="@+id/meeting_filter_wrapper"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/filter_bar_padding"
                 android:clickable="true"
                 android:focusable="true">
-
                 <ImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:contentDescription="filter"
-                    android:src="@drawable/ic_filter_list_black_24dp"/>
-
+                    android:src="@drawable/ic_filter_list_dark_12dp"/>
                 <TextView
                     android:id="@+id/meeting_filter_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/item_padding"
                     android:text="All Meetings"
                     android:textSize="@dimen/item_text_size_default" />
             </LinearLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="right|center_vertical">
                 <android.support.v7.widget.SearchView
-                    android:layout_width="wrap_content"
                     android:id="@+id/meeting_search"
-                    android:layout_alignParentEnd="true"
-                    android:layout_height="wrap_content" />
-
-            </RelativeLayout>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#FFDDDDDD"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/meetings_recycler_view"
@@ -72,9 +74,7 @@
             android:text="@string/no_meetings_found"
             android:textSize="@dimen/item_text_size_medium"
             android:visibility="gone"/>
+
     </LinearLayout>
-
-
-
 
 </android.support.design.widget.CoordinatorLayout>

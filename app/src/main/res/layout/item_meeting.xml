@@ -1,188 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:id="@+id/meeting_details_short"
-        android:orientation="horizontal"
+        android:id="@+id/meeting_container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/row_meeting_name"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/text_meeting_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:paddingTop="@dimen/item_padding"
                 android:paddingLeft="@dimen/item_padding"
-                android:paddingRight="@dimen/item_padding"
                 android:paddingBottom="@dimen/item_padding_inner"
                 android:text="@string/text_meeting_name_sample"
                 android:textSize="@dimen/item_text_size_large" />
 
-            <TextView
-                android:id="@+id/text_meeting_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/item_padding_inner"
-                android:paddingLeft="@dimen/item_padding"
-                android:paddingRight="@dimen/item_padding"
-                android:paddingBottom="@dimen/item_padding_inner"
-                android:text="@string/text_meeting_location_sample"
-                android:textSize="@dimen/item_text_size_default" />
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginLeft="@dimen/item_padding_inner"-->
+                <!--android:gravity="top"-->
+                <!--android:src="@drawable/ic_check_box_accent_24dp" />-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginLeft="@dimen/item_padding_inner"-->
+                <!--android:gravity="top"-->
+                <!--android:src="@drawable/ic_check_circle_accent_24dp" />-->
+
+
+
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:gravity="top"-->
+                <!--android:src="@drawable/ic_person_accent_24dp" />-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:gravity="top"-->
+                <!--android:src="@drawable/ic_person_dark_24dp" />-->
 
             <LinearLayout
+                android:id="@+id/meeting_members_wrapper"
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/item_padding_inner"
-                android:paddingLeft="@dimen/item_padding"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/item_padding"
                 android:paddingRight="@dimen/item_padding"
                 android:paddingBottom="@dimen/item_padding_inner">
-
                 <TextView
-                    android:id="@+id/text_meeting_start_date"
+                    android:id="@+id/text_join"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="@string/text_meeting_start_date_sample"
+                    android:paddingRight="@dimen/item_padding_inner"
+                    android:gravity="center"
+                    android:text="Join"
                     android:textSize="@dimen/item_text_size_default" />
-
-                <TextView
-                    android:id="@+id/text_meeting_start_time"
+                <ImageView
+                    android:id="@+id/icon_check"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:paddingLeft="@dimen/item_padding_inner"
-                    android:text="@string/text_meeting_start_time_sample"
-                    android:textSize="@dimen/item_text_size_default" />
-
-                <TextView
-                    android:id="@+id/text_meeting_duration"
+                    android:gravity="top"
+                    android:src="@drawable/ic_check_accent_24dp"
+                    android:visibility="gone"/>
+                <ImageView
+                    android:id="@+id/icon_members"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:paddingLeft="@dimen/item_padding"
-                    android:text="@string/text_meeting_duration_sample"
-                    android:textSize="@dimen/item_text_size_default" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/item_padding_inner"
-                android:paddingLeft="@dimen/item_padding"
-                android:paddingRight="@dimen/item_padding"
-                android:paddingBottom="@dimen/item_padding">
-
+                    android:gravity="top"
+                    android:src="@drawable/ic_people_dark_24dp" />
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Created by:"
-                    android:textSize="@dimen/item_text_size_default" />
-
-                <TextView
-                    android:id="@+id/text_meeting_creator"
+                    android:id="@+id/text_meeting_num_members"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:paddingLeft="@dimen/item_padding_inner"
-                    android:text="@string/text_meeting_creator_sample"
-                    android:textSize="@dimen/item_text_size_default" />
-
+                    android:text="@string/text_meeting_num_members_sample"
+                    android:textSize="@dimen/item_text_size_large" />
             </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/row_meeting_date_time_duration"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="2"
-            android:padding="@dimen/item_padding">
+            android:paddingTop="@dimen/item_padding_inner"
+            android:paddingLeft="@dimen/item_padding"
+            android:paddingRight="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding_inner">
 
-            <LinearLayout
-                android:id="@+id/meeting_num_members"
-                android:orientation="horizontal"
+            <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal">
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_access_time_dark_12dp" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="@dimen/item_padding_inner"
-                    android:src="@drawable/ic_group_black_24dp" />
-
-                <TextView
-                    android:id="@+id/text_meeting_num_members"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="@dimen/item_padding_inner"
-                    android:text="@string/text_meeting_num_members_sample"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/item_text_size_large" />
-
-            </LinearLayout>
-
-            <CheckBox
-                android:id="@+id/checkbox_meeting"
+            <TextView
+                android:id="@+id/text_meeting_start_date"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layoutDirection="rtl"
-                android:checked="false"
-                android:duplicateParentState="false"
-                android:text="Join" />
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding"
+                android:text="@string/text_meeting_start_date_sample"
+                android:textSize="@dimen/item_text_size_default" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding_inner"
+                android:text="at"
+                android:textSize="@dimen/item_text_size_default" />
+
+            <TextView
+                android:id="@+id/text_meeting_start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding_inner"
+                android:text="@string/text_meeting_start_time_sample"
+                android:textSize="@dimen/item_text_size_default" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding_inner"
+                android:text="•"
+                android:textSize="@dimen/item_text_size_default" />
+
+            <TextView
+                android:id="@+id/text_meeting_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding_inner"
+                android:text="@string/text_meeting_duration_sample"
+                android:textSize="@dimen/item_text_size_default" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/row_meeting_location_members"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding_inner"
+            android:paddingLeft="@dimen/item_padding"
+            android:paddingRight="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_location_on_dark_12dp" />
+
+            <TextView
+                android:id="@+id/text_meeting_location"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding"
+                android:text="@string/text_meeting_location_sample"
+                android:textSize="@dimen/item_text_size_default"/>
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/meeting_details_expanded"
+        android:id="@+id/meeting_container_expanded"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/item_padding"
-        android:visibility="gone" >
+        android:visibility="gone">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding_inner"
+            android:paddingLeft="@dimen/item_padding"
+            android:paddingRight="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding_inner">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Created by:"
+                android:textSize="@dimen/item_text_size_default" />
+            <TextView
+                android:id="@+id/text_meeting_creator"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/item_padding_inner"
+                android:text="@string/text_meeting_creator_sample"
+                android:textSize="@dimen/item_text_size_default" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/text_meeting_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/text_meeting_description_sample" />
+            android:paddingTop="@dimen/item_padding_inner"
+            android:paddingLeft="@dimen/item_padding"
+            android:paddingRight="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding_inner"
+            android:text="@string/text_meeting_description_sample"
+            android:textSize="@dimen/item_text_size_default"/>
 
         <LinearLayout
-            android:id="@+id/meeting_options"
+            android:id="@+id/row_meeting_buttons"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="right">
-
+            android:gravity="center">
             <Button
                 android:id="@+id/button_propose_new_time_location"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Propose New Time/Location"
+                android:drawableLeft="@drawable/ic_access_time_accent_24dp"
+                android:drawablePadding="@dimen/item_padding_medium"
+                android:text="Change"
                 android:visibility="gone" />
-
             <Button
                 android:id="@+id/button_delete_meeting"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:drawableLeft="@drawable/ic_delete_accent_24dp"
+                android:drawablePadding="@dimen/item_padding_medium"
                 android:text="Delete"
                 android:visibility="gone" />
-
+            <Button
+                android:id="@+id/button_meeting_members"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_people_accent_24dp"
+                android:drawablePadding="@dimen/item_padding_medium"
+                android:text="Members" />
         </LinearLayout>
 
     </LinearLayout>

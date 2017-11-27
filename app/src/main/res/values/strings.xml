@@ -86,4 +86,5 @@
     <string name="text_term_name_sample">Fall 2017</string>
     <string name="no_terms_found">No Terms Found</string>
     <string name="title_activity_term_list">Term List</string>
+    <string name="bullet">•</string>
 </resources>

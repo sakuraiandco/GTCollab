@@ -1,7 +1,6 @@
 package sakuraiandco.com.gtcollab.activities;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +24,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -94,6 +94,11 @@ public class CourseActivity extends AppCompatActivity {
     final static int FILTER_OPTION_MY = 1;
     final static String FILTER_TITLE = "Filter by";
 
+    final static int ALL_MEETINGS_LIST = 1;
+    final static int MY_MEETINGS_LIST = 2;
+    final static int ALL_GROUPS_LIST = 3;
+    final static int MY_GROUPS_LIST = 4;
+
     // data
     UserDAO userDAO;
     TermDAO termDAO;
@@ -155,6 +160,8 @@ public class CourseActivity extends AppCompatActivity {
     private String authToken;
     private Term intentTerm;
     private Course intentCourse;
+    private int currentMeetingList;
+    private int currentGroupList;
 //    private int currentTab;
 
     @Override
@@ -325,12 +332,12 @@ public class CourseActivity extends AppCompatActivity {
             public void onClick(Group group) {
                 List<Integer> members = group.getMembers();
                 if (members.contains(user.getId())) {
-                    Context context = SingletonProvider.getContext();
-                    startGroupChatActivity(context, user, group, course);
+                    Log.d("TEMP_TEST", "MADE IT HERE");
+                    startGroupChatActivity(CourseActivity.this, user, group, course);
                 }
             }
         });
-        meetingAdapter = new MeetingAdapter(new MeetingAdapterListener() {
+        meetingAdapter = new MeetingAdapter(this, new MeetingAdapterListener() {
             @Override
             public void onButtonDeleteMeetingClick(Meeting meeting) {
                 onButtonDeleteMeetingClickHandler(meeting);
@@ -738,14 +745,27 @@ public class CourseActivity extends AppCompatActivity {
 
     private void onMeetingObjectReady(Meeting meeting) {
         boolean joined = meeting.getMembers().contains(user.getId());
-        for (Meeting m : meetingsList) {
+        for (int i = 0; i < meetingsList.size(); i++) {
+            Meeting m = meetingsList.get(i);
             if (m.getId() == meeting.getId()) {
                 m.setMembers(meeting.getMembers()); //  TODO: this should update myMeetingsList too
+                int positionChangedMyMeetingsList;
                 if (joined) {
+                    positionChangedMyMeetingsList = myMeetingsList.size();
                     myMeetingsList.add(m); // TODO: check for duplicates?
                 } else {
+                    positionChangedMyMeetingsList = myMeetingsList.indexOf(m);
                     myMeetingsList.remove(m);
                 }
+//                if (currentMeetingList == ALL_MEETINGS_LIST) {
+//                    meetingAdapter.notifyItemChanged(i);
+//                } else if (currentMeetingList == MY_MEETINGS_LIST) {
+//                    if (joined) {
+//                        meetingAdapter.notifyItemInserted(positionChangedMyMeetingsList);
+//                    } else {
+//                        meetingAdapter.notifyItemRemoved(positionChangedMyMeetingsList);
+//                    }
+//                }
                 meetingAdapter.notifyDataSetChanged();
                 break;
             }
@@ -874,18 +894,22 @@ public class CourseActivity extends AppCompatActivity {
 
     private void showAllGroups() { // TODO: unnecessary?
         showGroups(groupsList);
+        currentGroupList = ALL_GROUPS_LIST;
     }
 
     private void showMyGroups() { // TODO: unnecessary?
         showGroups(myGroupsList);
+        currentGroupList = MY_GROUPS_LIST;
     }
 
     private void showAllMeetings() { // TODO: unnecessary?
         showMeetings(meetingsList);
+        currentMeetingList = ALL_MEETINGS_LIST;
     }
 
     private void showMyMeetings() { // TODO: unnecessary?
         showMeetings(myMeetingsList);
+        currentMeetingList = MY_MEETINGS_LIST;
     }
 
     private void showGroups(List<Group> groups) {
