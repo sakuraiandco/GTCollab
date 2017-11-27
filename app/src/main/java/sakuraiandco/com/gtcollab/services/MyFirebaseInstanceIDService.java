@@ -3,6 +3,7 @@ package sakuraiandco.com.gtcollab.services;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
@@ -14,6 +15,7 @@ import sakuraiandco.com.gtcollab.utils.NetworkUtils;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEVICE_REGISTRATION_ID;
 import static sakuraiandco.com.gtcollab.rest.RESTServices.registerDevice;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.login;
 
 /**
  * Created by kaliq on 10/31/2017.
@@ -43,7 +45,10 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         registerDevice(refreshedToken, new NetworkUtils.VolleyResponseListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, error.toString()); // TODO: ?
+                Log.d(TAG, error.toString());
+                if (error instanceof AuthFailureError) {
+                    login(MyFirebaseInstanceIDService.this); // TODO: can pass in service as context?
+                }
             } // if user is not logged in, fail silently...
             @Override
             public void onResponse(JSONObject response) {
