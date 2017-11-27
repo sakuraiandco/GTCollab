@@ -32,6 +32,7 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFE
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEVICE_REGISTRATION_ID;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE_TAB;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_DISPLAY_BACK_BUTTON;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_GROUP;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_MEETING;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SEARCH_RESULTS;
@@ -85,7 +86,12 @@ public class NavigationUtils {
     }
 
     public static void startSubjectSearchActivity(Context context, User user, Term term) {
+        startSubjectSearchActivity(context, user, term, false);
+    }
+
+    public static void startSubjectSearchActivity(Context context, User user, Term term, boolean displayBackButton) {
         Intent intent = new Intent(context, SubjectSearchActivity.class);
+        intent.putExtra(EXTRA_DISPLAY_BACK_BUTTON, displayBackButton);
         startActivityWithUserAndTerm(context, intent, user, term);
     }
 

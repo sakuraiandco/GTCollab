@@ -31,10 +31,12 @@ import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_CALLING_ACTIVITY;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_DISPLAY_BACK_BUTTON;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.SUBJECT_SEARCH_ACTIVITY;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.logout;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseSearchActivity;
 
 public class SubjectSearchActivity extends AppCompatActivity {
@@ -56,13 +58,15 @@ public class SubjectSearchActivity extends AppCompatActivity {
     User user;
     Term term;
 
+    // variables
+    Menu menu;
+    boolean displayBackButton;
+    boolean displayBackButtonRetrieved;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subject_search);
-
-        // toolbar
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // initialization
         SingletonProvider.setContext(getApplicationContext());
@@ -112,6 +116,12 @@ public class SubjectSearchActivity extends AppCompatActivity {
     }
 
     private void handleIntent(Intent intent) {
+        displayBackButton = intent.getBooleanExtra(EXTRA_DISPLAY_BACK_BUTTON, false);
+        displayBackButtonRetrieved = true;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(displayBackButton);
+        if (menu != null && !displayBackButton) { // TODO: messy
+            menu.findItem(R.id.action_logout).setVisible(true);
+        }
         user = intent.getParcelableExtra(EXTRA_USER);
         term = intent.getParcelableExtra(EXTRA_TERM);
         if (term != null) {
@@ -131,6 +141,10 @@ public class SubjectSearchActivity extends AppCompatActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        this.menu = menu;
+        if (displayBackButtonRetrieved && !displayBackButton) { // TODO: messy
+            menu.findItem(R.id.action_logout).setVisible(true);
+        }
         return true;
     }
 
@@ -139,6 +153,9 @@ public class SubjectSearchActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed(); // TODO: use NavUtils instead?
+                return true;
+            case R.id.action_logout:
+                logout(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

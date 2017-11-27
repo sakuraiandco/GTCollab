@@ -187,7 +187,7 @@ public class CourseActivity extends AppCompatActivity {
                         startTermActivity(CourseActivity.this, user);
                         break;
                     case R.id.menu_item_add_course:
-                        startSubjectSearchActivity(CourseActivity.this, user, term); // TODO: startActivityForResult instead?
+                        startSubjectSearchActivity(CourseActivity.this, user, term, true); // TODO: startActivityForResult instead?
                         break;
                     case R.id.menu_item_notifications:
                         startNotificationsActivity(CourseActivity.this, user, term); // TODO: only after term and user have been retrieved; do if-check, else display error Toast
@@ -613,6 +613,7 @@ public class CourseActivity extends AppCompatActivity {
     private void onCourseListReady(List<Course> courses) {
         if (courses.isEmpty()) {
             startSubjectSearchActivity(this, user, term); // TODO: default to subject search activity?
+            finish();
             return;
         }
         Menu menu = navigationView.getMenu();

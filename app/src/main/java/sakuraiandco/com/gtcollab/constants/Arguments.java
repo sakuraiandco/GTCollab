@@ -51,6 +51,8 @@ public class Arguments {
 
     public static final String EXTRA_NOTIFICATION_ID = "notification_id";
 
+    public static final String EXTRA_DISPLAY_BACK_BUTTON = "display_back_button";
+
         // search
     public static final String EXTRA_CALLING_ACTIVITY = "calling_activity";
     public static final int SUBJECT_SEARCH_ACTIVITY = 1;
