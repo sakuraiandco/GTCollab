@@ -131,11 +131,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
             @Override
             public void onObjectReady(GroupMessage groupMessage) {
-                View view = getCurrentFocus();
-                if (view != null) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                }
                 messageAdapter.addItem(groupMessage);
                 messageRecycler.scrollToPosition(messageAdapter.getItemCount() - 1);
             }
