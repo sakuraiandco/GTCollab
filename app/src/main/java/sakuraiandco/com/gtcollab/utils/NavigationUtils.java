@@ -26,6 +26,7 @@ import sakuraiandco.com.gtcollab.domain.Subject;
 import sakuraiandco.com.gtcollab.domain.Term;
 import sakuraiandco.com.gtcollab.domain.User;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static sakuraiandco.com.gtcollab.constants.Arguments.AUTH_TOKEN;
 import static sakuraiandco.com.gtcollab.constants.Arguments.CURRENT_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
@@ -49,6 +50,13 @@ import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
 public class NavigationUtils {
 
     // TODO: order of arguments?
+
+    public static void loginFromService(Context context) {
+        clearCookies(context);
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 
     public static void login(Context context) {
         clearCookies(context);
@@ -138,7 +146,7 @@ public class NavigationUtils {
         Intent intent = new Intent(context, GroupChatActivity.class);
         intent.putExtra(EXTRA_USER, user);
         intent.putExtra("group", group);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 

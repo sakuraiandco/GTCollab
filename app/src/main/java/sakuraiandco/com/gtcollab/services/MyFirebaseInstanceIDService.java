@@ -15,7 +15,7 @@ import sakuraiandco.com.gtcollab.utils.NetworkUtils;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_SHARED_PREFERENCES;
 import static sakuraiandco.com.gtcollab.constants.Arguments.DEVICE_REGISTRATION_ID;
 import static sakuraiandco.com.gtcollab.rest.RESTServices.registerDevice;
-import static sakuraiandco.com.gtcollab.utils.NavigationUtils.login;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.loginFromService;
 
 /**
  * Created by kaliq on 10/31/2017.
@@ -47,7 +47,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, error.toString());
                 if (error instanceof AuthFailureError) {
-                    login(getApplicationContext());
+                    loginFromService(getApplicationContext());
                 }
             } // if user is not logged in, fail silently...
             @Override
