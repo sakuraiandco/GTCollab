@@ -334,6 +334,8 @@ public class CourseActivity extends AppCompatActivity {
                 if (members.contains(user.getId())) {
                     Log.d("TEMP_TEST", "MADE IT HERE");
                     startGroupChatActivity(CourseActivity.this, user, group, course);
+                } else {
+                    Toast.makeText(CourseActivity.this, "MeetingProposalDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
                 }
             }
         });

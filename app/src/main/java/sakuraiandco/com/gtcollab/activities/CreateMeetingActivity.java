@@ -39,8 +39,6 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserIDs;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserNames;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.joinStrings;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserSelectActivityForResult;
 
@@ -102,6 +100,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
             public void onObjectDeleted() {
             }
         });
+
+        // TODO reorganize
+        members = new ArrayList<>();
 
         // handle intent
         handleIntent(getIntent());
@@ -206,9 +207,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
         now = DateTime.now();
         startDate = now.toLocalDate();
         startTime = now.toLocalTime();
-        List<User> members = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
-        if (members != null) {
-            this.members = members;
+        ArrayList<User> temp = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
+        if (temp != null) {
+            updateMembers(temp);
         }
     }
 
@@ -236,7 +237,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
         if (requestCode == DEFAULT_REQUEST_CODE && resultCode == DEFAULT_RESULT_CODE) {
             ArrayList<User> temp = data.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
             if (temp != null) {
-                members = temp;
+                updateMembers(temp);
             }
         }
     }
@@ -244,4 +245,10 @@ public class CreateMeetingActivity extends AppCompatActivity {
     public void selectMembers(View view) {
         startUserSelectActivityForResult(this, user, term, course, members, DEFAULT_REQUEST_CODE);
     }
+
+    private void updateMembers(List<User> users) {
+        members = users;
+//        textMeetingMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
+    }
+
 }

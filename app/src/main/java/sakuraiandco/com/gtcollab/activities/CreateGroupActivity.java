@@ -32,8 +32,6 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_GROUPS;
 import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserIDs;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserNames;
-import static sakuraiandco.com.gtcollab.utils.GeneralUtils.joinStrings;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserSelectActivityForResult;
 
@@ -127,10 +125,9 @@ public class CreateGroupActivity extends AppCompatActivity {
         user = intent.getParcelableExtra(EXTRA_USER);
         term = intent.getParcelableExtra(EXTRA_TERM);
         course = intent.getParcelableExtra(EXTRA_COURSE);
-        List<User> members = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
-        if (members != null) {
-            this.members = members;
-//            textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
+        ArrayList<User> temp = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
+        if (temp != null) {
+            updateMembers(temp);
         }
     }
 
@@ -160,7 +157,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 ArrayList<User> temp = data.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
                 if (temp != null) {
                     members = temp;
-//                    textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
+                    updateMembers(temp);
                 }
             }
         }
@@ -172,6 +169,11 @@ public class CreateGroupActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    private void updateMembers(List<User> users) {
+        members = users;
+//        textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
     }
 
 }
