@@ -176,7 +176,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -217,50 +217,71 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right">
+
             <Button
                 android:id="@+id/button_delete_meeting"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="@dimen/item_text_size_default"
                 android:drawableLeft="@drawable/ic_delete_accent_24dp"
-                android:drawablePadding="@dimen/item_padding_medium"
+                android:drawablePadding="@dimen/item_padding_inner"
                 android:text="Delete"
-                android:visibility="gone" />
+                android:visibility="visible" />
             <Button
                 android:id="@+id/button_propose_new_time_location"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
                 android:drawableLeft="@drawable/ic_access_time_accent_24dp"
-                android:drawablePadding="@dimen/item_padding_medium"
+                android:drawablePadding="@dimen/item_padding_inner"
                 android:text="Change"
-                android:visibility="gone" />
+                android:textSize="@dimen/item_text_size_default"
+                android:visibility="visible" />
             <Button
                 android:id="@+id/button_leave_meeting"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
                 android:drawableLeft="@drawable/ic_close_accent_24dp"
-                android:drawablePadding="@dimen/item_padding_medium"
+                android:drawablePadding="@dimen/item_padding_inner"
                 android:text="Leave"
+                android:textSize="@dimen/item_text_size_default"
                 android:visibility="gone" />
             <Button
                 android:id="@+id/button_join_meeting"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
                 android:drawableLeft="@drawable/ic_check_accent_24dp"
-                android:drawablePadding="@dimen/item_padding_medium"
+                android:drawablePadding="@dimen/item_padding_inner"
                 android:text="Join"
-                android:visibility="gone" />
+                android:textSize="@dimen/item_text_size_default"
+                android:visibility="visible" />
             <Button
                 android:id="@+id/button_meeting_members"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
                 android:drawableLeft="@drawable/ic_people_accent_24dp"
-                android:drawablePadding="@dimen/item_padding_medium"
-                android:text="Members" />
+                android:drawablePadding="@dimen/item_padding_inner"
+                android:text="Members"
+                android:textSize="@dimen/item_text_size_default" />
         </LinearLayout>
 
     </LinearLayout>
