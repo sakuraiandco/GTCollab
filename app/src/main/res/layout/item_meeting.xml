@@ -65,14 +65,6 @@
                 android:paddingTop="@dimen/item_padding"
                 android:paddingRight="@dimen/item_padding"
                 android:paddingBottom="@dimen/item_padding_inner">
-                <TextView
-                    android:id="@+id/text_join"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:paddingRight="@dimen/item_padding_inner"
-                    android:gravity="center"
-                    android:text="Join"
-                    android:textSize="@dimen/item_text_size_default" />
                 <ImageView
                     android:id="@+id/icon_check"
                     android:layout_width="wrap_content"
@@ -224,7 +216,16 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center">
+            android:gravity="right">
+            <Button
+                android:id="@+id/button_delete_meeting"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_delete_accent_24dp"
+                android:drawablePadding="@dimen/item_padding_medium"
+                android:text="Delete"
+                android:visibility="gone" />
             <Button
                 android:id="@+id/button_propose_new_time_location"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
@@ -235,14 +236,22 @@
                 android:text="Change"
                 android:visibility="gone" />
             <Button
-                android:id="@+id/button_delete_meeting"
+                android:id="@+id/button_leave_meeting"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="0dp"
-                android:drawableLeft="@drawable/ic_delete_accent_24dp"
+                android:drawableLeft="@drawable/ic_close_accent_24dp"
                 android:drawablePadding="@dimen/item_padding_medium"
-                android:text="Delete"
+                android:text="Leave"
+                android:visibility="gone" />
+            <Button
+                android:id="@+id/button_join_meeting"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_check_accent_24dp"
+                android:drawablePadding="@dimen/item_padding_medium"
+                android:text="Join"
                 android:visibility="gone" />
             <Button
                 android:id="@+id/button_meeting_members"

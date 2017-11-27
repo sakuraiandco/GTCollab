@@ -28,6 +28,7 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
 
     private Context context;
     private User user;
+    private int meetingIdExpanded;
 
     public MeetingAdapter(Context context, MeetingAdapterListener callback) { this(context, callback, null); }
 
@@ -63,7 +64,6 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
         TextView textMeetingStartDate;
         TextView textMeetingStartTime;
         TextView textMeetingDuration;
-        TextView textJoin;
 
         LinearLayout rowMeetingLocationMembers;
         TextView textMeetingLocation;
@@ -75,14 +75,15 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
         TextView textMeetingDescription;
 
         LinearLayout rowMeetingButtons;
-        Button buttonProposeNewTimeLocation;
         Button buttonDeleteMeeting;
+        Button buttonProposeNewTimeLocation;
+        Button buttonJoinMeeting;
+        Button buttonLeaveMeeting;
         Button buttonMeetingMembers;
 
         Meeting object;
 
         boolean selected;
-        boolean expanded;
 
         MeetingViewHolder(View view) {
             super(view);
@@ -99,22 +100,24 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
             textMeetingStartDate = view.findViewById(R.id.text_meeting_start_date);
             textMeetingStartTime = view.findViewById(R.id.text_meeting_start_time);
             textMeetingDuration = view.findViewById(R.id.text_meeting_duration);
-            textJoin = view.findViewById(R.id.text_join);
             textMeetingCreator = view.findViewById(R.id.text_meeting_creator);
             textMeetingNumMembers = view.findViewById(R.id.text_meeting_num_members);
             textMeetingDescription = view.findViewById(R.id.text_meeting_description);
             rowMeetingButtons = view.findViewById(R.id.row_meeting_buttons);
-            buttonProposeNewTimeLocation = view.findViewById(R.id.button_propose_new_time_location);
             buttonDeleteMeeting = view.findViewById(R.id.button_delete_meeting);
+            buttonProposeNewTimeLocation = view.findViewById(R.id.button_propose_new_time_location);
+            buttonJoinMeeting = view.findViewById(R.id.button_join_meeting);
+            buttonLeaveMeeting = view.findViewById(R.id.button_leave_meeting);
             buttonMeetingMembers = view.findViewById(R.id.button_meeting_members);
-            textMeetingName.setOnClickListener(new View.OnClickListener() {
+            meetingDetailsShort.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (expanded) {
-                        expanded = false;
+                    if (meetingIdExpanded == object.getId()) {
+                        meetingIdExpanded = -1;
                         meetingDetailsExpanded.setVisibility(View.GONE);
                     } else {
-                        expanded = true;
+                        notifyDataSetChanged(); // TODO: inefficient - better way to collapse existing expanded views?
+                        meetingIdExpanded = object.getId();
                         meetingDetailsExpanded.setVisibility(View.VISIBLE);
                     }
                 }
@@ -137,26 +140,32 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
                     ((MeetingAdapterListener) callback).onMeetingMembersClick(object);
                 }
             });
-            meetingMembersWrapper.setOnClickListener(new View.OnClickListener() {
+            buttonJoinMeeting.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (selected) {
-                        selected = false;
-                        textMeetingNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorDark));
-                        iconMembers.setImageResource(R.drawable.ic_people_dark_24dp);
-                        iconCheck.setVisibility(View.GONE);
-                        textJoin.setVisibility(View.VISIBLE);
-                    } else {
-                        selected = true;
-                        textMeetingNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-                        iconMembers.setImageResource(R.drawable.ic_people_accent_24dp);
-                        iconCheck.setVisibility(View.VISIBLE);
-                        textJoin.setVisibility(View.GONE);
-                    }
+                    selected = true;
+                    v.setVisibility(View.GONE);
+                    buttonLeaveMeeting.setVisibility(View.VISIBLE);
+                    buttonProposeNewTimeLocation.setVisibility(View.VISIBLE); // TODO: ok to put this here for instant UI response before even joined meeting yet?
+                    textMeetingNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+                    iconMembers.setImageResource(R.drawable.ic_people_accent_24dp);
+                    iconCheck.setVisibility(View.VISIBLE);
                     ((MeetingAdapterListener) callback).onMeetingCheckboxClick(object, selected);
                 }
             });
-
+            buttonLeaveMeeting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selected = false;
+                    v.setVisibility(View.GONE);
+                    buttonJoinMeeting.setVisibility(View.VISIBLE);
+                    buttonProposeNewTimeLocation.setVisibility(View.GONE); // TODO: ok to put this here for instant UI response before even joined meeting yet?
+                    textMeetingNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorDark));
+                    iconMembers.setImageResource(R.drawable.ic_people_dark_24dp);
+                    iconCheck.setVisibility(View.GONE);
+                    ((MeetingAdapterListener) callback).onMeetingCheckboxClick(object, selected);
+                }
+            });
         }
 
         @Override
@@ -165,19 +174,19 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
             boolean isCreator = m.getCreator().getId() == user.getId();
             if (isMember) {
                 selected = true;
+                buttonJoinMeeting.setVisibility(View.GONE);
+                buttonLeaveMeeting.setVisibility(View.VISIBLE);
                 textMeetingNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 iconMembers.setImageResource(R.drawable.ic_people_accent_24dp);
                 iconCheck.setVisibility(View.VISIBLE);
-                textJoin.setVisibility(View.GONE);
             } else {
                 selected = false;
+                buttonLeaveMeeting.setVisibility(View.GONE);
+                buttonJoinMeeting.setVisibility(View.VISIBLE);
                 textMeetingNumMembers.setTextColor(ContextCompat.getColor(context, R.color.colorDark));
                 iconMembers.setImageResource(R.drawable.ic_people_dark_24dp);
                 iconCheck.setVisibility(View.GONE);
-                textJoin.setVisibility(View.VISIBLE);
             }
-            expanded = false;
-            meetingDetailsExpanded.setVisibility(View.GONE);
             textMeetingName.setText(m.getName());
             textMeetingLocation.setText(m.getLocation());
             textMeetingStartDate.setText(m.getStartDate().toString("EEE MMM dd"));
@@ -188,9 +197,7 @@ public class MeetingAdapter extends BaseAdapter<Meeting, MeetingViewHolder> {
             textMeetingDescription.setText(m.getDescription());
             buttonProposeNewTimeLocation.setVisibility(isMember ? View.VISIBLE : View.GONE);
             buttonDeleteMeeting.setVisibility(isCreator ? View.VISIBLE : View.GONE);
-
-//            meetingDetailsExpanded.setVisibility((this == currentExpanded) ? View.VISIBLE : View.GONE);
-
+            meetingDetailsExpanded.setVisibility((meetingIdExpanded == m.getId()) ? View.VISIBLE : View.GONE);
             object = m;
         }
 

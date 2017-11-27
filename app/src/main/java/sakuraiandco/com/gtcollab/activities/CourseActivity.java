@@ -757,15 +757,15 @@ public class CourseActivity extends AppCompatActivity {
                     positionChangedMyMeetingsList = myMeetingsList.indexOf(m);
                     myMeetingsList.remove(m);
                 }
-//                if (currentMeetingList == ALL_MEETINGS_LIST) {
-//                    meetingAdapter.notifyItemChanged(i);
-//                } else if (currentMeetingList == MY_MEETINGS_LIST) {
-//                    if (joined) {
-//                        meetingAdapter.notifyItemInserted(positionChangedMyMeetingsList);
-//                    } else {
-//                        meetingAdapter.notifyItemRemoved(positionChangedMyMeetingsList);
-//                    }
-//                }
+                if (currentMeetingList == ALL_MEETINGS_LIST) {
+                    meetingAdapter.notifyItemChanged(i);
+                } else if (currentMeetingList == MY_MEETINGS_LIST) {
+                    if (joined) {
+                        meetingAdapter.notifyItemInserted(positionChangedMyMeetingsList);
+                    } else {
+                        meetingAdapter.notifyItemRemoved(positionChangedMyMeetingsList);
+                    }
+                }
                 meetingAdapter.notifyDataSetChanged();
                 break;
             }
