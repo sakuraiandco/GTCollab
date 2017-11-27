@@ -29,12 +29,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Message data payload: " + data); // TODO: remove
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
-        if (notification != null) {
-            Log.d(TAG, "Message Notification Title: " + notification.getTitle());
-            Log.d(TAG, "Message Notification Body: " + notification.getBody());
-        }
 
-        handleNotification(this, data);
+        Log.d(TAG, "Message Notification Title: " + notification.getTitle());
+        Log.d(TAG, "Message Notification Body: " + notification.getBody());
+
+        handleNotification(this, data, notification.getTitle(), notification.getBody());
     }
 
     @Override

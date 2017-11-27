@@ -57,14 +57,12 @@ import static sakuraiandco.com.gtcollab.constants.Constants.STANDARD_NOTIFICATIO
 
 public class NotificationUtils {
 
-    public static void handleNotification(Context context, Map<String, String> data) {
+    public static void handleNotification(Context context, Map<String, String> data, String title, String message) {
 
         if (data.size() > 0) {
             // Notification
             int id = Integer.valueOf(data.get("id"));
             int type = Integer.valueOf(data.get("type"));
-            String title = data.get("title");
-            String message = data.get("message");
             String messageExpanded = data.get("message_expanded");
             String creatorFirstName = data.get("creator_first_name");
 
@@ -93,30 +91,32 @@ public class NotificationUtils {
                         Log.d(TAG_NOTIFICATION_UTILS, "Group Invitation"); // TODO: remove
                         dispatchGroupInvitation(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, groupId);
                     }
-                } else if (type == MEETING_NOTIFICATION || type == MEETING_INVITATION) {
-                    meetingId = Integer.valueOf(data.get("meeting_id"));
-                    if (type == MEETING_NOTIFICATION) {
-                        Log.d(TAG_NOTIFICATION_UTILS, "Meeting Notification"); // TODO: remove
-                        dispatchMeetingNotification(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId);
-                    } else {
-                        Log.d(TAG_NOTIFICATION_UTILS, "Meeting Invitation"); // TODO: remove
-                        dispatchMeetingInvitation(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId);
-                    }
-                } else if (type == MEETING_PROPOSAL || type == MEETING_PROPOSAL_RESULT) {
-                    location = data.get("location");
-                    startDate = DateTime.parse(data.get("start_date"), ISODateTimeFormat.yearMonthDay()).toLocalDate();
-                    startTime = DateTime.parse(data.get("start_time"), ISODateTimeFormat.hourMinuteSecond()).toLocalTime();
-                    if (type == MEETING_PROPOSAL) {
-                        Log.d(TAG_NOTIFICATION_UTILS, "Meeting Proposal"); // TODO: remove
-                        courseShortName = data.get("course_short_name");
-                        dispatchMeetingProposal(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId, location, startDate, startTime);
-                    } else {
-                        Log.d(TAG_NOTIFICATION_UTILS, "Meeting Proposal Result"); // TODO: remove
-                        meetingProposalId = Integer.valueOf(data.get("meeting_proposal_id"));
-                        dispatchMeetingProposalResult(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId, location, startDate, startTime);
-                    }
                 } else {
-
+                    meetingId = Integer.valueOf(data.get("meeting_id"));
+                    if (type == MEETING_NOTIFICATION || type == MEETING_INVITATION) {
+                        if (type == MEETING_NOTIFICATION) {
+                            Log.d(TAG_NOTIFICATION_UTILS, "Meeting Notification"); // TODO: remove
+                            dispatchMeetingNotification(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId);
+                        } else {
+                            Log.d(TAG_NOTIFICATION_UTILS, "Meeting Invitation"); // TODO: remove
+                            dispatchMeetingInvitation(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId);
+                        }
+                    } else if (type == MEETING_PROPOSAL || type == MEETING_PROPOSAL_RESULT) {
+                        location = data.get("location");
+                        startDate = DateTime.parse(data.get("start_date"), ISODateTimeFormat.yearMonthDay()).toLocalDate();
+                        startTime = DateTime.parse(data.get("start_time"), ISODateTimeFormat.hourMinuteSecond()).toLocalTime();
+                        if (type == MEETING_PROPOSAL) {
+                            Log.d(TAG_NOTIFICATION_UTILS, "Meeting Proposal"); // TODO: remove
+                            courseShortName = data.get("course_short_name");
+                            dispatchMeetingProposal(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId, location, startDate, startTime);
+                        } else {
+                            Log.d(TAG_NOTIFICATION_UTILS, "Meeting Proposal Result"); // TODO: remove
+                            meetingProposalId = Integer.valueOf(data.get("meeting_proposal_id"));
+                            dispatchMeetingProposalResult(context, id, title, message, messageExpanded, creatorFirstName, courseShortName, meetingId, location, startDate, startTime);
+                        }
+                    } else {
+                        // TODO: error handling
+                    }
                 }
             }
 
