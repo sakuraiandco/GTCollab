@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +31,17 @@ import sakuraiandco.com.gtcollab.rest.UserDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 import sakuraiandco.com.gtcollab.utils.PaginationScrollListener;
 
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_REQUEST_CODE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_GROUP;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_MEETING;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SELECTED_USERS;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSES_AS_MEMBER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_GROUPS_AS_MEMBER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_MEETINGS_AS_MEMBER;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserSelectActivityForResult;
 
 public class UserListActivity extends AppCompatActivity {
 
@@ -145,7 +150,7 @@ public class UserListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.user_list_menu, menu);
         return true;
     }
 
@@ -172,5 +177,26 @@ public class UserListActivity extends AppCompatActivity {
 
     private void onClickUser(User user) {
         // TODO: show user profile?
+    }
+
+    public void createMeetingWithMembers(MenuItem item) {
+        // TODO: fill out once/if creating private meetings implemented (little point in doubling notifications for people in your class)
+    }
+
+    public void createGroupWithMembers(MenuItem item) {
+        ArrayList<User> users = (ArrayList) userListAdapter.getData();
+        // filters out current user from list
+        ArrayList<User> tempUsers = new ArrayList<>(users.size() - 1);
+        for (User user: users) {
+            if (user.getId() != this.user.getId()) {
+                tempUsers.add(user);
+            }
+        }
+        Intent intent = new Intent(this, CreateGroupActivity.class);
+        intent.putParcelableArrayListExtra(EXTRA_SELECTED_USERS, tempUsers);
+        intent.putExtra(EXTRA_COURSE, course);
+        intent.putExtra(EXTRA_TERM, term);
+        intent.putExtra(EXTRA_USER, user);
+        startActivity(intent);
     }
 }

@@ -23,19 +23,23 @@ import java.util.List;
 import sakuraiandco.com.gtcollab.R;
 import sakuraiandco.com.gtcollab.adapters.GroupMessageAdapter;
 import sakuraiandco.com.gtcollab.constants.SingletonProvider;
+import sakuraiandco.com.gtcollab.domain.Course;
 import sakuraiandco.com.gtcollab.domain.Group;
 import sakuraiandco.com.gtcollab.domain.GroupMessage;
 import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.GroupMessageDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_GROUP;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserListActivity;
 
 public class GroupChatActivity extends AppCompatActivity {
 
     private Group group;
     private User user;
+    private Course course;
     private RecyclerView messageRecycler;
     private GroupMessageAdapter messageAdapter;
     private EditText messageText;
@@ -57,8 +61,9 @@ public class GroupChatActivity extends AppCompatActivity {
         SingletonProvider.setContext(getApplicationContext());
 
         messageText = findViewById(R.id.edittext_message);
-        group = getIntent().getParcelableExtra("group");
+        group = getIntent().getParcelableExtra(EXTRA_GROUP);
         user = getIntent().getParcelableExtra(EXTRA_USER);
+        course = getIntent().getParcelableExtra(EXTRA_COURSE);
         getSupportActionBar().setTitle(group.getName());
 
         messageRecycler = findViewById(R.id.recyclerview_message_list);
@@ -142,8 +147,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
 
     public void viewMembers(MenuItem item) {
-        Intent intent = new Intent(this, UserListActivity.class);
-        intent.putExtra(EXTRA_GROUP, group);
-        this.startActivity(intent);
+        startUserListActivity(this, user, null, course, group, null);
     }
 }

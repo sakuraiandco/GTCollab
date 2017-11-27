@@ -87,14 +87,14 @@ public class CreateGroupActivity extends AppCompatActivity {
         // TODO reorganize
         members = new ArrayList<>();
 
-        // handle intent
-        handleIntent(getIntent());
-
         // view
         editGroupName = findViewById(R.id.edit_group_name);
         buttonAddMembers = findViewById(R.id.button_add_members);
         textGroupMembers = findViewById(R.id.text_group_members);
         buttonCreateGroup = findViewById(R.id.button_create_group);
+
+        // handle intent
+        handleIntent(getIntent());
 
         buttonAddMembers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,6 +127,11 @@ public class CreateGroupActivity extends AppCompatActivity {
         user = intent.getParcelableExtra(EXTRA_USER);
         term = intent.getParcelableExtra(EXTRA_TERM);
         course = intent.getParcelableExtra(EXTRA_COURSE);
+        List<User> members = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
+        if (members != null) {
+            this.members = members;
+            textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
+        }
     }
 
     @Override

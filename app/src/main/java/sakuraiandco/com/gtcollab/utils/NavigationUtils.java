@@ -142,10 +142,11 @@ public class NavigationUtils {
         startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
     }
 
-    public static void startGroupChatActivity(Context context, User user, Group group) { // TODO: review
+    public static void startGroupChatActivity(Context context, User user, Group group, Course course) { // TODO: review
         Intent intent = new Intent(context, GroupChatActivity.class);
         intent.putExtra(EXTRA_USER, user);
-        intent.putExtra("group", group);
+        intent.putExtra(EXTRA_GROUP, group);
+        intent.putExtra(EXTRA_COURSE, course);
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

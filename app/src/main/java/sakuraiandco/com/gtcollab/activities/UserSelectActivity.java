@@ -153,9 +153,16 @@ public class UserSelectActivity extends AppCompatActivity {
     }
 
     private void onUserListReady(List<User> users) {
-        userSelectAdapter.addData(users);
+        // filters out current user from list
+        List<User> filteredUsers = new ArrayList<>(users.size() - 1);
+        for (User user: users) {
+            if (user.getId() != this.user.getId()) {
+                filteredUsers.add(user);
+            }
+        }
+        userSelectAdapter.addData(filteredUsers);
         if (!selectedUsersIDs.isEmpty()) {
-            for (User u : users) {
+            for (User u : filteredUsers) {
                 if (selectedUsersIDs.contains(u.getId())) {
                     selectedUsersIDs.remove((Integer) u.getId());
                     userSelectAdapter.addSelected(u);
@@ -167,7 +174,7 @@ public class UserSelectActivity extends AppCompatActivity {
         } else {
             textNoUsersFound.setVisibility(View.VISIBLE);
         }
-        getSupportActionBar().setTitle(title + " - " + users.size() + " Members");
+        getSupportActionBar().setTitle(title + " - " + filteredUsers.size() + " Members");
     }
 
     private void onClickUser(User user) {

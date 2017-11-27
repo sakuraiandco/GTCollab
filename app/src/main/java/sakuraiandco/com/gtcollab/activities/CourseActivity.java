@@ -326,7 +326,7 @@ public class CourseActivity extends AppCompatActivity {
                 List<Integer> members = group.getMembers();
                 if (members.contains(user.getId())) {
                     Context context = SingletonProvider.getContext();
-                    startGroupChatActivity(context, user, group);
+                    startGroupChatActivity(context, user, group, course);
                 }
             }
         });
