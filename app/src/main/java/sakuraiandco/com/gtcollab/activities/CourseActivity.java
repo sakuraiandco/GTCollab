@@ -335,7 +335,7 @@ public class CourseActivity extends AppCompatActivity {
                     Log.d("TEMP_TEST", "MADE IT HERE");
                     startGroupChatActivity(CourseActivity.this, user, group, course);
                 } else {
-                    Toast.makeText(CourseActivity.this, "MeetingProposalDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling
+                    Toast.makeText(CourseActivity.this, "Must join to view group chat", Toast.LENGTH_SHORT).show(); // TODO: error handling
                 }
             }
         });
