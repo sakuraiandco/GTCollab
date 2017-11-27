@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:cropToPadding="false"
         android:scaleType="centerCrop"
-        android:src="@drawable/navagation_drawer_header_background_2"
+        android:src="@drawable/navagation_drawer_header_background"
         android:contentDescription="Georgia Tech Logo" />
 
 </LinearLayout>
