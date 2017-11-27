@@ -12,32 +12,27 @@ import lombok.Data;
 import sakuraiandco.com.gtcollab.constants.Constants;
 
 /**
- * Created by kaliq on 11/1/2017.
+ * Created by kaliq on 11/26/2017.
  */
 
 @Data
-@Builder
-public class GroupInvitation extends Entity implements Parcelable {
+public class GroupInvitation extends GroupNotification implements Parcelable {
 
     public static final String BASE_URL = Constants.BASE_URL + "/group-invitations/";
 
-    int id;
-    int groupId;
-    User creator;
-    List<Integer> recipients;
-    DateTime timestamp;
+    @Builder
+    GroupInvitation(int id, String title, String message, String messageExpanded, User creator, List<Integer> recipients, List<Integer> recipientsReadBy, DateTime timestamp, int groupId) {
+        super(id, title, message, messageExpanded, creator, recipients, recipientsReadBy, timestamp, groupId);
+    }
+
+    private GroupInvitation(Parcel in) {
+        super(in);
+    }
 
     public static final Creator<GroupInvitation> CREATOR = new Creator<GroupInvitation>() {
         @Override
         public GroupInvitation createFromParcel(Parcel in) {
-            GroupInvitation gi = GroupInvitation.builder()
-                    .id(in.readInt())
-                    .groupId(in.readInt())
-                    .creator((User) in.readParcelable(User.class.getClassLoader()))
-                    .timestamp(new DateTime(in.readString()))
-                    .build();
-            in.readList(gi.getRecipients(), null);
-            return gi;
+            return new GroupInvitation(in);
         }
 
         @Override
@@ -53,10 +48,12 @@ public class GroupInvitation extends Entity implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeInt(groupId);
-        dest.writeParcelable(creator, flags);
-        dest.writeString(timestamp.toString());
-        dest.writeList(recipients); // TODO: out of order - messy? better way?
+        super.writeToParcel(dest, flags);
+    }
+
+    public static class GroupInvitationBuilder extends GroupNotificationBuilder {
+        GroupInvitationBuilder() {
+            super();
+        }
     }
 }

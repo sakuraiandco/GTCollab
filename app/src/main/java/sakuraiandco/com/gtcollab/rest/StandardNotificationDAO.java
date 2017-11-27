@@ -8,29 +8,31 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import sakuraiandco.com.gtcollab.domain.MeetingInvitation;
+import sakuraiandco.com.gtcollab.domain.StandardNotification;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 
 /**
  * Created by kaliq on 11/1/2017.
  */
 
-public class MeetingInvitationDAO extends BaseDAO<MeetingInvitation> {
+public class StandardNotificationDAO extends BaseDAO<StandardNotification> {
 
-    public MeetingInvitationDAO(Listener<MeetingInvitation> callback) {
-        super(MeetingInvitation.BASE_URL, callback);
+    public StandardNotificationDAO(Listener<StandardNotification> callback) {
+        super(StandardNotification.BASE_URL, callback);
     }
 
     @Override
-    public JSONObject toJSON(MeetingInvitation mi) throws JSONException {
+    public JSONObject toJSON(StandardNotification sn) throws JSONException {
         JSONObject o = new JSONObject();
-        o.put("meeting", mi.getMeetingId());
-        o.put("recipients", new JSONArray(mi.getRecipients()));
+        o.put("title", sn.getTitle());
+        o.put("message", sn.getMessage());
+        o.put("messageExpanded", sn.getMessageExpanded());
+        o.put("recipients", new JSONArray(sn.getRecipients()));
         return o;
     }
 
     @Override
-    public MeetingInvitation toDomain(JSONObject o) throws JSONException {
+    public StandardNotification toDomain(JSONObject o) throws JSONException {
         JSONArray recipientsJSON = o.getJSONArray("recipients");
         List<Integer> recipients = new ArrayList<>();
         for (int i = 0; i < recipientsJSON.length(); i++) {
@@ -41,9 +43,8 @@ public class MeetingInvitationDAO extends BaseDAO<MeetingInvitation> {
         for (int i = 0; i < recipientsReadByJSON.length(); i++) {
             recipients.add(recipientsReadByJSON.getInt(i));
         }
-        return MeetingInvitation.builder()
+        return StandardNotification.builder()
                 .id(o.getInt("id"))
-                .meetingId(o.getInt("meeting"))
                 .title(o.getString("title"))
                 .message(o.getString("message"))
                 .messageExpanded(o.getString("message_expanded"))

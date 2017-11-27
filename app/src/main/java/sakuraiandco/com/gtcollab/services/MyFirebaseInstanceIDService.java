@@ -43,7 +43,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         registerDevice(refreshedToken, new NetworkUtils.VolleyResponseListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, String.valueOf(error.networkResponse.statusCode)); // TODO: ?
+                Log.d(TAG, error.toString()); // TODO: ?
             } // if user is not logged in, fail silently...
             @Override
             public void onResponse(JSONObject response) {

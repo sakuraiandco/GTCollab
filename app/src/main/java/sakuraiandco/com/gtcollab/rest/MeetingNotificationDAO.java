@@ -8,29 +8,31 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import sakuraiandco.com.gtcollab.domain.MeetingInvitation;
+import sakuraiandco.com.gtcollab.domain.MeetingNotification;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 
 /**
  * Created by kaliq on 11/1/2017.
  */
 
-public class MeetingInvitationDAO extends BaseDAO<MeetingInvitation> {
+public class MeetingNotificationDAO extends BaseDAO<MeetingNotification> {
 
-    public MeetingInvitationDAO(Listener<MeetingInvitation> callback) {
-        super(MeetingInvitation.BASE_URL, callback);
+    public MeetingNotificationDAO(Listener<MeetingNotification> callback) {
+        super(MeetingNotification.BASE_URL, callback);
     }
 
     @Override
-    public JSONObject toJSON(MeetingInvitation mi) throws JSONException {
+    public JSONObject toJSON(MeetingNotification mn) throws JSONException {
         JSONObject o = new JSONObject();
-        o.put("meeting", mi.getMeetingId());
-        o.put("recipients", new JSONArray(mi.getRecipients()));
+        o.put("meeting", mn.getMeetingId());
+        o.put("message", mn.getMessage());
+        o.put("messageExpanded", mn.getMessageExpanded());
+        o.put("recipients", new JSONArray(mn.getRecipients()));
         return o;
     }
 
     @Override
-    public MeetingInvitation toDomain(JSONObject o) throws JSONException {
+    public MeetingNotification toDomain(JSONObject o) throws JSONException {
         JSONArray recipientsJSON = o.getJSONArray("recipients");
         List<Integer> recipients = new ArrayList<>();
         for (int i = 0; i < recipientsJSON.length(); i++) {
@@ -41,7 +43,7 @@ public class MeetingInvitationDAO extends BaseDAO<MeetingInvitation> {
         for (int i = 0; i < recipientsReadByJSON.length(); i++) {
             recipients.add(recipientsReadByJSON.getInt(i));
         }
-        return MeetingInvitation.builder()
+        return MeetingNotification.builder()
                 .id(o.getInt("id"))
                 .meetingId(o.getInt("meeting"))
                 .title(o.getString("title"))

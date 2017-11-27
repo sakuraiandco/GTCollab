@@ -36,11 +36,20 @@ public class GroupInvitationDAO extends BaseDAO<GroupInvitation> {
         for (int i = 0; i < recipientsJSON.length(); i++) {
             recipients.add(recipientsJSON.getInt(i));
         }
+        JSONArray recipientsReadByJSON = o.getJSONArray("recipients_read_by");
+        List<Integer> recipientsReadBy = new ArrayList<>();
+        for (int i = 0; i < recipientsReadByJSON.length(); i++) {
+            recipients.add(recipientsReadByJSON.getInt(i));
+        }
         return GroupInvitation.builder()
                 .id(o.getInt("id"))
                 .groupId(o.getInt("group"))
+                .title(o.getString("title"))
+                .message(o.getString("message"))
+                .messageExpanded(o.getString("message_expanded"))
                 .creator(new UserDAO(null).toDomain(o.getJSONObject("creator")))
                 .recipients(recipients)
+                .recipientsReadBy(recipientsReadBy)
                 .timestamp(DateTime.parse(o.getString("timestamp"))) // TODO: format?
                 .build();
     }

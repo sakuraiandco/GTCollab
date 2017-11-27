@@ -36,18 +36,27 @@ public class MeetingProposalDAO extends BaseDAO<MeetingProposal> {
     }
 
     @Override
-    public JSONObject toJSON(MeetingProposal m) throws JSONException {
+    public JSONObject toJSON(MeetingProposal mn) throws JSONException {
         JSONObject o = new JSONObject();
-        o.put("id", m.getId());
-        o.put("meeting", m.getMeetingId());
-        o.put("location", m.getLocation());
-        o.put("start_date", m.getStartDate().toString());
-        o.put("start_time", m.getStartTime().toString("HH:mm"));
+        o.put("meeting", mn.getMeetingId());
+        o.put("location", mn.getLocation());
+        o.put("start_date", mn.getStartDate().toString());
+        o.put("start_time", mn.getStartTime().toString("HH:mm"));
         return o;
     }
 
     @Override
     public MeetingProposal toDomain(JSONObject o) throws JSONException {
+        JSONArray recipientsJSON = o.getJSONArray("recipients");
+        List<Integer> recipients = new ArrayList<>();
+        for (int i = 0; i < recipientsJSON.length(); i++) {
+            recipients.add(recipientsJSON.getInt(i));
+        }
+        JSONArray recipientsReadByJSON = o.getJSONArray("recipients_read_by");
+        List<Integer> recipientsReadBy = new ArrayList<>();
+        for (int i = 0; i < recipientsReadByJSON.length(); i++) {
+            recipients.add(recipientsReadByJSON.getInt(i));
+        }
         JSONArray responsesReceivedJSON = o.getJSONArray("responses_received");
         List<Integer> responsesReceived = new ArrayList<>();
         for (int i = 0; i < responsesReceivedJSON.length(); i++) {
@@ -56,11 +65,16 @@ public class MeetingProposalDAO extends BaseDAO<MeetingProposal> {
         return MeetingProposal.builder()
                 .id(o.getInt("id"))
                 .meetingId(o.getInt("meeting"))
+                .title(o.getString("title"))
+                .message(o.getString("message"))
+                .messageExpanded(o.getString("message_expanded"))
+                .creator(new UserDAO(null).toDomain(o.getJSONObject("creator")))
+                .recipients(recipients)
+                .recipientsReadBy(recipientsReadBy)
+                .timestamp(DateTime.parse(o.getString("timestamp"))) // TODO: format?
                 .location(o.getString("location"))
                 .startDate(DateTime.parse(o.getString("start_date"), ISODateTimeFormat.yearMonthDay()).toLocalDate())
                 .startTime(DateTime.parse(o.getString("start_time"), ISODateTimeFormat.hourMinuteSecond()).toLocalTime())
-                .creator(userDAO.toDomain(o.getJSONObject("creator")))
-                .timestamp(DateTime.parse(o.getString("timestamp"))) // TODO: format?
                 .responsesReceived(responsesReceived)
                 .expirationMinutes(o.getInt("expiration_minutes"))
                 .applied(o.getBoolean("applied"))

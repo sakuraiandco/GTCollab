@@ -12,32 +12,27 @@ import lombok.Data;
 import sakuraiandco.com.gtcollab.constants.Constants;
 
 /**
- * Created by kaliq on 11/1/2017.
+ * Created by kaliq on 11/26/2017.
  */
 
 @Data
-@Builder
-public class MeetingInvitation extends Entity implements Parcelable {
+public class MeetingInvitation extends MeetingNotification implements Parcelable {
 
-    public static final String BASE_URL = Constants.BASE_URL + "/meeting-invitations/";
+    public static final String BASE_URL = Constants.BASE_URL + "/group-invitations/";
 
-    int id;
-    int meetingId;
-    User creator;
-    List<Integer> recipients;
-    DateTime timestamp;
+    @Builder
+    MeetingInvitation(int id, String title, String message, String messageExpanded, User creator, List<Integer> recipients, List<Integer> recipientsReadBy, DateTime timestamp, int meetingId) {
+        super(id, title, message, messageExpanded, creator, recipients, recipientsReadBy, timestamp, meetingId);
+    }
+
+    private MeetingInvitation(Parcel in) {
+        super(in);
+    }
 
     public static final Creator<MeetingInvitation> CREATOR = new Creator<MeetingInvitation>() {
         @Override
         public MeetingInvitation createFromParcel(Parcel in) {
-            MeetingInvitation mi = MeetingInvitation.builder()
-                    .id(in.readInt())
-                    .meetingId(in.readInt())
-                    .creator((User) in.readParcelable(User.class.getClassLoader()))
-                    .timestamp(new DateTime(in.readString()))
-                    .build();
-            in.readList(mi.getRecipients(), null);
-            return mi;
+            return new MeetingInvitation(in);
         }
 
         @Override
@@ -53,10 +48,12 @@ public class MeetingInvitation extends Entity implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeInt(meetingId);
-        dest.writeParcelable(creator, flags);
-        dest.writeString(timestamp.toString());
-        dest.writeList(recipients); // TODO: out of order - messy? better way?
+        super.writeToParcel(dest, flags);
+    }
+
+    public static class MeetingInvitationBuilder extends MeetingNotificationBuilder {
+        MeetingInvitationBuilder() {
+            super();
+        }
     }
 }

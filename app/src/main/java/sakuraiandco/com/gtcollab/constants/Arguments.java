@@ -35,7 +35,16 @@ public class Arguments {
     public static final String EXTRA_SELECTED_USERS = "selected_users";
     public static final String EXTRA_COURSE_TAB = "course_tab";
 
+    public static final String EXTRA_GROUP_NOTIFICATION_ID = "group_notification_id";
+    public static final String EXTRA_MEETING_NOTIFICATION_ID = "meeting_notification_id";
+    public static final String EXTRA_GROUP_INVITATION_ID = "group_invitation_id";
+    public static final String EXTRA_MEETING_INVITATION_ID = "meeting_invitation_id";
     public static final String EXTRA_MEETING_PROPOSAL_ID = "meeting_proposal_id";
+    public static final String EXTRA_MEETING_PROPOSAL_RESULT_ID = "meeting_proposal_result_id";
+
+    public static final String EXTRA_GROUP_ID = "group_id";
+    public static final String EXTRA_MEETING_ID = "meeting_id";
+
     public static final String EXTRA_MEETING_PROPOSAL_RESPONSE = "meeting_proposal_response";
     public static final int ACCEPTED = 1;
     public static final int REJECTED = 2;
@@ -58,11 +67,12 @@ public class Arguments {
 
     // Intent actions for notifications (arbitrary)
 
-    public static final String ACTION_1  = "action_1"; // TODO
-    public static final String ACTION_2  = "action_2"; // TODO
-    public static final String ACTION_3  = "action_3"; // TODO
-    public static final String ACTION_4  = "action_4"; // TODO
-    public static final String ACTION_5  = "action_5"; // TODO
+    public static final String ACTION_GROUP_INVITATION_ACCEPT  = "action_group_invitation_accept";
+    public static final String ACTION_GROUP_INVITATION_IGNORE  = "action_group_invitation_ignore";
+    public static final String ACTION_MEETING_INVITATION_ACCEPT  = "action_meeting_invitation_accept";
+    public static final String ACTION_MEETING_INVITATION_IGNORE  = "action_meeting_invitation_ignore";
+    public static final String ACTION_MEETING_PROPOSAL_ACCEPT  = "action_meeting_proposal_accept";
+    public static final String ACTION_MEETING_PROPOSAL_REJECT  = "action_meeting_proposal_reject";
 
     // startActivityForResult()
     public static final int DEFAULT_REQUEST_CODE = 0;
@@ -70,5 +80,6 @@ public class Arguments {
 
     // Tags TODO
     public static final String TAG_MEETING_PROPOSAL_DIALOG = "meeting_proposal_dialog";
+    public final static String TAG_NOTIFICATION_UTILS = "NOTIFICATIONS";
 
 }

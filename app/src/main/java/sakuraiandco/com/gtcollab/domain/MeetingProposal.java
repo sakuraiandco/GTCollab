@@ -15,45 +15,51 @@ import lombok.Data;
 import sakuraiandco.com.gtcollab.constants.Constants;
 
 /**
- * Created by kaliq on 10/14/2017.
+ * Created by kaliq on 11/26/2017.
  */
 
 @Data
-@Builder
-public class MeetingProposal extends Entity implements Parcelable {
+public class MeetingProposal extends MeetingNotification implements Parcelable {
 
     public static final String BASE_URL = Constants.BASE_URL + "/meeting-proposals/";
 
-    int id;
-    int meetingId;
     String location;
     LocalDate startDate;
     LocalTime startTime;
-    User creator;
-    DateTime timestamp;
     List<Integer> responsesReceived;
     int expirationMinutes;
     boolean applied;
     boolean closed;
 
+    @Builder
+    MeetingProposal(int id, String title, String message, String messageExpanded, User creator, List<Integer> recipients, List<Integer> recipientsReadBy, DateTime timestamp, int meetingId, String location, LocalDate startDate, LocalTime startTime, List<Integer> responsesReceived, int expirationMinutes, boolean applied, boolean closed) {
+        super(id, title, message, messageExpanded, creator, recipients, recipientsReadBy, timestamp, meetingId);
+        this.location = location;
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.responsesReceived = responsesReceived;
+        this.expirationMinutes = expirationMinutes;
+        this.applied = applied;
+        this.closed = closed;
+    }
+
+    private MeetingProposal(Parcel in) {
+        super(in);
+        responsesReceived = new ArrayList<>();
+
+        location = in.readString();
+        startDate = new LocalDate(in.readString());
+        startTime = new LocalTime(in.readString());
+        expirationMinutes = in.readInt();
+        applied = in.readByte() != 0;
+        closed = in.readByte() != 0;
+        in.readList(responsesReceived, null);
+    }
+
     public static final Creator<MeetingProposal> CREATOR = new Creator<MeetingProposal>() {
         @Override
         public MeetingProposal createFromParcel(Parcel in) {
-            MeetingProposal mp =  MeetingProposal.builder()
-                    .id(in.readInt())
-                    .meetingId(in.readInt())
-                    .location(in.readString())
-                    .startDate(new LocalDate(in.readString()))
-                    .startTime(new LocalTime(in.readString()))
-                    .creator((User)in.readParcelable(User.class.getClassLoader()))
-                    .timestamp(new DateTime(in.readString()))
-                    .responsesReceived(new ArrayList<Integer>())
-                    .expirationMinutes(in.readInt())
-                    .applied(in.readByte() != 0)
-                    .closed(in.readByte() != 0)
-                    .build();
-            in.readList(mp.getResponsesReceived(), null);
-            return mp;
+            return new MeetingProposal(in);
         }
 
         @Override
@@ -69,16 +75,19 @@ public class MeetingProposal extends Entity implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeInt(meetingId);
+        super.writeToParcel(dest, flags);
         dest.writeString(location);
         dest.writeString(startDate.toString());
         dest.writeString(startTime.toString());
-        dest.writeParcelable(creator, flags);
-        dest.writeString(timestamp.toString());
         dest.writeInt(expirationMinutes);
         dest.writeByte((byte) (applied ? 1 : 0));
         dest.writeByte((byte) (closed ? 1 : 0));
         dest.writeList(responsesReceived); // TODO: out of order - messy? better way?
+    }
+
+    public static class MeetingProposalBuilder extends MeetingNotificationBuilder {
+        MeetingProposalBuilder() {
+            super();
+        }
     }
 }
