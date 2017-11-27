@@ -128,6 +128,9 @@ public class NavigationUtils {
         intent.putExtra(EXTRA_USER, user);
         intent.putExtra(EXTRA_TERM, term);
         intent.putExtra(EXTRA_COURSE, course);
+        if (selectedUsers == null) {
+            selectedUsers = new ArrayList<>();
+        }
         intent.putParcelableArrayListExtra(EXTRA_SELECTED_USERS, new ArrayList<>(selectedUsers));
         ((AppCompatActivity) context).startActivityForResult(intent, requestCode);
     }
@@ -137,8 +140,20 @@ public class NavigationUtils {
         startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
     }
 
+    public static void startCreateMeetingActivity(Context context, User user, Term term, Course course, ArrayList<User> members) {
+        Intent intent = new Intent(context, CreateMeetingActivity.class);
+        intent.putParcelableArrayListExtra(EXTRA_SELECTED_USERS, members);
+        startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
+    }
+
     public static void startCreateGroupActivity(Context context, User user, Term term, Course course) {
         Intent intent = new Intent(context, CreateGroupActivity.class);
+        startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
+    }
+
+    public static void startCreateGroupActivity(Context context, User user, Term term, Course course, ArrayList<User> members) {
+        Intent intent = new Intent(context, CreateGroupActivity.class);
+        intent.putParcelableArrayListExtra(EXTRA_SELECTED_USERS, members);
         startActivityWithUserAndTermAndCourse(context, intent, user, term, course);
     }
 

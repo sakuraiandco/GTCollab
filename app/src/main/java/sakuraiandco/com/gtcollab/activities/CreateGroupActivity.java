@@ -130,7 +130,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         List<User> members = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
         if (members != null) {
             this.members = members;
-            textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
+//            textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
         }
     }
 
@@ -160,7 +160,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 ArrayList<User> temp = data.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
                 if (temp != null) {
                     members = temp;
-                    textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
+//                    textGroupMembers.setText(joinStrings(getUserNames(members), "\n")); // TODO display users on UI
                 }
             }
         }

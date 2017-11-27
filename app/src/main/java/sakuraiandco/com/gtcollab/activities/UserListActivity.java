@@ -41,6 +41,8 @@ import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_COURSES_AS_MEMBER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_GROUPS_AS_MEMBER;
 import static sakuraiandco.com.gtcollab.constants.Arguments.FILTER_MEETINGS_AS_MEMBER;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateGroupActivity;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCreateMeetingActivity;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserSelectActivityForResult;
 
 public class UserListActivity extends AppCompatActivity {
@@ -179,24 +181,27 @@ public class UserListActivity extends AppCompatActivity {
         // TODO: show user profile?
     }
 
+    // filters out current user from list
     public void createMeetingWithMembers(MenuItem item) {
-        // TODO: fill out once/if creating private meetings implemented (little point in doubling notifications for people in your class)
+        ArrayList<User> users = (ArrayList) userListAdapter.getData();
+        ArrayList<User> tempUsers = filterUsers(users);
+        startCreateMeetingActivity(this, user, null, course, tempUsers);
     }
 
     public void createGroupWithMembers(MenuItem item) {
         ArrayList<User> users = (ArrayList) userListAdapter.getData();
-        // filters out current user from list
+        ArrayList<User> tempUsers = filterUsers(users);
+        startCreateGroupActivity(this, user, null, course, tempUsers);
+    }
+
+    // filters out current user from list
+    private ArrayList<User> filterUsers(ArrayList<User> users) {
         ArrayList<User> tempUsers = new ArrayList<>(users.size() - 1);
         for (User user: users) {
             if (user.getId() != this.user.getId()) {
                 tempUsers.add(user);
             }
         }
-        Intent intent = new Intent(this, CreateGroupActivity.class);
-        intent.putParcelableArrayListExtra(EXTRA_SELECTED_USERS, tempUsers);
-        intent.putExtra(EXTRA_COURSE, course);
-        intent.putExtra(EXTRA_TERM, term);
-        intent.putExtra(EXTRA_USER, user);
-        startActivity(intent);
+        return tempUsers;
     }
 }

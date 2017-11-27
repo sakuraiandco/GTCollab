@@ -19,6 +19,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import sakuraiandco.com.gtcollab.R;
@@ -30,11 +31,18 @@ import sakuraiandco.com.gtcollab.domain.User;
 import sakuraiandco.com.gtcollab.rest.MeetingDAO;
 import sakuraiandco.com.gtcollab.rest.base.BaseDAO;
 
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_REQUEST_CODE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.DEFAULT_RESULT_CODE;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_COURSE;
+import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_SELECTED_USERS;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_TERM;
 import static sakuraiandco.com.gtcollab.constants.Arguments.EXTRA_USER;
 import static sakuraiandco.com.gtcollab.constants.Constants.TAB_MEETINGS;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserIDs;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.getUserNames;
+import static sakuraiandco.com.gtcollab.utils.GeneralUtils.joinStrings;
 import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startCourseActvitiy;
+import static sakuraiandco.com.gtcollab.utils.NavigationUtils.startUserSelectActivityForResult;
 
 public class CreateMeetingActivity extends AppCompatActivity {
 
@@ -54,6 +62,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
     User user;
     Term term;
     Course course;
+    List<User> members;
 
     // variables
     DateTime now;
@@ -78,15 +87,20 @@ public class CreateMeetingActivity extends AppCompatActivity {
             public void onDAOError(BaseDAO.Error error) {
                 Toast.makeText(CreateMeetingActivity.this, "MeetingDAO error", Toast.LENGTH_SHORT).show(); // TODO: error handling - handle server-side validation error
             }
+
             @Override
-            public void onListReady(List<Meeting> meetings) {}
+            public void onListReady(List<Meeting> meetings) {
+            }
+
             @Override
             public void onObjectReady(Meeting meeting) {
                 Toast.makeText(CreateMeetingActivity.this, "Created new meeting: " + meeting.getName(), Toast.LENGTH_SHORT).show();
                 startCourseActvitiy(CreateMeetingActivity.this, user, term, course, TAB_MEETINGS);
             }
+
             @Override
-            public void onObjectDeleted() {}
+            public void onObjectDeleted() {
+            }
         });
 
         // handle intent
@@ -164,6 +178,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
                             .startTime(startTime)
                             .durationMinutes(Integer.valueOf(editMeetingDuration.getText().toString())) // TODO: validate
                             .courseId(course.getId())
+                            .members(getUserIDs(members))
                             .build();
                     meetingDAO.create(m);
                 }
@@ -191,6 +206,10 @@ public class CreateMeetingActivity extends AppCompatActivity {
         now = DateTime.now();
         startDate = now.toLocalDate();
         startTime = now.toLocalTime();
+        List<User> members = intent.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
+        if (members != null) {
+            this.members = members;
+        }
     }
 
     @Override
@@ -211,4 +230,18 @@ public class CreateMeetingActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == DEFAULT_REQUEST_CODE && resultCode == DEFAULT_RESULT_CODE) {
+            ArrayList<User> temp = data.getParcelableArrayListExtra(EXTRA_SELECTED_USERS);
+            if (temp != null) {
+                members = temp;
+            }
+        }
+    }
+
+    public void selectMembers(View view) {
+        startUserSelectActivityForResult(this, user, term, course, members, DEFAULT_REQUEST_CODE);
+    }
 }
